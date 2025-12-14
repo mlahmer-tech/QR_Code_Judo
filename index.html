@@ -137,14 +137,14 @@
           <div>
             <div class="label">
               <span>Nom</span>
-              <span class="req">Obligatoire</span>
+              <span class="req">⚠️ Obligatoire</span>
             </div>
             <input id="nom" placeholder="JORDAN" autocomplete="family-name" required>
           </div>
           <div>
             <div class="label">
               <span>Prénom</span>
-              <span class="req">Obligatoire</span>
+              <span class="req">⚠️ Obligatoire</span>
             </div>
             <input id="prenom" placeholder="Mickael" autocomplete="given-name" required>
           </div>
@@ -153,7 +153,7 @@
         <div style="margin-top:12px">
           <div class="label">
             <span>Club</span>
-            <span class="req">Obligatoire</span>
+            <span class="req">⚠️ Obligatoire</span>
           </div>
           <select id="club" required>
             <option value="">— Sélectionne un club —</option>
@@ -163,7 +163,7 @@
         <div style="margin-top:12px">
           <div class="label">
             <span>Sexe</span>
-            <span class="req">Obligatoire</span>
+            <span class="req">⚠️ Obligatoire</span>
           </div>
           <select id="sexe" required>
             <option value="">— Sélectionne —</option>
@@ -173,7 +173,7 @@
         </div>
 
         <div class="actions">
-          <button class="btn" id="resetBtn">Réinitialiser</button>
+          <button class="btn" id="resetBtn">Réinitialiser ✏️</button>
         </div>
 
         <div class="hint" id="formHint"></div>
@@ -288,7 +288,7 @@
           this.empty.style.display = "block";
           this.hint.textContent = "";
           this.payloadBox.style.display = "none";
-          this.formHint.textContent = "Champs manquants : " + missing.join(", ");
+          this.formHint.textContent = "🚨 Champs manquants : " + missing.join(", ");
           return;
         }
 
