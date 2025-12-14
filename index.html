@@ -16,7 +16,7 @@
       --r:22px;
     }
     *{box-sizing:border-box}
-    body{      
+    body{
       margin:0; min-height:100vh; padding:22px;
       display:flex; justify-content:center; align-items:center;
       font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Arial,sans-serif;
@@ -139,14 +139,14 @@
               <span>Nom</span>
               <span class="req">Obligatoire</span>
             </div>
-            <input id="nom" placeholder="JORDAN" autocomplete="family-name" required>
+            <input id="nom" placeholder="LAHMER" autocomplete="family-name" required>
           </div>
           <div>
             <div class="label">
               <span>Prénom</span>
               <span class="req">Obligatoire</span>
             </div>
-            <input id="prenom" placeholder="Michael" autocomplete="given-name" required>
+            <input id="prenom" placeholder="Mehdi" autocomplete="given-name" required>
           </div>
         </div>
 
@@ -159,145 +159,3 @@
             <option value="">— Sélectionne un club —</option>
           </select>
         </div>
-
-        <div class="actions">
-          <button class="btn" id="resetBtn">Réinitialiser</button>
-        </div>
-
-        <div class="hint" id="formHint"></div>
-      </div>
-
-      <div class="qrBox">
-        <div class="qrFrame">
-          <img id="qr" alt="QR Code">
-          <div id="empty" class="hint" style="padding:18px;max-width:340px;">
-            Renseigne <b>Nom</b>, <b>Prénom</b> et <b>Club</b> pour afficher le QR.
-          </div>
-        </div>
-
-        <div class="hint" id="hint"></div>
-        <div class="payload" id="payload"></div>
-
-        <div class="hint" style="margin-top:12px;">
-          Astuce 👉 appui long sur le QR → <b>Enregistrer l’image</b>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // ------------------------------------------------------------
-    // 1) "Classe" qui fournit la liste des clubs autorisés
-    // ------------------------------------------------------------
-    class ClubsProvider {
-      static list() {
-        return [
-          "Paris",
-          "Nice",
-          "Lyon",
-          "Marseille",
-          "Lille",
-          "Toulouse",
-          "Chambly"          
-        ];
-      }
-    }
-
-    // ------------------------------------------------------------
-    // 2) Service QR (génère l'URL d'image QR)
-    // ------------------------------------------------------------
-    class QrService {
-      static url(payload, size = 520) {
-        return "https://api.qrserver.com/v1/create-qr-code/?size="
-          + size + "x" + size
-          + "&data=" + encodeURIComponent(payload);
-      }
-    }
-
-    // ------------------------------------------------------------
-    // 3) App (contrôle UI)
-    // ------------------------------------------------------------
-    class App {
-      constructor() {
-        this.nom = document.getElementById("nom");
-        this.prenom = document.getElementById("prenom");
-        this.club = document.getElementById("club");
-        this.qr = document.getElementById("qr");
-        this.empty = document.getElementById("empty");
-        this.hint = document.getElementById("hint");
-        this.payloadBox = document.getElementById("payload");
-        this.resetBtn = document.getElementById("resetBtn");
-        this.formHint = document.getElementById("formHint");
-      }
-
-      init() {
-        this.populateClubs();
-
-        // select: "input" ne fire pas toujours pareil sur iOS → on met input + change
-        this.nom.addEventListener("input", () => this.update());
-        this.prenom.addEventListener("input", () => this.update());
-        this.club.addEventListener("change", () => this.update());
-        this.club.addEventListener("input", () => this.update());
-
-        this.resetBtn.addEventListener("click", () => this.reset());
-
-        this.update();
-      }
-
-      populateClubs() {
-        const clubs = ClubsProvider.list();
-        clubs.forEach(c => {
-          const opt = document.createElement("option");
-          opt.value = c;
-          opt.textContent = c;
-          this.club.appendChild(opt);
-        });
-      }
-
-      buildPayload() {
-        const n = this.nom.value.trim();
-        const p = this.prenom.value.trim();
-        const c = this.club.value.trim();
-        // on garde le payload interne (si tu veux le changer plus tard, c'est ici)
-        return { n, p, c, payload: [n, p, c].join(";") };
-      }
-
-      update() {
-        const { n, p, c, payload } = this.buildPayload();
-
-        const missing = [];
-        if (!n) missing.push("Nom");
-        if (!p) missing.push("Prénom");
-        if (!c) missing.push("Club");
-
-        if (missing.length > 0) {
-          this.qr.style.display = "none";
-          this.empty.style.display = "block";
-          this.hint.textContent = "";
-          this.payloadBox.style.display = "none";
-          this.formHint.textContent = "Champs manquants : " + missing.join(", ");
-          return;
-        }
-
-        this.formHint.textContent = "";
-        this.qr.src = QrService.url(payload, 520);
-        this.qr.style.display = "block";
-        this.empty.style.display = "none";
-
-        this.hint.textContent = "Données encodées :";
-        this.payloadBox.textContent = payload;
-        this.payloadBox.style.display = "block";
-      }
-
-      reset() {
-        this.nom.value = "";
-        this.prenom.value = "";
-        this.club.value = "";
-        this.update();
-      }
-    }
-
-    new App().init();
-  </script>
-</body>
-</html>
