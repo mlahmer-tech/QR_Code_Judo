@@ -8,13 +8,17 @@
   <style>
     :root{
       --bg:#0b0b0f;
-      --card:rgba(255,255,255,.10);
       --stroke:rgba(255,255,255,.14);
       --text:rgba(255,255,255,.92);
       --muted:rgba(255,255,255,.68);
       --shadow:0 18px 50px rgba(0,0,0,.45);
       --r:22px;
+
+      --ok: rgba(60,220,140,.95);
+      --warn: rgba(255,205,80,.95);
+      --bad: rgba(255,105,105,.95);
     }
+
     *{box-sizing:border-box}
     body{
       margin:0; min-height:100vh; padding:22px;
@@ -27,9 +31,10 @@
         radial-gradient(900px 700px at 40% 90%, rgba(255,80,160,.28), transparent 65%),
         var(--bg);
     }
-    .wrap{width:100%;max-width:540px}
-    .header{text-align:center;margin-bottom:16px}
-    .title{margin:0 0 6px;font-weight:800;letter-spacing:-.02em;font-size:28px}
+
+    .wrap{width:100%;max-width:560px}
+    .header{text-align:center;margin-bottom:14px}
+    .title{margin:0 0 6px;font-weight:850;letter-spacing:-.02em;font-size:30px}
     .sub{margin:0;color:var(--muted);font-size:14px;line-height:1.35}
 
     .card{
@@ -41,25 +46,94 @@
       backdrop-filter:blur(14px);
       -webkit-backdrop-filter:blur(14px);
     }
+
+    /* Progress bar */
+    .topbar{
+      height:8px;
+      background:rgba(255,255,255,.08);
+      border-bottom:1px solid rgba(255,255,255,.08);
+      position:relative;
+      overflow:hidden;
+    }
+    .topbar > div{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, rgba(0,200,255,.9), rgba(120,80,255,.9), rgba(255,80,160,.9));
+      transition:width .25s ease;
+    }
+
     .sec{padding:18px}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     @media (max-width:420px){.row{grid-template-columns:1fr}}
+
     .label{
-      font-size:12px;color:var(--muted);margin:0 0 8px;padding-left:4px;
-      display:flex;align-items:center;justify-content:space-between;gap:8px;
+      font-size:12px;color:var(--muted);
+      margin:0 0 8px;padding-left:4px;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
     }
-    .req{
-      font-size:11px;
-      color:rgba(255,255,255,.75);
+
+    /* Apple-like chip */
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      border-radius:999px;
       border:1px solid rgba(255,255,255,.16);
       background:rgba(0,0,0,.18);
-      padding:4px 8px;
+      color:rgba(255,255,255,.82);
+      font-size:11px;
+      white-space:nowrap;
+
+      transition:opacity .18s ease, transform .18s ease;
+    }
+    .chip .dot{
+      width:7px;height:7px;border-radius:99px;
+      background: var(--warn);
+      box-shadow:0 0 0 3px rgba(255,205,80,.18);
+      flex:0 0 auto;
+    }
+    .chip.ok .dot{
+      background: var(--ok);
+      box-shadow:0 0 0 3px rgba(60,220,140,.18);
+    }
+    .chip.hidden{
+      opacity:0;
+      transform:translateY(-2px) scale(.98);
+      pointer-events:none;
+    }
+
+    /* Field wrapper for checkmark */
+    .field{ position:relative; }
+    .check{
+      position:absolute;
+      right:12px;
+      top:50%;
+      transform:translateY(-50%) scale(.92);
+      width:22px;height:22px;
       border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.18);
+      color:rgba(255,255,255,.88);
+      font-size:13px;
+      opacity:0;
+      transition:opacity .18s ease, transform .18s ease;
+      pointer-events:none;
+    }
+    .check.show{
+      opacity:1;
+      transform:translateY(-50%) scale(1);
+      border-color:rgba(60,220,140,.35);
+      box-shadow:0 0 0 6px rgba(60,220,140,.10);
     }
 
     input, select{
       width:100%;
       padding:14px;
+      padding-right:44px; /* place for check */
       font-size:16px;
       border-radius:16px;
       border:1px solid rgba(255,255,255,.14);
@@ -68,9 +142,23 @@
       outline:none;
       -webkit-appearance:none;
       appearance:none;
+      transition:border-color .2s ease, box-shadow .2s ease;
     }
     input::placeholder{color:rgba(255,255,255,.35)}
-    input:focus, select:focus{border-color:rgba(120,180,255,.55)}
+    input:focus, select:focus{
+      border-color:rgba(120,180,255,.55);
+      box-shadow:0 0 0 6px rgba(120,180,255,.12);
+    }
+
+    /* States */
+    .is-empty{
+      border-color:rgba(255,205,80,.40) !important;
+      box-shadow:0 0 0 6px rgba(255,205,80,.09);
+    }
+    .is-ok{
+      border-color:rgba(60,220,140,.45) !important;
+      box-shadow:0 0 0 6px rgba(60,220,140,.10);
+    }
 
     .actions{
       display:flex;
@@ -83,15 +171,22 @@
       border-radius:16px;
       border:1px solid rgba(255,255,255,.16);
       background:rgba(0,0,0,.18);
-      color:rgba(255,255,255,.9);
+      color:rgba(255,255,255,.92);
       font-size:15px;
       cursor:pointer;
     }
     .btn:active{transform:scale(.99)}
 
+    .mini{
+      margin-top:10px;
+      font-size:12px;
+      color:rgba(255,255,255,.72);
+      line-height:1.4;
+    }
+
     .qrBox{
       padding:16px 18px 18px;
-      border-top:1px solid var(--stroke);
+      border-top:1px solid rgba(255,255,255,.14);
       background:rgba(0,0,0,.12);
       text-align:center;
     }
@@ -107,7 +202,21 @@
       justify-content:center;
       overflow:hidden;
     }
-    #qr{width:100%;height:100%;object-fit:contain;display:none}
+    #qr{
+      width:100%;height:100%;
+      object-fit:contain;
+      display:none;
+      opacity:0;
+      transform:scale(.98);
+    }
+    #qr.show{
+      display:block;
+      animation: qrIn .26s ease forwards;
+    }
+    @keyframes qrIn{
+      to{ opacity:1; transform:scale(1); }
+    }
+
     .hint{margin-top:12px;font-size:13px;color:var(--muted);line-height:1.45}
     .payload{
       margin-top:10px;
@@ -132,51 +241,66 @@
     </div>
 
     <div class="card">
+      <div class="topbar"><div id="progressBar"></div></div>
+
       <div class="sec">
         <div class="row">
           <div>
             <div class="label">
               <span>Nom</span>
-              <span class="req" data-for="nom">⚠️ Obligatoire</span>
+              <span class="chip" data-for="nom"><span class="dot"></span><span class="txt">Requis</span></span>
             </div>
-            <input id="nom" placeholder="JORDAN" autocomplete="family-name" required>
+            <div class="field">
+              <input id="nom" placeholder="LAHMER" autocomplete="family-name" required>
+              <div class="check" id="check-nom">✓</div>
+            </div>
           </div>
+
           <div>
             <div class="label">
               <span>Prénom</span>
-              <span class="req" data-for="prenom">⚠️ Obligatoire</span>
+              <span class="chip" data-for="prenom"><span class="dot"></span><span class="txt">Requis</span></span>
             </div>
-            <input id="prenom" placeholder="Mickael" autocomplete="given-name" required>
+            <div class="field">
+              <input id="prenom" placeholder="Mehdi" autocomplete="given-name" required>
+              <div class="check" id="check-prenom">✓</div>
+            </div>
           </div>
         </div>
 
         <div style="margin-top:12px">
           <div class="label">
             <span>Club</span>
-            <span class="req" data-for="club">⚠️ Obligatoire</span>
+            <span class="chip" data-for="club"><span class="dot"></span><span class="txt">Requis</span></span>
           </div>
-          <select id="club" required>
-            <option value="">— Sélectionne un club —</option>
-          </select>
+          <div class="field">
+            <select id="club" required>
+              <option value="">— Sélectionne un club —</option>
+            </select>
+            <div class="check" id="check-club">✓</div>
+          </div>
         </div>
 
         <div style="margin-top:12px">
           <div class="label">
             <span>Sexe</span>
-            <span class="req" data-for="sexe">⚠️ Obligatoire</span>
+            <span class="chip" data-for="sexe"><span class="dot"></span><span class="txt">Requis</span></span>
           </div>
-          <select id="sexe" required>
-            <option value="">— Sélectionne —</option>
-            <option value="Masculin">Masculin</option>
-            <option value="Féminin">Féminin</option>
-          </select>
+          <div class="field">
+            <select id="sexe" required>
+              <option value="">— Sélectionne —</option>
+              <option value="Masculin">Masculin</option>
+              <option value="Féminin">Féminin</option>
+            </select>
+            <div class="check" id="check-sexe">✓</div>
+          </div>
         </div>
 
         <div class="actions">
           <button class="btn" id="resetBtn">Réinitialiser ✏️</button>
         </div>
 
-        <div class="hint" id="formHint"></div>
+        <div class="mini" id="formHint"></div>
       </div>
 
       <div class="qrBox">
@@ -199,17 +323,7 @@
 
   <script>
     class ClubsProvider {
-      static list() {
-        return [
-          "Paris",
-          "Nice",
-          "Lyon",
-          "Marseille",
-          "Lille",
-          "Toulouse",
-          "Chambly"
-        ];
-      }
+      static list() { return ["Paris","Nice","Lyon","Marseille","Lille","Toulouse","Chambly"]; }
     }
 
     class QrService {
@@ -227,6 +341,11 @@
         this.club = document.getElementById("club");
         this.sexe = document.getElementById("sexe");
 
+        this.checkNom = document.getElementById("check-nom");
+        this.checkPrenom = document.getElementById("check-prenom");
+        this.checkClub = document.getElementById("check-club");
+        this.checkSexe = document.getElementById("check-sexe");
+
         this.qr = document.getElementById("qr");
         this.empty = document.getElementById("empty");
         this.hint = document.getElementById("hint");
@@ -234,15 +353,28 @@
 
         this.resetBtn = document.getElementById("resetBtn");
         this.formHint = document.getElementById("formHint");
+
+        this.chips = document.querySelectorAll(".chip[data-for]");
+        this.progressBar = document.getElementById("progressBar");
+
+        this.fields = [
+          { id:"nom",   el:this.nom,   check:this.checkNom },
+          { id:"prenom",el:this.prenom,check:this.checkPrenom },
+          { id:"club",  el:this.club,  check:this.checkClub },
+          { id:"sexe",  el:this.sexe,  check:this.checkSexe },
+        ];
+
+        this.qrShown = false;
       }
 
       init() {
         this.populateClubs();
 
-        this.nom.addEventListener("input", () => this.update());
-        this.prenom.addEventListener("input", () => this.update());
+        // Text
+        this.nom.addEventListener("input", () => { this.normalize(); this.update(); });
+        this.prenom.addEventListener("input", () => { this.normalize(); this.update(); });
 
-        // iOS : select → change + input
+        // iOS: select → change + input
         [this.club, this.sexe].forEach(el => {
           el.addEventListener("change", () => this.update());
           el.addEventListener("input", () => this.update());
@@ -254,8 +386,7 @@
       }
 
       populateClubs() {
-        const clubs = ClubsProvider.list();
-        clubs.forEach(c => {
+        ClubsProvider.list().forEach(c => {
           const opt = document.createElement("option");
           opt.value = c;
           opt.textContent = c;
@@ -263,18 +394,86 @@
         });
       }
 
+      normalize() {
+        // Nom MAJ
+        this.nom.value = (this.nom.value || "").toUpperCase();
+
+        // Prénom: capitalise
+        const p = (this.prenom.value || "");
+        if (p) this.prenom.value = p.charAt(0).toUpperCase() + p.slice(1);
+      }
+
+      isFilled(el) {
+        return String(el.value || "").trim().length > 0;
+      }
+
       buildPayload() {
         const n = this.nom.value.trim();
         const p = this.prenom.value.trim();
         const c = this.club.value.trim();
         const s = this.sexe.value.trim();
-
-        // IMPORTANT: ; final demandé
         const payload = `${n};${p};${c};${s};`;
         return { n, p, c, s, payload };
       }
 
+      updateUIStates() {
+        // Chips + checks + input states
+        this.fields.forEach(f => {
+          const ok = this.isFilled(f.el);
+          f.el.classList.toggle("is-ok", ok);
+          f.el.classList.toggle("is-empty", !ok);
+          f.check.classList.toggle("show", ok);
+        });
+
+        this.chips.forEach(chip => {
+          const id = chip.dataset.for;
+          const field = document.getElementById(id);
+          const ok = this.isFilled(field);
+          const txt = chip.querySelector(".txt");
+
+          if (ok) {
+            chip.classList.add("ok");
+            if (txt) txt.textContent = "✓ OK";
+            // disparaît
+            chip.classList.add("hidden");
+          } else {
+            chip.classList.remove("ok");
+            chip.classList.remove("hidden");
+            if (txt) txt.textContent = "Requis";
+          }
+        });
+
+        // Progress
+        const total = this.fields.length;
+        const filled = this.fields.reduce((acc, f) => acc + (this.isFilled(f.el) ? 1 : 0), 0);
+        const pct = Math.round((filled / total) * 100);
+        this.progressBar.style.width = `${pct}%`;
+      }
+
+      setQrVisible(visible) {
+        if (visible) {
+          if (!this.qrShown) {
+            // première apparition: animation
+            this.qr.classList.remove("show");
+            // petit reset pour relancer l'animation
+            void this.qr.offsetWidth;
+            this.qr.classList.add("show");
+            this.qrShown = true;
+          } else {
+            this.qr.style.display = "block";
+          }
+          this.empty.style.display = "none";
+        } else {
+          this.qr.classList.remove("show");
+          this.qr.style.display = "none";
+          this.empty.style.display = "block";
+          this.qrShown = false;
+        }
+      }
+
       update() {
+        this.updateUIStates();
+
         const { n, p, c, s, payload } = this.buildPayload();
 
         const missing = [];
@@ -284,18 +483,16 @@
         if (!s) missing.push("Sexe");
 
         if (missing.length > 0) {
-          this.qr.style.display = "none";
-          this.empty.style.display = "block";
+          this.setQrVisible(false);
           this.hint.textContent = "";
           this.payloadBox.style.display = "none";
           this.formHint.textContent = "⛔ Champs manquants : " + missing.join(", ");
           return;
         }
 
-        this.formHint.textContent = "";
+        this.formHint.textContent = "✅ OK — QR prêt";
         this.qr.src = QrService.url(payload, 520);
-        this.qr.style.display = "block";
-        this.empty.style.display = "none";
+        this.setQrVisible(true);
 
         this.hint.textContent = "Données encodées :";
         this.payloadBox.textContent = payload;
