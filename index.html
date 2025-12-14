@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QR Judoka</title>
+
+  <style>
+    :root{
+      --bg:#0b0b0f;
+      --card:rgba(255,255,255,.10);
+      --stroke:rgba(255,255,255,.14);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.68);
+      --shadow:0 18px 50px rgba(0,0,0,.45);
+      --r:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; padding:22px;
+      display:flex; justify-content:center; align-items:center;
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% 10%, rgba(120,80,255,.40), transparent 60%),
+        radial-gradient(900px 700px at 90% 20%, rgba(0,200,255,.35), transparent 60%),
+        radial-gradient(900px 700px at 40% 90%, rgba(255,80,160,.28), transparent 65%),
+        var(--bg);
+    }
+    .wrap{width:100%;max-width:540px}
+    .header{text-align:center;margin-bottom:16px}
+    .title{margin:0 0 6px;font-weight:800;letter-spacing:-.02em;font-size:28px}
+    .sub{margin:0;color:var(--muted);font-size:14px;line-height:1.35}
+
+    .card{
+      border-radius:var(--r);
+      border:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.08));
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+    }
+    .sec{padding:18px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:420px){.row{grid-template-columns:1fr}}
+    .label{font-size:12px;color:var(--muted);margin:0 0 8px;padding-left:4px}
+
+    input, select{
+      width:100%;
+      padding:14px;
+      font-size:16px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.22);
+      color:var(--text);
+      outline:none;
+      -webkit-appearance:none;
+      appearance:none;
+    }
+    input::placeholder{color:rgba(255,255,255,.35)}
+    input:focus, select:focus{border-color:rgba(120,180,255,.55)}
+
+    .actions{
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+    }
+    .btn{
+      flex:1;
+      padding:12px 14px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(0,0,0,.18);
+      color:rgba(255,255,255,.9);
+      font-size:15px;
+      cursor:pointer;
+    }
+    .btn:active{transform:scale(.99)}
+
+    .qrBox{
+      padding:16px 18px 18px;
+      border-top:1px solid var(--stroke);
+      background:rgba(0,0,0,.12);
+      text-align:center;
+    }
+    .qrFrame{
+      margin:8px auto 0;
+      width:min(360px,92%);
+      aspect-ratio:1/1;
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+    #qr{width:100%;height:100%;object-fit:contain;display:none}
+    .hint{margin-top:12px;font-size:13px;color:var(--muted);line-height:1.45}
+    .payload{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      text-align:left;
+      border:1px dashed rgba(255,255,255,.22);
+      background:rgba(0,0,0,.18);
+      word-break:break-word;
+      font-size:13px;
+      color:rgba(255,255,255,.82);
+      display:none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="header">
+      <h1 class="title">Générateur QR Judo</h1>
+      <p class="sub">Format : <b>Nom;Prénom;Club</b> • mise à jour en direct</p>
+    </div>
+
+    <div class="card">
+      <div class="sec">
+        <div class="row">
+          <div>
+            <div class="label">Nom</div>
+            <input id="nom" placeholder="DUPONT" autocomplete="family-name">
+          </div>
+          <div>
+            <div class="label">Prénom</div>
+            <input id="prenom" placeholder="LÉO" autocomplete="given-name">
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="label">Club</div>
+          <select id="club">
+            <option value="">— Sélectionne un club —</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button class="btn" id="copyBtn">Copier (Nom;Prénom;Club)</button>
+          <button class="btn" id="resetBtn">Réinitialiser</button>
+        </div>
+
+        <div class="hint" id="copyHint"></div>
+      </div>
+
+      <div class="qrBox">
+        <div class="qrFrame">
+          <img id="qr" alt="QR Code">
+          <div id="empty" class="hint" style="padding:18px;max-width:340px;">
+            Saisis au moins un champ pour afficher le QR.
+          </div>
+        </div>
+
+        <div class="hint" id="hint"></div>
+        <div class="payload" id="payload"></div>
+        <div class="hint" style="margin-top:12px;">
+          iPhone : appui long sur le QR → <b>Enregistrer l’image</b>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ------------------------------------------------------------
+    // 1) "Classe" qui fournit la liste des clubs autorisés
+    // ------------------------------------------------------------
+    class ClubsProvider {
+      static list() {
+        return [
+          "Judo Paris",
+          "Judo Nice",
+          "Judo Lyon",
+          "Judo Marseille",
+          "Judo Lille",
+          "Judo Toulouse"
+          // 👉 ajoute tes clubs ici
+        ];
+      }
+    }
+
+    // ------------------------------------------------------------
+    // 2) Service QR (génère l'URL d'image QR)
+    // ------------------------------------------------------------
+    class QrService {
+      static url(payload, size = 520) {
+        return "https://api.qrserver.com/v1/create-qr-code/?size="
+          + size + "x" + size
+          + "&data=" + encodeURIComponent(payload);
+      }
+    }
+
+    // ------------------------------------------------------------
+    // 3) App (contrôle UI)
+    // ------------------------------------------------------------
+    class App {
+      constructor() {
+        this.nom = document.getElementById("nom");
+        this.prenom = document.getElementById("prenom");
+        this.club = document.getElementById("club");
+        this.qr = document.getElementById("qr");
+        this.empty = document.getElementById("empty");
+        this.hint = document.getElementById("hint");
+        this.payloadBox = document.getElementById("payload");
+        this.copyBtn = document.getElementById("copyBtn");
+        this.resetBtn = document.getElementById("resetBtn");
+        this.copyHint = document.getElementById("copyHint");
+      }
+
+      init() {
+        this.populateClubs();
+        [this.nom, this.prenom, this.club].forEach(el =>
+          el.addEventListener("input", () => this.update())
+        );
+
+        this.copyBtn.addEventListener("click", () => this.copyPayload());
+        this.resetBtn.addEventListener("click", () => this.reset());
+
+        this.update();
+      }
+
+      populateClubs() {
+        const clubs = ClubsProvider.list();
+        clubs.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c;
+          opt.textContent = c;
+          this.club.appendChild(opt);
+        });
+      }
+
+      buildPayload() {
+        const n = this.nom.value.trim();
+        const p = this.prenom.value.trim();
+        const c = this.club.value.trim();
+        return { n, p, c, payload: [n, p, c].join(";") };
+      }
+
+      update() {
+        const { n, p, c, payload } = this.buildPayload();
+
+        if (!n && !p && !c) {
+          this.qr.style.display = "none";
+          this.empty.style.display = "block";
+          this.hint.textContent = "";
+          this.payloadBox.style.display = "none";
+          return;
+        }
+
+        this.qr.src = QrService.url(payload, 520);
+        this.qr.style.display = "block";
+        this.empty.style.display = "none";
+
+        this.hint.textContent = "Données encodées :";
+        this.payloadBox.textContent = payload;
+        this.payloadBox.style.display = "block";
+      }
+
+      async copyPayload() {
+        const { payload } = this.buildPayload();
+        if (!payload || payload === ";;") return;
+
+        try {
+          await navigator.clipboard.writeText(payload);
+          this.copyHint.textContent = "✅ Copié dans le presse-papiers";
+          setTimeout(() => (this.copyHint.textContent = ""), 1500);
+        } catch (e) {
+          this.copyHint.textContent = "⚠️ Impossible de copier automatiquement (iOS). Sélectionne le texte en bas.";
+          setTimeout(() => (this.copyHint.textContent = ""), 2500);
+        }
+      }
+
+      reset() {
+        this.nom.value = "";
+        this.prenom.value = "";
+        this.club.value = "";
+        this.update();
+      }
+    }
+
+    new App().init();
+  </script>
+</body>
+</html>
