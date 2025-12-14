@@ -159,3 +159,159 @@
             <option value="">— Sélectionne un club —</option>
           </select>
         </div>
+
+        <div style="margin-top:12px">
+          <div class="label">
+            <span>Sexe</span>
+            <span class="req">Obligatoire</span>
+          </div>
+          <select id="sexe" required>
+            <option value="">— Sélectionne —</option>
+            <option value="Masculin">Masculin</option>
+            <option value="Féminin">Féminin</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button class="btn" id="resetBtn">Réinitialiser</button>
+        </div>
+
+        <div class="hint" id="formHint"></div>
+      </div>
+
+      <div class="qrBox">
+        <div class="qrFrame">
+          <img id="qr" alt="QR Code">
+          <div id="empty" class="hint" style="padding:18px;max-width:340px;">
+            Renseigne <b>Nom</b>, <b>Prénom</b>, <b>Club</b> et <b>Sexe</b> pour afficher le QR.
+          </div>
+        </div>
+
+        <div class="hint" id="hint"></div>
+        <div class="payload" id="payload"></div>
+
+        <div class="hint" style="margin-top:12px;">
+          Astuce 👉 appui long sur le QR → <b>Enregistrer l’image</b>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class ClubsProvider {
+      static list() {
+        return [
+          "Paris",
+          "Nice",
+          "Lyon",
+          "Marseille",
+          "Lille",
+          "Toulouse",
+          "Chambly"
+        ];
+      }
+    }
+
+    class QrService {
+      static url(payload, size = 520) {
+        return "https://api.qrserver.com/v1/create-qr-code/?size="
+          + size + "x" + size
+          + "&data=" + encodeURIComponent(payload);
+      }
+    }
+
+    class App {
+      constructor() {
+        this.nom = document.getElementById("nom");
+        this.prenom = document.getElementById("prenom");
+        this.club = document.getElementById("club");
+        this.sexe = document.getElementById("sexe");
+
+        this.qr = document.getElementById("qr");
+        this.empty = document.getElementById("empty");
+        this.hint = document.getElementById("hint");
+        this.payloadBox = document.getElementById("payload");
+
+        this.resetBtn = document.getElementById("resetBtn");
+        this.formHint = document.getElementById("formHint");
+      }
+
+      init() {
+        this.populateClubs();
+
+        this.nom.addEventListener("input", () => this.update());
+        this.prenom.addEventListener("input", () => this.update());
+
+        // iOS : select → change + input
+        [this.club, this.sexe].forEach(el => {
+          el.addEventListener("change", () => this.update());
+          el.addEventListener("input", () => this.update());
+        });
+
+        this.resetBtn.addEventListener("click", () => this.reset());
+
+        this.update();
+      }
+
+      populateClubs() {
+        const clubs = ClubsProvider.list();
+        clubs.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c;
+          opt.textContent = c;
+          this.club.appendChild(opt);
+        });
+      }
+
+      buildPayload() {
+        const n = this.nom.value.trim();
+        const p = this.prenom.value.trim();
+        const c = this.club.value.trim();
+        const s = this.sexe.value.trim();
+
+        // IMPORTANT: ; final demandé
+        const payload = `${n};${p};${c};${s};`;
+        return { n, p, c, s, payload };
+      }
+
+      update() {
+        const { n, p, c, s, payload } = this.buildPayload();
+
+        const missing = [];
+        if (!n) missing.push("Nom");
+        if (!p) missing.push("Prénom");
+        if (!c) missing.push("Club");
+        if (!s) missing.push("Sexe");
+
+        if (missing.length > 0) {
+          this.qr.style.display = "none";
+          this.empty.style.display = "block";
+          this.hint.textContent = "";
+          this.payloadBox.style.display = "none";
+          this.formHint.textContent = "Champs manquants : " + missing.join(", ");
+          return;
+        }
+
+        this.formHint.textContent = "";
+        this.qr.src = QrService.url(payload, 520);
+        this.qr.style.display = "block";
+        this.empty.style.display = "none";
+
+        this.hint.textContent = "Données encodées :";
+        this.payloadBox.textContent = payload;
+        this.payloadBox.style.display = "block";
+      }
+
+      reset() {
+        this.nom.value = "";
+        this.prenom.value = "";
+        this.club.value = "";
+        this.sexe.value = "";
+        this.update();
+      }
+    }
+
+    new App().init();
+  </script>
+</body>
+</html>
