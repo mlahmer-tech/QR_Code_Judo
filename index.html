@@ -44,7 +44,18 @@
     .sec{padding:18px}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     @media (max-width:420px){.row{grid-template-columns:1fr}}
-    .label{font-size:12px;color:var(--muted);margin:0 0 8px;padding-left:4px}
+    .label{
+      font-size:12px;color:var(--muted);margin:0 0 8px;padding-left:4px;
+      display:flex;align-items:center;justify-content:space-between;gap:8px;
+    }
+    .req{
+      font-size:11px;
+      color:rgba(255,255,255,.75);
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(0,0,0,.18);
+      padding:4px 8px;
+      border-radius:999px;
+    }
 
     input, select{
       width:100%;
@@ -117,47 +128,56 @@
   <div class="wrap">
     <div class="header">
       <h1 class="title">Générateur QR Judo</h1>
-      <p class="sub">Format : <b>Nom;Prénom;Club</b> • mise à jour en direct</p>
+      <p class="sub">mise à jour en direct</p>
     </div>
 
     <div class="card">
       <div class="sec">
         <div class="row">
           <div>
-            <div class="label">Nom</div>
-            <input id="nom" placeholder="DUPONT" autocomplete="family-name">
+            <div class="label">
+              <span>Nom</span>
+              <span class="req">Obligatoire</span>
+            </div>
+            <input id="nom" placeholder="DUPONT" autocomplete="family-name" required>
           </div>
           <div>
-            <div class="label">Prénom</div>
-            <input id="prenom" placeholder="LÉO" autocomplete="given-name">
+            <div class="label">
+              <span>Prénom</span>
+              <span class="req">Obligatoire</span>
+            </div>
+            <input id="prenom" placeholder="LÉO" autocomplete="given-name" required>
           </div>
         </div>
 
         <div style="margin-top:12px">
-          <div class="label">Club</div>
-          <select id="club">
+          <div class="label">
+            <span>Club</span>
+            <span class="req">Obligatoire</span>
+          </div>
+          <select id="club" required>
             <option value="">— Sélectionne un club —</option>
           </select>
         </div>
 
         <div class="actions">
-          <button class="btn" id="copyBtn">Copier (Nom;Prénom;Club)</button>
           <button class="btn" id="resetBtn">Réinitialiser</button>
         </div>
 
-        <div class="hint" id="copyHint"></div>
+        <div class="hint" id="formHint"></div>
       </div>
 
       <div class="qrBox">
         <div class="qrFrame">
           <img id="qr" alt="QR Code">
           <div id="empty" class="hint" style="padding:18px;max-width:340px;">
-            Saisis au moins un champ pour afficher le QR.
+            Renseigne <b>Nom</b>, <b>Prénom</b> et <b>Club</b> pour afficher le QR.
           </div>
         </div>
 
         <div class="hint" id="hint"></div>
         <div class="payload" id="payload"></div>
+
         <div class="hint" style="margin-top:12px;">
           iPhone : appui long sur le QR → <b>Enregistrer l’image</b>
         </div>
@@ -206,18 +226,19 @@
         this.empty = document.getElementById("empty");
         this.hint = document.getElementById("hint");
         this.payloadBox = document.getElementById("payload");
-        this.copyBtn = document.getElementById("copyBtn");
         this.resetBtn = document.getElementById("resetBtn");
-        this.copyHint = document.getElementById("copyHint");
+        this.formHint = document.getElementById("formHint");
       }
 
       init() {
         this.populateClubs();
-        [this.nom, this.prenom, this.club].forEach(el =>
-          el.addEventListener("input", () => this.update())
-        );
 
-        this.copyBtn.addEventListener("click", () => this.copyPayload());
+        // select: "input" ne fire pas toujours pareil sur iOS → on met input + change
+        this.nom.addEventListener("input", () => this.update());
+        this.prenom.addEventListener("input", () => this.update());
+        this.club.addEventListener("change", () => this.update());
+        this.club.addEventListener("input", () => this.update());
+
         this.resetBtn.addEventListener("click", () => this.reset());
 
         this.update();
@@ -237,20 +258,28 @@
         const n = this.nom.value.trim();
         const p = this.prenom.value.trim();
         const c = this.club.value.trim();
+        // on garde le payload interne (si tu veux le changer plus tard, c'est ici)
         return { n, p, c, payload: [n, p, c].join(";") };
       }
 
       update() {
         const { n, p, c, payload } = this.buildPayload();
 
-        if (!n && !p && !c) {
+        const missing = [];
+        if (!n) missing.push("Nom");
+        if (!p) missing.push("Prénom");
+        if (!c) missing.push("Club");
+
+        if (missing.length > 0) {
           this.qr.style.display = "none";
           this.empty.style.display = "block";
           this.hint.textContent = "";
           this.payloadBox.style.display = "none";
+          this.formHint.textContent = "Champs manquants : " + missing.join(", ");
           return;
         }
 
+        this.formHint.textContent = "";
         this.qr.src = QrService.url(payload, 520);
         this.qr.style.display = "block";
         this.empty.style.display = "none";
@@ -258,20 +287,6 @@
         this.hint.textContent = "Données encodées :";
         this.payloadBox.textContent = payload;
         this.payloadBox.style.display = "block";
-      }
-
-      async copyPayload() {
-        const { payload } = this.buildPayload();
-        if (!payload || payload === ";;") return;
-
-        try {
-          await navigator.clipboard.writeText(payload);
-          this.copyHint.textContent = "✅ Copié dans le presse-papiers";
-          setTimeout(() => (this.copyHint.textContent = ""), 1500);
-        } catch (e) {
-          this.copyHint.textContent = "⚠️ Impossible de copier automatiquement (iOS). Sélectionne le texte en bas.";
-          setTimeout(() => (this.copyHint.textContent = ""), 2500);
-        }
       }
 
       reset() {
