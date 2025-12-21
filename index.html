@@ -34,7 +34,7 @@
       padding:
         calc(14px + env(safe-area-inset-top))
         14px
-        calc(98px + env(safe-area-inset-bottom)) /* reserve for sticky CTA */
+        calc(104px + env(safe-area-inset-bottom))
         14px;
       font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Arial,sans-serif;
       color:var(--text);
@@ -63,7 +63,6 @@
       border-bottom:1px solid rgba(255,255,255,.10);
       background:rgba(0,0,0,.10);
       text-align:center;
-      position:relative;
     }
     .title{
       margin:0 0 6px;
@@ -79,15 +78,18 @@
       line-height:1.35;
     }
 
-    /* =======================
-       PREMIUM PROGRESS + BACK
-       ======================= */
+    /* ===== Premium progress + back ===== */
     .progressWrap{
       padding:14px 14px 16px;
       border-bottom:1px solid rgba(255,255,255,.10);
       background:rgba(0,0,0,.06);
       position:relative;
       overflow:hidden;
+
+      /* Apple-like: gestures are scoped here only */
+      touch-action: pan-y;
+      user-select:none;
+      -webkit-user-select:none;
     }
 
     .progressTopRow{
@@ -95,9 +97,10 @@
       align-items:center;
       gap:10px;
       margin-bottom:12px;
+      position:relative;
+      z-index:1;
     }
 
-    /* Small back chevron button (top-left near progress) */
     .backMini{
       width:38px;height:38px;
       border-radius:999px;
@@ -108,17 +111,14 @@
       align-items:center;
       justify-content:center;
       cursor:pointer;
-      user-select:none;
       box-shadow:0 16px 40px rgba(0,0,0,.22);
-      transition:transform .08s ease, opacity .16s ease, border-color .16s ease;
+      transition:transform .08s ease, opacity .16s ease;
       flex:0 0 auto;
     }
     .backMini:active{ transform:scale(.99); }
     .backMini[disabled]{ opacity:.35; cursor:not-allowed; }
-
     .backMini svg{ width:18px;height:18px; opacity:.95; }
 
-    /* subtle grain */
     .progressWrap::before{
       content:"";
       position:absolute; inset:0;
@@ -132,7 +132,6 @@
       mix-blend-mode: overlay;
     }
 
-    /* sweep highlight when step validates */
     .progressWrap::after{
       content:"";
       position:absolute;
@@ -149,17 +148,13 @@
       opacity:1;
       animation: wave 720ms cubic-bezier(.2,.9,.2,1) forwards;
     }
-    @keyframes wave{
-      to{ transform:translateX(120%); opacity:0; }
-    }
+    @keyframes wave{ to{ transform:translateX(120%); opacity:0; } }
 
     .qui{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:14px;
-      position:relative;
-      z-index:1;
       width:100%;
     }
 
@@ -169,12 +164,8 @@
       align-items:center;
       justify-content:center;
       cursor:pointer;
-      user-select:none;
-      flex:0 0 auto;
       position:relative;
     }
-
-    /* outer glass ring */
     .node::before{
       content:"";
       position:absolute;
@@ -193,17 +184,10 @@
       border:2px solid rgba(255,255,255,.28);
       background:rgba(0,0,0,.22);
       position:relative;
-      box-shadow:
-        0 14px 28px rgba(0,0,0,.22),
-        inset 0 1px 0 rgba(255,255,255,.10);
-      transition:
-        transform .18s ease,
-        border-color .18s ease,
-        background .18s ease,
-        box-shadow .18s ease;
+      box-shadow: 0 14px 28px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.10);
+      transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
     }
 
-    /* active premium halo */
     .node.active .dot{
       border-color:rgba(10,132,255,.98);
       background:rgba(0,0,0,.10);
@@ -218,20 +202,15 @@
       position:absolute;
       inset:-12px;
       border-radius:999px;
-      background:
-        radial-gradient(circle at 50% 50%,
-          rgba(10,132,255,.24),
-          rgba(10,132,255,0) 62%);
+      background:radial-gradient(circle at 50% 50%, rgba(10,132,255,.24), rgba(10,132,255,0) 62%);
       animation:pulse 1.25s ease-in-out infinite;
       pointer-events:none;
-      filter: blur(.2px);
     }
     @keyframes pulse{
       0%,100%{ transform:scale(.88); opacity:.72 }
       50%{ transform:scale(1.08); opacity:1 }
     }
 
-    /* done = glossy green + pop */
     .node.done .dot{
       background:linear-gradient(180deg, rgba(90,255,150,.98), rgba(30,175,70,.92));
       border-color:rgba(52,199,89,.96);
@@ -253,9 +232,7 @@
       color:#fff;
       text-shadow:0 12px 24px rgba(0,0,0,.35);
     }
-    .node.done.pop .dot{
-      animation: pop 260ms cubic-bezier(.2,.9,.2,1) both;
-    }
+    .node.done.pop .dot{ animation: pop 260ms cubic-bezier(.2,.9,.2,1) both; }
     @keyframes pop{
       0%{ transform:scale(.92) }
       60%{ transform:scale(1.10) }
@@ -277,21 +254,14 @@
       height:100%;
       width:0%;
       border-radius:999px;
-      background:linear-gradient(90deg,
-        rgba(10,132,255,.98),
-        rgba(88,86,214,.96),
-        rgba(255,45,85,.92));
+      background:linear-gradient(90deg, rgba(10,132,255,.98), rgba(88,86,214,.96), rgba(255,45,85,.92));
       transition:width .32s cubic-bezier(.2,.9,.2,1);
       position:relative;
     }
     .line > i::after{
       content:"";
-      position:absolute;
-      inset:0;
-      background:linear-gradient(90deg,
-        rgba(255,255,255,0),
-        rgba(255,255,255,.18),
-        rgba(255,255,255,0));
+      position:absolute; inset:0;
+      background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.18), rgba(255,255,255,0));
       transform:translateX(-55%);
       animation: shine 1.65s linear infinite;
       opacity:.95;
@@ -299,26 +269,20 @@
     @keyframes shine{ to{ transform:translateX(55%);} }
     .line.filled > i{ width:100%; }
 
-    /* =======================
-       Sheet + steps
-       ======================= */
+    /* ===== Sheet / step ===== */
     .sec{ padding:16px; }
-
     .sheet{
       border:1px solid rgba(255,255,255,.12);
       background:rgba(0,0,0,.14);
       border-radius:22px;
       overflow:hidden;
-      position:relative;
     }
-
     .sheetTop{
       padding:14px 14px 12px;
       display:flex;
       align-items:flex-start;
       gap:12px;
     }
-
     .badge{
       width:34px;height:34px;border-radius:999px;
       display:flex;align-items:center;justify-content:center;
@@ -330,20 +294,8 @@
       box-shadow:0 14px 34px rgba(0,0,0,.22);
       flex:0 0 auto;
     }
-
-    .stepTitle{
-      margin:0;
-      font-size:18px;
-      font-weight:950;
-      letter-spacing:-.02em;
-      line-height:1.15;
-    }
-    .stepSub{
-      margin:6px 0 0;
-      font-size:13px;
-      color:var(--muted);
-      line-height:1.35;
-    }
+    .stepTitle{ margin:0; font-size:18px; font-weight:950; letter-spacing:-.02em; line-height:1.15; }
+    .stepSub{ margin:6px 0 0; font-size:13px; color:var(--muted); line-height:1.35; }
 
     .divider{ height:1px; background:var(--sep); }
 
@@ -364,13 +316,6 @@
     .fieldArea.in .stage{
       transform:translateY(12px) scale(.985);
       opacity:0;
-    }
-
-    /* swipe hint overlay (invisible, but captures touch) */
-    .swipeZone{
-      position:absolute;
-      inset:0;
-      background:transparent;
     }
 
     .field{ position:relative; }
@@ -394,13 +339,10 @@
     input::placeholder{ color:rgba(255,255,255,.28); }
 
     .chev{
-      position:absolute;
-      right:14px;
-      top:50%;
+      position:absolute; right:14px; top:50%;
       transform:translateY(-50%);
       width:16px;height:16px;
-      opacity:.78;
-      pointer-events:none;
+      opacity:.78; pointer-events:none;
       background:conic-gradient(from 180deg, rgba(255,255,255,.0), rgba(255,255,255,.85), rgba(255,255,255,.0));
       -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="black" d="M5.6 7.4a1 1 0 0 1 1.4 0L10 10.4l3-3a1 1 0 1 1 1.4 1.4l-3.7 3.7a1 1 0 0 1-1.4 0L5.6 8.8a1 1 0 0 1 0-1.4Z"/></svg>') center/contain no-repeat;
               mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="black" d="M5.6 7.4a1 1 0 0 1 1.4 0L10 10.4l3-3a1 1 0 1 1 1.4 1.4l-3.7 3.7a1 1 0 0 1-1.4 0L5.6 8.8a1 1 0 0 1 0-1.4Z"/></svg>') center/contain no-repeat;
@@ -410,8 +352,6 @@
       border-color:rgba(52,199,89,.45) !important;
       box-shadow:0 0 0 7px rgba(52,199,89,.12);
     }
-
-    /* invalid micro feedback: shake + soft red glow */
     .invalid{
       border-color:rgba(255,95,95,.55) !important;
       box-shadow:0 0 0 7px rgba(255,95,95,.10);
@@ -448,9 +388,7 @@
       box-shadow:0 0 0 7px rgba(52,199,89,.10);
     }
 
-    /* =======================
-       QR
-       ======================= */
+    /* ===== QR ===== */
     .qrBox{
       padding:14px 16px 18px;
       border-top:1px solid rgba(255,255,255,.14);
@@ -543,22 +481,16 @@
       display:none;
     }
 
-    /* =======================
-       Sticky CTA bar (single)
-       ======================= */
+    /* ===== Sticky CTA (single) ===== */
     .ctaBar{
       position:fixed;
       left:0; right:0;
       bottom:0;
-      padding:
-        12px
-        14px
-        calc(12px + env(safe-area-inset-bottom))
-        14px;
+      padding: 12px 14px calc(12px + env(safe-area-inset-bottom)) 14px;
       display:flex;
       justify-content:center;
       z-index:9999;
-      pointer-events:none; /* allow only button to receive */
+      pointer-events:none;
     }
     .ctaGlass{
       width:min(680px, calc(100% - 28px));
@@ -581,9 +513,7 @@
       font-size:16px;
       letter-spacing:-.01em;
       cursor:pointer;
-      user-select:none;
-      background:
-        linear-gradient(180deg, rgba(10,132,255,.26), rgba(0,0,0,.16));
+      background:linear-gradient(180deg, rgba(10,132,255,.26), rgba(0,0,0,.16));
       box-shadow:0 16px 46px rgba(10,132,255,.12);
       position:relative;
       overflow:hidden;
@@ -602,7 +532,6 @@
     }
     @keyframes btnshine{ to{ transform:translateX(60%);} }
 
-    /* Prefer reduced motion */
     @media (prefers-reduced-motion: reduce){
       *{ animation:none !important; transition:none !important; }
       .progressWrap::after{ display:none; }
@@ -619,7 +548,7 @@
         <p class="sub">Renseigne les infos, puis récupère ton QR.</p>
       </div>
 
-      <div class="progressWrap" id="progressWrap">
+      <div class="progressWrap" id="progressWrap" aria-label="Progression">
         <div class="progressTopRow">
           <button class="backMini" id="backMini" disabled aria-label="Retour">
             <svg viewBox="0 0 20 20" fill="none">
@@ -656,7 +585,6 @@
 
           <div class="fieldArea" id="fieldArea">
             <div class="stage" id="stage"></div>
-            <div class="swipeZone" id="swipeZone" aria-hidden="true"></div>
           </div>
         </div>
       </div>
@@ -678,7 +606,6 @@
     </div>
   </div>
 
-  <!-- Sticky single CTA -->
   <div class="ctaBar">
     <div class="ctaGlass">
       <button class="ctaBtn" id="ctaBtn" disabled>Continuer</button>
@@ -696,6 +623,13 @@
           + size + "x" + size
           + "&data=" + encodeURIComponent(payload);
       }
+    }
+
+    class Haptics {
+      // iOS Safari often ignores vibrate; harmless fallback.
+      static light(){ try{ navigator.vibrate?.(10); }catch(e){} }
+      static success(){ try{ navigator.vibrate?.([12, 18, 12]); }catch(e){} }
+      static error(){ try{ navigator.vibrate?.([20, 30, 20]); }catch(e){} }
     }
 
     class SoundService {
@@ -732,8 +666,8 @@
           const v = this._cachedVoice || this.pickVoice(voices);
           const u = new SpeechSynthesisUtterance("はじめ！");
           u.lang = "ja-JP";
-          u.rate = 1.10;   // energetic
-          u.pitch = 0.72;  // deeper (male-ish)
+          u.rate = 1.10;
+          u.pitch = 0.72;
           u.volume = 1.0;
           if (v) u.voice = v;
           window.speechSynthesis.cancel();
@@ -752,10 +686,8 @@
         this.badge = document.getElementById("badge");
         this.stepTitle = document.getElementById("stepTitle");
         this.stepSub = document.getElementById("stepSub");
-
         this.stage = document.getElementById("stage");
         this.fieldArea = document.getElementById("fieldArea");
-        this.swipeZone = document.getElementById("swipeZone");
 
         this.ctaBtn = document.getElementById("ctaBtn");
 
@@ -769,7 +701,8 @@
         this.current = 0;
         this.playedSound = false;
 
-        this.currentFieldEl = null; // input/select
+        this.currentFieldEl = null;
+
         this.steps = [
           { key:"nom", title:"Nom", sub:"Le nom passe automatiquement en MAJ.",
             render: () => this.renderInput("nom","JORDAN","family-name"),
@@ -789,10 +722,10 @@
       init() {
         SoundService.warmupVoices();
 
-        // mini back
         this.backMini.addEventListener("click", () => this.prev());
+        this.ctaBtn.addEventListener("click", () => this.next());
 
-        // click nodes to jump (only up to reachable)
+        // Click on nodes (only up to reachable)
         this.nodes.forEach(n => {
           n.addEventListener("click", () => {
             const i = Number(n.dataset.i);
@@ -801,18 +734,15 @@
           });
         });
 
-        // sticky CTA
-        this.ctaBtn.addEventListener("click", () => this.next());
-
-        // swipe gestures
-        this.bindSwipe();
+        // Apple-like: swipe ONLY on progress bar area
+        this.bindSwipeOnProgress();
 
         this.renderStep(this.current, false);
         this.refresh();
       }
 
-      bindSwipe() {
-        let startX = 0, startY = 0, tracking = false;
+      bindSwipeOnProgress() {
+        let startX=0, startY=0, tracking=false;
 
         const onStart = (e) => {
           const t = e.touches ? e.touches[0] : e;
@@ -826,7 +756,8 @@
           const t = e.touches ? e.touches[0] : e;
           const dx = t.clientX - startX;
           const dy = t.clientY - startY;
-          // If mostly horizontal, prevent scroll bounce
+
+          // Only prevent default if clearly horizontal (keeps scroll natural)
           if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 16) {
             e.preventDefault?.();
           }
@@ -835,26 +766,19 @@
         const onEnd = (e) => {
           if (!tracking) return;
           tracking = false;
+
           const t = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0] : e;
           const dx = t.clientX - startX;
           const dy = t.clientY - startY;
 
-          // threshold
           if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy)) return;
 
-          if (dx < 0) {
-            // swipe left -> next
-            this.next();
-          } else {
-            // swipe right -> prev
-            this.prev();
-          }
+          if (dx < 0) this.next(); else this.prev();
         };
 
-        // Use swipeZone so inputs still usable; touch events on overlay (transparent)
-        this.swipeZone.addEventListener("touchstart", onStart, { passive:true });
-        this.swipeZone.addEventListener("touchmove", onMove, { passive:false });
-        this.swipeZone.addEventListener("touchend", onEnd, { passive:true });
+        this.progressWrap.addEventListener("touchstart", onStart, { passive:true });
+        this.progressWrap.addEventListener("touchmove", onMove, { passive:false });
+        this.progressWrap.addEventListener("touchend", onEnd, { passive:true });
       }
 
       renderStep(i, animateIn=true) {
@@ -896,9 +820,7 @@
           input.classList.toggle("is-ok", ok);
           check.classList.toggle("show", ok);
 
-          // remove invalid state if user is typing
           input.classList.remove("invalid");
-
           this.refresh();
         };
 
@@ -935,9 +857,7 @@
           select.classList.toggle("is-ok", ok);
           check.classList.toggle("show", ok);
 
-          // remove invalid state when user chooses
           select.classList.remove("invalid");
-
           this.refresh();
         };
 
@@ -951,14 +871,14 @@
       next() {
         if (!this.isStepOk(this.current)) {
           this.invalidNudge();
+          Haptics.error();
           return;
         }
 
-        // micro animations: sweep + dot pop
+        Haptics.light();
         this.wave();
         this.popDone(this.current);
 
-        // spring transition to next
         this.fieldArea.classList.add("out");
         setTimeout(() => {
           if (this.current < this.steps.length - 1) {
@@ -975,6 +895,8 @@
 
       prev() {
         if (this.current === 0) return;
+        Haptics.light();
+
         this.fieldArea.classList.add("out");
         setTimeout(() => {
           this.current--;
@@ -989,6 +911,8 @@
         const max = this.maxReachableStep();
         if (i > max) return;
 
+        Haptics.light();
+
         this.fieldArea.classList.add("out");
         setTimeout(() => {
           this.current = i;
@@ -999,7 +923,6 @@
       }
 
       invalidNudge() {
-        // shake + soft red glow on the field
         const el = this.currentFieldEl;
         if (!el) return;
         el.classList.remove("invalid");
@@ -1037,15 +960,10 @@
       refresh() {
         const ok = this.isStepOk(this.current);
 
-        // back mini
         this.backMini.disabled = (this.current === 0);
-
-        // single CTA label and enabled state
         this.ctaBtn.disabled = !ok;
-        this.ctaBtn.textContent =
-          (this.current === this.steps.length - 1) ? "Terminer" : "Continuer";
+        this.ctaBtn.textContent = (this.current === this.steps.length - 1) ? "Terminer" : "Continuer";
 
-        // progress visuals
         this.nodes.forEach((node, i) => {
           node.classList.toggle("active", i === this.current);
           node.classList.toggle("done", this.isStepOk(i));
@@ -1088,6 +1006,7 @@
 
         if (!this.playedSound) {
           this.playedSound = true;
+          Haptics.success();
           SoundService.playHajimeManga();
         }
       }
