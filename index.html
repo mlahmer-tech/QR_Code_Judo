@@ -8,21 +8,20 @@
   <style>
     :root{
       --bg:#0b0b0f;
-      --card:rgba(255,255,255,.10);
       --stroke:rgba(255,255,255,.14);
       --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.64);
+      --muted:rgba(255,255,255,.66);
       --shadow:0 18px 50px rgba(0,0,0,.45);
       --r:22px;
 
-      --ok: rgba(52, 199, 89, 1);      /* iOS green */
-      --warn: rgba(255, 204, 0, 1);    /* iOS yellow */
-      --bad: rgba(255, 59, 48, 1);     /* iOS red */
-      --blue: rgba(10, 132, 255, 1);   /* iOS blue */
+      --ok: rgba(52,199,89,1);     /* iOS green */
+      --warn: rgba(255,204,0,1);   /* iOS yellow */
+      --bad: rgba(255,59,48,1);    /* iOS red */
+      --blue: rgba(10,132,255,1);  /* iOS blue */
+      --pink: rgba(255,45,85,1);
 
-      --glass1: rgba(255,255,255,.12);
-      --glass2: rgba(255,255,255,.07);
-
+      --glass1: rgba(255,255,255,.14);
+      --glass2: rgba(255,255,255,.08);
       --sep: rgba(255,255,255,.10);
       --chip: rgba(0,0,0,.16);
     }
@@ -35,15 +34,15 @@
       font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Arial,sans-serif;
       color:var(--text);
       background:
-        radial-gradient(1200px 600px at 12% 8%, rgba(120,80,255,.38), transparent 60%),
-        radial-gradient(900px 700px at 88% 16%, rgba(0,200,255,.30), transparent 60%),
-        radial-gradient(900px 700px at 40% 92%, rgba(255,80,160,.22), transparent 65%),
+        radial-gradient(1200px 600px at 12% 8%, rgba(120,80,255,.44), transparent 60%),
+        radial-gradient(900px 700px at 88% 16%, rgba(0,200,255,.34), transparent 60%),
+        radial-gradient(900px 700px at 40% 92%, rgba(255,80,160,.26), transparent 65%),
         var(--bg);
     }
 
-    .wrap{width:100%;max-width:560px}
+    .wrap{width:100%;max-width:620px}
     .header{ text-align:center; margin-bottom:14px; }
-    .title{ margin:0 0 6px; font-weight:900; letter-spacing:-.03em; font-size:30px; }
+    .title{ margin:0 0 6px; font-weight:950; letter-spacing:-.03em; font-size:32px; }
     .sub{ margin:0; color:var(--muted); font-size:14px; line-height:1.35; }
 
     .card{
@@ -56,30 +55,115 @@
       -webkit-backdrop-filter: blur(18px);
     }
 
-    /* iOS-like top progress */
-    .topbar{
-      height:10px;
-      background:rgba(255,255,255,.07);
-      border-bottom:1px solid rgba(255,255,255,.08);
-      overflow:hidden;
+    /* ===== BIG FUN PROGRESS (with steps) ===== */
+    .progressWrap{
+      padding:14px 14px 12px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.08);
     }
-    .topbar > div{
+
+    .stepsRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+    .s{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+      flex:1;
+    }
+
+    .bubble{
+      width:30px;height:30px;border-radius:999px;
+      display:flex;align-items:center;justify-content:center;
+      font-weight:900;
+      font-size:13px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.16);
+      box-shadow:0 12px 28px rgba(0,0,0,.25);
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+      flex:0 0 auto;
+    }
+    .s.active .bubble{
+      border-color:rgba(10,132,255,.5);
+      box-shadow:0 0 0 7px rgba(10,132,255,.14), 0 16px 34px rgba(0,0,0,.30);
+      transform:scale(1.05);
+    }
+    .s.done .bubble{
+      border-color:rgba(52,199,89,.50);
+      box-shadow:0 0 0 7px rgba(52,199,89,.12), 0 16px 34px rgba(0,0,0,.28);
+    }
+    .s.done .bubble::after{
+      content:"✓";
+      font-size:13px;
+      font-weight:1000;
+    }
+    .s.done .bubble span{ display:none; }
+
+    .lbl{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width:0;
+    }
+    .lbl strong{
+      font-size:12px;
+      letter-spacing:-.01em;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .lbl em{
+      font-style:normal;
+      font-size:11px;
+      color:rgba(255,255,255,.60);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .bar{
+      height:12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.07);
+      overflow:hidden;
+      position:relative;
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .bar > div{
       height:100%;
       width:0%;
       border-radius:999px;
       background:linear-gradient(90deg, rgba(10,132,255,.95), rgba(88,86,214,.95), rgba(255,45,85,.92));
       transition:width .28s ease;
+      position:relative;
+    }
+    .bar > div::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(90deg, rgba(255,255,255,.0), rgba(255,255,255,.14), rgba(255,255,255,.0));
+      transform:translateX(-40%);
+      animation: shine 1.6s linear infinite;
+      opacity:.9;
+    }
+    @keyframes shine{
+      to{ transform:translateX(40%); }
     }
 
     .sec{ padding:18px; }
 
-    /* ===== Apple-ish "stacked sheet" step container ===== */
+    /* ===== Apple-ish "sheet" ===== */
     .sheet{
       border:1px solid rgba(255,255,255,.12);
       background:rgba(0,0,0,.14);
       border-radius:20px;
       overflow:hidden;
-      position:relative;
     }
 
     .sheetTop{
@@ -93,28 +177,27 @@
     .kicker{
       display:flex;
       align-items:center;
-      gap:10px;
+      gap:12px;
       min-width:0;
     }
 
-    /* iOS-like step badge */
     .badge{
-      width:28px;height:28px;border-radius:999px;
+      width:30px;height:30px;border-radius:999px;
       display:flex;align-items:center;justify-content:center;
       background:rgba(255,255,255,.10);
       border:1px solid rgba(255,255,255,.14);
       color:rgba(255,255,255,.9);
-      font-weight:800;
+      font-weight:900;
       font-size:13px;
-      box-shadow:0 10px 26px rgba(0,0,0,.25);
+      box-shadow:0 12px 28px rgba(0,0,0,.25);
       flex:0 0 auto;
     }
 
     .titles{ min-width:0; }
     .stepTitle{
       margin:0;
-      font-size:15px;
-      font-weight:900;
+      font-size:16px;
+      font-weight:950;
       letter-spacing:-.02em;
       line-height:1.15;
       white-space:nowrap;
@@ -128,7 +211,6 @@
       line-height:1.35;
     }
 
-    /* iOS-like "status capsule" */
     .status{
       display:inline-flex;
       align-items:center;
@@ -151,23 +233,14 @@
       background:var(--ok);
       box-shadow:0 0 0 3px rgba(52,199,89,.16);
     }
-    .status.bad .dot{
-      background:var(--bad);
-      box-shadow:0 0 0 3px rgba(255,59,48,.14);
-    }
 
-    .divider{
-      height:1px;
-      background:var(--sep);
-    }
+    .divider{ height:1px; background:var(--sep); }
 
-    /* Animated field area (appears/disappears) */
+    /* Animated field area */
     .fieldArea{
       padding:14px;
-      position:relative;
       overflow:hidden;
     }
-
     .stage{
       display:grid;
       gap:10px;
@@ -177,11 +250,10 @@
     }
     .fieldArea.hiding .stage{
       opacity:0;
-      transform:translateY(-8px);
+      transform:translateY(-10px);
       pointer-events:none;
     }
 
-    /* iOS-like input */
     .field{ position:relative; }
     input, select{
       width:100%;
@@ -194,7 +266,7 @@
       outline:none;
       -webkit-appearance:none;
       appearance:none;
-      transition:border-color .2s ease, box-shadow .2s ease, transform .12s ease;
+      transition:border-color .2s ease, box-shadow .2s ease;
     }
     input:focus, select:focus{
       border-color:rgba(10,132,255,.55);
@@ -234,14 +306,6 @@
       box-shadow:0 0 0 6px rgba(52,199,89,.10);
     }
 
-    /* Tiny iOS hint */
-    .mini{
-      font-size:12px;
-      color:rgba(255,255,255,.70);
-      line-height:1.4;
-    }
-
-    /* iOS-like nav buttons */
     .nav{
       display:flex;
       gap:10px;
@@ -249,7 +313,6 @@
       border-top:1px solid var(--sep);
       background:rgba(0,0,0,.08);
     }
-
     .btn{
       flex:1;
       padding:12px 14px;
@@ -258,7 +321,7 @@
       background:rgba(0,0,0,.16);
       color:rgba(255,255,255,.92);
       font-size:15px;
-      font-weight:700;
+      font-weight:800;
       cursor:pointer;
       user-select:none;
       transition:transform .08s ease, box-shadow .16s ease, border-color .16s ease;
@@ -266,23 +329,34 @@
     .btn:active{ transform:scale(.99); }
     .btn.primary{
       border-color:rgba(10,132,255,.35);
-      box-shadow:0 10px 30px rgba(10,132,255,.08);
+      box-shadow:0 12px 34px rgba(10,132,255,.08);
     }
-    .btn.secondary{ opacity:.92; }
     .btn[disabled]{ opacity:.45; cursor:not-allowed; box-shadow:none; }
 
-    /* QR area */
+    /* QR */
     .qrBox{
       padding:16px 18px 18px;
       border-top:1px solid rgba(255,255,255,.14);
       background:rgba(0,0,0,.10);
       text-align:center;
     }
+    .tip{
+      margin:0 0 10px;
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.14);
+      color:rgba(255,255,255,.86);
+      font-size:13px;
+      line-height:1.35;
+    }
+    .tip b{ color:rgba(255,255,255,.95); }
+
     .qrFrame{
       margin:8px auto 0;
-      width:min(360px,92%);
+      width:min(380px,94%);
       aspect-ratio:1/1;
-      border-radius:22px;
+      border-radius:24px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(255,255,255,.06);
       display:flex;align-items:center;justify-content:center;
@@ -296,17 +370,15 @@
       display:none;
       opacity:0;
       transform:scale(.86);
-      filter:drop-shadow(0 14px 34px rgba(0,0,0,.38));
+      filter:drop-shadow(0 16px 40px rgba(0,0,0,.40));
     }
-
-    /* Fun + still "clean" */
     #qr.reveal{
       display:block;
       animation: reveal .62s cubic-bezier(.2,.9,.2,1) forwards;
     }
     @keyframes reveal{
-      0%{opacity:0; transform:scale(.72) rotate(-4deg)}
-      58%{opacity:1; transform:scale(1.05) rotate(1.5deg)}
+      0%{opacity:0; transform:scale(.70) rotate(-5deg)}
+      58%{opacity:1; transform:scale(1.06) rotate(2deg)}
       100%{opacity:1; transform:scale(1) rotate(0)}
     }
 
@@ -315,26 +387,26 @@
       pointer-events:none;
       opacity:0;
     }
-    .spark.on{ animation:spark .7s ease forwards; }
+    .spark.on{ animation:spark .72s ease forwards; }
     @keyframes spark{
       0%{opacity:0; transform:scale(.98)}
       25%{opacity:1}
-      100%{opacity:0; transform:scale(1.02)}
+      100%{opacity:0; transform:scale(1.03)}
     }
     .spark:before,.spark:after{
       content:"✨";
       position:absolute;
-      font-size:18px;
+      font-size:20px;
       opacity:.92;
       filter:drop-shadow(0 10px 22px rgba(0,0,0,.40));
-      animation: floaty .7s ease forwards;
+      animation: floaty .72s ease forwards;
     }
     .spark:before{ left:18px; top:18px; }
     .spark:after{ right:18px; bottom:18px; }
     @keyframes floaty{
-      from{ transform:translateY(10px) scale(.9); opacity:0}
+      from{ transform:translateY(12px) scale(.9); opacity:0}
       45%{opacity:1}
-      to{ transform:translateY(-12px) scale(1.08); opacity:0}
+      to{ transform:translateY(-14px) scale(1.08); opacity:0}
     }
 
     .hint{margin-top:12px;font-size:13px;color:var(--muted);line-height:1.45}
@@ -357,11 +429,34 @@
   <div class="wrap">
     <div class="header">
       <h1 class="title">🏆 Pré-inscription 🥋</h1>
-      <p class="sub">Ultra compact · une étape à la fois · style iOS</p>
+      <p class="sub">Remplis les champs, puis récupère ton QR.</p>
     </div>
 
     <div class="card">
-      <div class="topbar"><div id="progressBar"></div></div>
+
+      <!-- Big fun progress with steps -->
+      <div class="progressWrap">
+        <div class="stepsRow" id="stepsRow">
+          <div class="s active" data-i="0">
+            <div class="bubble"><span>1</span></div>
+            <div class="lbl"><strong>Nom</strong><em id="pv-0">…</em></div>
+          </div>
+          <div class="s" data-i="1">
+            <div class="bubble"><span>2</span></div>
+            <div class="lbl"><strong>Prénom</strong><em id="pv-1">…</em></div>
+          </div>
+          <div class="s" data-i="2">
+            <div class="bubble"><span>3</span></div>
+            <div class="lbl"><strong>Club</strong><em id="pv-2">…</em></div>
+          </div>
+          <div class="s" data-i="3">
+            <div class="bubble"><span>4</span></div>
+            <div class="lbl"><strong>Sexe</strong><em id="pv-3">…</em></div>
+          </div>
+        </div>
+
+        <div class="bar"><div id="progressBar"></div></div>
+      </div>
 
       <div class="sec">
         <div class="sheet">
@@ -386,33 +481,25 @@
           </div>
 
           <div class="nav">
-            <button class="btn secondary" id="backBtn" disabled>Retour</button>
+            <button class="btn" id="backBtn" disabled>Retour</button>
             <button class="btn primary" id="nextBtn" disabled>Suivant</button>
           </div>
         </div>
-
-        <div style="margin-top:10px; display:flex; gap:10px;">
-          <button class="btn secondary" id="resetBtn" style="flex:1;">Réinitialiser</button>
-        </div>
-
-        <div class="mini" id="formHint" style="margin-top:10px;"></div>
       </div>
 
       <div class="qrBox">
+        <p class="tip">Astuce 👉 appui long sur le QR → <b>Enregistrer l’image</b></p>
+
         <div class="qrFrame">
           <div class="spark" id="spark"></div>
           <img id="qr" alt="QR Code">
-          <div id="empty" class="hint" style="padding:18px;max-width:340px;">
-            Complète les 4 étapes pour afficher le QR ✨
+          <div id="empty" class="hint" style="padding:18px;max-width:360px;">
+            Le QR apparaîtra ici à la fin 🎉
           </div>
         </div>
 
         <div class="hint" id="hint"></div>
         <div class="payload" id="payload"></div>
-
-        <div class="hint" style="margin-top:12px;">
-          Astuce 👉 appui long sur le QR → <b>Enregistrer l’image</b>
-        </div>
       </div>
     </div>
   </div>
@@ -423,7 +510,7 @@
     }
 
     class QrService {
-      static url(payload, size = 520) {
+      static url(payload, size = 560) {
         return "https://api.qrserver.com/v1/create-qr-code/?size="
           + size + "x" + size
           + "&data=" + encodeURIComponent(payload);
@@ -431,11 +518,10 @@
     }
 
     class SoundService {
-      // “はじめ / Hajime” via SpeechSynthesis (gratuit). Fallback beep.
       static playHajime() {
         try {
           const text = "はじめ";
-          if (!("speechSynthesis" in window)) return SoundService.beep();
+          if (!("speechSynthesis" in window)) return;
 
           const u = new SpeechSynthesisUtterance(text);
           u.lang = "ja-JP";
@@ -448,31 +534,24 @@
 
           window.speechSynthesis.cancel();
           window.speechSynthesis.speak(u);
-        } catch(e) {
-          SoundService.beep();
-        }
-      }
-
-      static beep() {
-        try{
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.type = "sine";
-          o.frequency.value = 880;
-          g.gain.value = 0.0001;
-          o.connect(g); g.connect(ctx.destination);
-          o.start();
-          g.gain.exponentialRampToValueAtTime(0.14, ctx.currentTime + 0.02);
-          g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.22);
-          o.stop(ctx.currentTime + 0.25);
-        }catch(e){}
+        } catch(e) {}
       }
     }
 
     class App {
       constructor() {
-        // UI
+        // progress steps
+        this.stepsRow = document.getElementById("stepsRow");
+        this.stepNodes = [...document.querySelectorAll(".s[data-i]")];
+        this.preview = [
+          document.getElementById("pv-0"),
+          document.getElementById("pv-1"),
+          document.getElementById("pv-2"),
+          document.getElementById("pv-3"),
+        ];
+        this.progressBar = document.getElementById("progressBar");
+
+        // sheet
         this.badge = document.getElementById("badge");
         this.stepTitle = document.getElementById("stepTitle");
         this.stepSub = document.getElementById("stepSub");
@@ -481,12 +560,9 @@
         this.stage = document.getElementById("stage");
         this.fieldArea = document.getElementById("fieldArea");
 
-        this.progressBar = document.getElementById("progressBar");
-        this.formHint = document.getElementById("formHint");
-
+        // nav
         this.backBtn = document.getElementById("backBtn");
         this.nextBtn = document.getElementById("nextBtn");
-        this.resetBtn = document.getElementById("resetBtn");
 
         // QR
         this.qr = document.getElementById("qr");
@@ -506,7 +582,8 @@
             title:"Nom",
             sub:"Le nom passe automatiquement en MAJ.",
             render: () => this.renderInput("nom", "JORDAN", "family-name"),
-            normalize: (v)=> String(v||"").toUpperCase()
+            normalize: (v)=> String(v||"").toUpperCase(),
+            preview: (v)=> v ? v : "…",
           },
           {
             key:"prenom",
@@ -517,21 +594,24 @@
               v = String(v||"").trim();
               if (!v) return "";
               return v.charAt(0).toUpperCase() + v.slice(1);
-            }
+            },
+            preview: (v)=> v ? v : "…",
           },
           {
             key:"club",
             title:"Club",
             sub:"Choisis ton club.",
             render: () => this.renderSelect("club", "— Sélectionne un club —", ClubsProvider.list()),
-            normalize: (v)=> String(v||"").trim()
+            normalize: (v)=> String(v||"").trim(),
+            preview: (v)=> v ? v : "…",
           },
           {
             key:"sexe",
             title:"Sexe",
             sub:"Choisis Masculin ou Féminin.",
             render: () => this.renderSelect("sexe", "— Sélectionne —", ["Masculin","Féminin"]),
-            normalize: (v)=> String(v||"").trim()
+            normalize: (v)=> String(v||"").trim(),
+            preview: (v)=> v ? v : "…",
           }
         ];
       }
@@ -539,7 +619,15 @@
       init() {
         this.backBtn.addEventListener("click", () => this.go(this.current - 1, true));
         this.nextBtn.addEventListener("click", () => this.next());
-        this.resetBtn.addEventListener("click", () => this.reset());
+
+        // allow tapping on already reached steps
+        this.stepNodes.forEach(node => {
+          node.addEventListener("click", () => {
+            const i = Number(node.dataset.i);
+            const max = this.maxReachableStep();
+            if (i <= max) this.go(i, true);
+          });
+        });
 
         this.renderStep(this.current);
         this.refresh();
@@ -550,11 +638,8 @@
         this.badge.textContent = String(i + 1);
         this.stepTitle.textContent = step.title;
         this.stepSub.textContent = step.sub;
-
-        // build control
         this.stage.innerHTML = "";
         step.render();
-
         this.refresh();
       }
 
@@ -564,7 +649,6 @@
             <input id="field" placeholder="${this.esc(placeholder)}" autocomplete="${this.esc(autocomplete)}" />
             <div class="check" id="check">✓</div>
           </div>
-          <div class="mini">Astuce : tu peux juste coller le texte.</div>
         `;
 
         const input = document.getElementById("field");
@@ -588,8 +672,6 @@
         };
 
         input.addEventListener("input", onInput);
-
-        // init state
         onInput();
 
         setTimeout(() => {
@@ -608,7 +690,6 @@
             <select id="field">${opts}</select>
             <div class="check" id="check">✓</div>
           </div>
-          <div class="mini">Sélection → on passe automatiquement à l’étape suivante.</div>
         `;
 
         const select = document.getElementById("field");
@@ -626,8 +707,6 @@
           check.classList.toggle("show", ok);
 
           this.refresh();
-
-          if (ok) setTimeout(() => this.next(), 140);
         };
 
         select.addEventListener("change", onChange);
@@ -643,7 +722,6 @@
       next() {
         if (!this.isStepOk(this.current)) return;
 
-        // hide current field area (the zone disappears)
         this.fieldArea.classList.add("hiding");
 
         setTimeout(() => {
@@ -652,7 +730,6 @@
             this.fieldArea.classList.remove("hiding");
             this.renderStep(this.current);
           } else {
-            // final -> show QR
             this.fieldArea.classList.remove("hiding");
             this.showQR();
           }
@@ -661,7 +738,6 @@
 
       go(i, animate) {
         i = Math.max(0, Math.min(this.steps.length - 1, i));
-        // allow going back freely; forward only up to first missing step
         const max = this.maxReachableStep();
         if (i > max) return;
 
@@ -685,25 +761,17 @@
         return this.steps.length - 1;
       }
 
-      isFilled(v) {
-        return String(v || "").trim().length > 0;
-      }
+      isFilled(v) { return String(v || "").trim().length > 0; }
 
       isStepOk(i) {
         const key = this.steps[i].key;
         return this.isFilled(this.state[key]);
       }
 
-      isAllComplete() {
-        return this.steps.every((_, i) => this.isStepOk(i));
-      }
-
       refresh() {
+        // status
         const ok = this.isStepOk(this.current);
-
-        // status capsule
         this.status.classList.toggle("ok", ok);
-        this.status.classList.toggle("bad", !ok && this.isFilled(this.state[this.steps[this.current].key]) === false);
         this.statusTxt.textContent = ok ? "✓ OK" : "Requis";
 
         // buttons
@@ -711,22 +779,28 @@
         this.nextBtn.disabled = !ok;
         this.nextBtn.textContent = (this.current === this.steps.length - 1) ? "Terminer" : "Suivant";
 
-        // progress
+        // previews in progress row
+        this.preview[0].textContent = this.steps[0].preview(this.state.nom);
+        this.preview[1].textContent = this.steps[1].preview(this.state.prenom);
+        this.preview[2].textContent = this.steps[2].preview(this.state.club);
+        this.preview[3].textContent = this.steps[3].preview(this.state.sexe);
+
+        // step states
+        this.stepNodes.forEach((node, i) => {
+          node.classList.toggle("active", i === this.current);
+          node.classList.toggle("done", this.isStepOk(i));
+        });
+
+        // progress bar
         const filled = this.steps.reduce((acc, _, i) => acc + (this.isStepOk(i) ? 1 : 0), 0);
         this.progressBar.style.width = `${Math.round((filled / this.steps.length) * 100)}%`;
 
-        // hint + QR visibility
-        if (this.isAllComplete()) {
-          this.formHint.textContent = "✅ Tout est OK — QR généré";
-        } else {
-          const missing = [];
-          if (!this.isFilled(this.state.nom)) missing.push("Nom");
-          if (!this.isFilled(this.state.prenom)) missing.push("Prénom");
-          if (!this.isFilled(this.state.club)) missing.push("Club");
-          if (!this.isFilled(this.state.sexe)) missing.push("Sexe");
-          this.formHint.textContent = `Étape ${this.current+1}/4 · Manque : ${missing.join(", ")}`;
-          this.hideQR();
-        }
+        // QR visibility
+        if (!this.isAllComplete()) this.hideQR();
+      }
+
+      isAllComplete() {
+        return this.steps.every((_, i) => this.isStepOk(i));
       }
 
       buildPayload() {
@@ -741,7 +815,7 @@
         if (!this.isAllComplete()) return;
 
         const payload = this.buildPayload();
-        this.qr.src = QrService.url(payload, 520);
+        this.qr.src = QrService.url(payload, 560);
 
         this.qr.classList.remove("reveal");
         void this.qr.offsetWidth;
@@ -771,14 +845,6 @@
         this.hint.textContent = "";
         this.payloadBox.style.display = "none";
         this.playedSound = false;
-      }
-
-      reset() {
-        this.state = { nom:"", prenom:"", club:"", sexe:"" };
-        this.current = 0;
-        this.hideQR();
-        this.renderStep(this.current);
-        this.refresh();
       }
 
       esc(s){
