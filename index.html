@@ -11,16 +11,17 @@
       --stroke:rgba(255,255,255,.14);
       --text:rgba(255,255,255,.92);
       --muted:rgba(255,255,255,.64);
-      --shadow:0 26px 90px rgba(0,0,0,.60);
-      --r:26px;
+      --shadow:0 22px 70px rgba(0,0,0,.55);
+      --r:24px;
 
-      --blue: rgba(10,132,255,1);
       --ok: rgba(52,199,89,1);
+      --blue: rgba(10,132,255,1);
+      --violet: rgba(88,86,214,1);
+      --pink: rgba(255,45,85,1);
+
       --glass1: rgba(255,255,255,.14);
       --glass2: rgba(255,255,255,.08);
       --sep: rgba(255,255,255,.10);
-
-      --grad: linear-gradient(90deg, rgba(10,132,255,.95), rgba(88,86,214,.95), rgba(255,45,85,.92));
     }
 
     *{box-sizing:border-box}
@@ -29,55 +30,45 @@
       margin:0;
       min-height:100vh;
       padding:
-        calc(18px + env(safe-area-inset-top))
+        calc(16px + env(safe-area-inset-top))
         16px
-        calc(20px + env(safe-area-inset-bottom))
+        calc(18px + env(safe-area-inset-bottom))
         16px;
       font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Arial,sans-serif;
       color:var(--text);
       background:
-        radial-gradient(1200px 700px at 12% 8%, rgba(120,80,255,.48), transparent 62%),
-        radial-gradient(900px 760px at 88% 16%, rgba(0,200,255,.36), transparent 60%),
-        radial-gradient(900px 800px at 40% 92%, rgba(255,80,160,.28), transparent 66%),
+        radial-gradient(1200px 650px at 12% 10%, rgba(120,80,255,.46), transparent 60%),
+        radial-gradient(900px 720px at 88% 18%, rgba(0,200,255,.34), transparent 60%),
+        radial-gradient(1000px 800px at 45% 95%, rgba(255,80,160,.26), transparent 65%),
         var(--bg);
       overflow-x:hidden;
     }
 
-    /* subtle grain */
-    body:before{
-      content:"";
-      position:fixed; inset:-40px;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
-      mix-blend-mode:overlay;
-      opacity:.10;
-      pointer-events:none;
-    }
-
-    .wrap{width:100%;max-width:660px;margin:0 auto}
-
+    .wrap{width:100%;max-width:650px;margin:0 auto}
     .card{
       border-radius:var(--r);
       border:1px solid var(--stroke);
       background:linear-gradient(180deg, var(--glass1), var(--glass2));
       box-shadow:var(--shadow);
       overflow:hidden;
-      backdrop-filter: blur(22px);
-      -webkit-backdrop-filter: blur(22px);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      position:relative;
     }
 
-    /* header inside card (no truncation) */
+    /* Header inside card -> no truncation */
     .cardHead{
-      padding:18px 18px 14px;
+      padding:18px 16px 14px;
       border-bottom:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.08);
+      background:rgba(0,0,0,.10);
       text-align:center;
     }
     .title{
       margin:0 0 6px;
-      font-weight:980;
-      letter-spacing:-.04em;
+      font-weight:950;
+      letter-spacing:-.03em;
       font-size:30px;
-      line-height:1.08;
+      line-height:1.06;
     }
     .sub{
       margin:0;
@@ -86,30 +77,34 @@
       line-height:1.35;
     }
 
-    /* ===== WOW progress (QUI-like) ===== */
+    /* ===== WOW PROGRESS (QUI style) ===== */
     .progressWrap{
-      padding:18px 18px 16px;
+      padding:16px;
       border-bottom:1px solid rgba(255,255,255,.10);
       background:rgba(0,0,0,.06);
       position:relative;
       overflow:hidden;
     }
 
-    /* wave that runs when a step completes */
-    .progressWrap.wave:after{
+    /* wave sweep on validate */
+    .progressWrap::after{
       content:"";
       position:absolute;
-      left:-30%;
-      top:0;
-      width:30%;
-      height:100%;
-      background:linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
-      transform:skewX(-18deg);
-      animation: wave 620ms ease forwards;
+      inset:0;
       pointer-events:none;
+      background:linear-gradient(90deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,.14) 45%,
+        rgba(255,255,255,0) 100%);
+      transform:translateX(-120%);
+      opacity:0;
+    }
+    .progressWrap.wave::after{
+      opacity:1;
+      animation: wave 650ms cubic-bezier(.2,.9,.2,1) forwards;
     }
     @keyframes wave{
-      to{ left:110%; }
+      to{ transform:translateX(120%); opacity:0; }
     }
 
     .qui{
@@ -118,97 +113,101 @@
       justify-content:space-between;
       gap:12px;
     }
+
     .node{
       display:flex;
       align-items:center;
       justify-content:center;
+      width:34px;height:34px;
       flex:0 0 auto;
-      width:30px; height:30px;
       cursor:pointer;
       user-select:none;
     }
 
     .dot{
-      width:28px;height:28px;border-radius:999px;
-      border:2px solid rgba(255,255,255,.26);
+      width:26px;height:26px;
+      border-radius:999px;
+      border:2px solid rgba(255,255,255,.28);
       background:rgba(0,0,0,.18);
-      box-shadow:0 14px 32px rgba(0,0,0,.22);
+      box-shadow:0 14px 30px rgba(0,0,0,.22);
       position:relative;
       transition:transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
     }
 
     /* active pulse ring */
     .node.active .dot{
-      border-color: rgba(10,132,255,.92);
-      box-shadow:0 0 0 8px rgba(10,132,255,.14), 0 16px 34px rgba(0,0,0,.26);
+      border-color:rgba(10,132,255,.95);
+      box-shadow:0 0 0 7px rgba(10,132,255,.16), 0 16px 36px rgba(0,0,0,.24);
       transform:scale(1.04);
     }
-    .node.active .dot:after{
+    .node.active .dot::after{
       content:"";
-      position:absolute; inset:-10px;
+      position:absolute;
+      inset:-10px;
       border-radius:999px;
-      border:1px solid rgba(10,132,255,.22);
-      opacity:.0;
-      animation:pulse 1.35s ease-in-out infinite;
+      background:radial-gradient(circle at 50% 50%, rgba(10,132,255,.22), rgba(10,132,255,0) 60%);
+      animation:pulse 1.2s ease-in-out infinite;
+      pointer-events:none;
     }
     @keyframes pulse{
-      0%{opacity:0; transform:scale(.95)}
-      35%{opacity:.9}
-      100%{opacity:0; transform:scale(1.16)}
+      0%,100%{ transform:scale(.88); opacity:.75 }
+      50%{ transform:scale(1.05); opacity:1 }
     }
 
-    /* done = green fill + check */
+    /* done -> green filled + check */
     .node.done .dot{
       background:rgba(52,199,89,.92);
-      border-color:rgba(52,199,89,.98);
-      box-shadow:0 0 0 8px rgba(52,199,89,.12), 0 16px 34px rgba(0,0,0,.24);
+      border-color:rgba(52,199,89,.96);
+      box-shadow:0 0 0 7px rgba(52,199,89,.14), 0 16px 36px rgba(0,0,0,.24);
+      transform:scale(1.02);
     }
-    .node.done .dot:before{
+    .node.done .dot::after{ display:none; }
+    .node.done .dot::before{
       content:"✓";
-      position:absolute; inset:0;
-      display:flex; align-items:center; justify-content:center;
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       font-weight:1000;
-      font-size:15px;
-      color:white;
-      text-shadow:0 10px 20px rgba(0,0,0,.35);
-    }
-    /* little pop when a step becomes done */
-    .node.pop .dot{ animation: pop 260ms cubic-bezier(.2,.9,.2,1); }
-    @keyframes pop{
-      0%{transform:scale(.92)}
-      60%{transform:scale(1.14)}
-      100%{transform:scale(1)}
+      font-size:14px;
+      color:#fff;
+      text-shadow:0 12px 24px rgba(0,0,0,.35);
     }
 
     .line{
-      height:4px;
       flex:1;
+      height:4px;
       border-radius:999px;
       background:rgba(255,255,255,.18);
-      overflow:hidden;
       position:relative;
+      overflow:hidden;
     }
     .line > i{
       display:block;
       height:100%;
       width:0%;
-      background:var(--grad);
       border-radius:999px;
-      transition:width .25s ease;
+      background:linear-gradient(90deg, rgba(10,132,255,.95), rgba(88,86,214,.95), rgba(255,45,85,.92));
+      transition:width .28s ease;
       position:relative;
     }
-    .line > i:after{
+    /* glossy highlight */
+    .line > i::after{
       content:"";
-      position:absolute; inset:0;
-      background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.16), rgba(255,255,255,0));
-      transform:translateX(-45%);
-      animation: shine 1.6s linear infinite;
-      opacity:.95;
+      position:absolute;
+      inset:0;
+      background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.18), rgba(255,255,255,0));
+      transform:translateX(-55%);
+      animation: shine 1.7s linear infinite;
+      opacity:.9;
     }
-    @keyframes shine{ to{ transform:translateX(45%);} }
+    @keyframes shine{ to{ transform:translateX(55%);} }
 
-    /* ===== sheet ===== */
-    .sec{ padding:18px; }
+    .line.filled > i{ width:100%; }
+
+    /* ===== Sheet ===== */
+    .sec{ padding:16px; }
 
     .sheet{
       border:1px solid rgba(255,255,255,.12);
@@ -218,95 +217,97 @@
     }
 
     .sheetTop{
-      padding:16px 16px 14px;
+      padding:14px 14px 12px;
       display:flex;
-      gap:12px;
       align-items:flex-start;
+      gap:12px;
     }
+
     .badge{
       width:32px;height:32px;border-radius:999px;
       display:flex;align-items:center;justify-content:center;
       background:rgba(255,255,255,.10);
       border:1px solid rgba(255,255,255,.14);
       color:rgba(255,255,255,.92);
-      font-weight:1000;
+      font-weight:950;
       font-size:13px;
-      box-shadow:0 14px 32px rgba(0,0,0,.22);
+      box-shadow:0 14px 34px rgba(0,0,0,.22);
       flex:0 0 auto;
     }
-    .titles{ min-width:0; }
+
     .stepTitle{
       margin:0;
       font-size:18px;
-      font-weight:980;
+      font-weight:950;
       letter-spacing:-.02em;
       line-height:1.15;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
     }
     .stepSub{
-      margin:7px 0 0;
+      margin:6px 0 0;
       font-size:13px;
       color:var(--muted);
       line-height:1.35;
     }
+
     .divider{ height:1px; background:var(--sep); }
 
-    .fieldArea{
-      padding:16px;
-      overflow:hidden;
-      position:relative;
-    }
-
-    /* spring-like slide */
+    /* Stage transitions (spring-ish) */
+    .fieldArea{ padding:14px; overflow:hidden; position:relative; }
     .stage{
       display:grid;
       gap:10px;
+      transform:translateY(0);
       opacity:1;
-      transform:translateY(0) scale(1);
-      transition:opacity .22s ease, transform .34s cubic-bezier(.2,.9,.2,1);
+      transition:transform 320ms cubic-bezier(.2,.9,.2,1), opacity 240ms ease;
     }
     .fieldArea.out .stage{
+      transform:translateY(-12px) scale(.985);
       opacity:0;
-      transform:translateY(-12px) scale(.99);
       pointer-events:none;
     }
     .fieldArea.in .stage{
+      transform:translateY(10px) scale(.985);
       opacity:0;
-      transform:translateY(12px) scale(.99);
     }
 
+    /* Inputs */
     .field{ position:relative; }
     input, select{
       width:100%;
-      padding:15px 46px 15px 14px;
+      padding:14px 44px 14px 14px;
       font-size:16px;
-      border-radius:18px;
+      border-radius:16px;
       border:1px solid rgba(255,255,255,.14);
       background:rgba(0,0,0,.18);
       color:var(--text);
       outline:none;
       -webkit-appearance:none;
       appearance:none;
-      transition:border-color .2s ease, box-shadow .2s ease;
+      transition:border-color .2s ease, box-shadow .2s ease, transform .12s ease;
     }
     input:focus, select:focus{
-      border-color:rgba(10,132,255,.55);
+      border-color:rgba(10,132,255,.60);
       box-shadow:0 0 0 7px rgba(10,132,255,.14);
     }
     input::placeholder{ color:rgba(255,255,255,.28); }
 
-    /* iOS chevron for select */
-    .field.select:after{
-      content:"⌄";
+    /* iOS-like chevron for select */
+    .chev{
       position:absolute;
-      right:16px;
+      right:14px;
       top:50%;
-      transform:translateY(-55%);
-      color:rgba(255,255,255,.70);
-      font-size:18px;
+      transform:translateY(-50%);
+      width:16px;height:16px;
+      opacity:.75;
       pointer-events:none;
+      background:conic-gradient(from 180deg, rgba(255,255,255,.0), rgba(255,255,255,.85), rgba(255,255,255,.0));
+      -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="black" d="M5.6 7.4a1 1 0 0 1 1.4 0L10 10.4l3-3a1 1 0 1 1 1.4 1.4l-3.7 3.7a1 1 0 0 1-1.4 0L5.6 8.8a1 1 0 0 1 0-1.4Z"/></svg>') center/contain no-repeat;
+              mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="black" d="M5.6 7.4a1 1 0 0 1 1.4 0L10 10.4l3-3a1 1 0 1 1 1.4 1.4l-3.7 3.7a1 1 0 0 1-1.4 0L5.6 8.8a1 1 0 0 1 0-1.4Z"/></svg>') center/contain no-repeat;
+    }
+
+    .is-ok{
+      border-color:rgba(52,199,89,.45) !important;
+      box-shadow:0 0 0 7px rgba(52,199,89,.12);
     }
 
     .check{
@@ -319,7 +320,7 @@
       display:flex;align-items:center;justify-content:center;
       border:1px solid rgba(255,255,255,.14);
       background:rgba(0,0,0,.16);
-      color:rgba(255,255,255,.9);
+      color:rgba(255,255,255,.92);
       font-size:14px;
       opacity:0;
       transition:opacity .18s ease, transform .18s ease;
@@ -332,42 +333,51 @@
       box-shadow:0 0 0 7px rgba(52,199,89,.10);
     }
 
+    /* Buttons */
     .nav{
       display:flex;
       gap:10px;
-      padding:16px;
+      padding:14px;
       border-top:1px solid var(--sep);
       background:rgba(0,0,0,.08);
     }
     .btn{
       flex:1;
       padding:12px 14px;
-      border-radius:18px;
+      border-radius:16px;
       border:1px solid rgba(255,255,255,.16);
       background:rgba(0,0,0,.16);
       color:rgba(255,255,255,.92);
       font-size:15px;
-      font-weight:980;
+      font-weight:950;
       cursor:pointer;
       user-select:none;
-      transition:transform .08s ease, box-shadow .16s ease, border-color .16s ease, background .16s ease;
+      transition:transform .08s ease, box-shadow .16s ease, border-color .16s ease;
+      position:relative;
+      overflow:hidden;
     }
     .btn:active{ transform:scale(.99); }
+    .btn[disabled]{ opacity:.45; cursor:not-allowed; box-shadow:none; }
     .btn.primary{
-      border-color:rgba(10,132,255,.25);
-      background:linear-gradient(180deg, rgba(10,132,255,.22), rgba(0,0,0,.12));
-      box-shadow:0 16px 44px rgba(10,132,255,.08);
+      border-color:rgba(10,132,255,.38);
+      background:linear-gradient(180deg, rgba(10,132,255,.22), rgba(0,0,0,.16));
+      box-shadow:0 14px 40px rgba(10,132,255,.10);
     }
-    .btn[disabled]{
-      opacity:.42;
-      cursor:not-allowed;
-      box-shadow:none;
-      background:rgba(0,0,0,.12);
+    .btn.primary::after{
+      content:"";
+      position:absolute; inset:0;
+      background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.14), rgba(255,255,255,0));
+      transform:translateX(-60%);
+      transition:opacity .2s ease;
+      opacity:.9;
+      animation: btnshine 2.0s linear infinite;
+      pointer-events:none;
     }
+    @keyframes btnshine{ to{ transform:translateX(60%);} }
 
-    /* ===== QR (compact) ===== */
+    /* ===== QR area ===== */
     .qrBox{
-      padding:14px 18px 18px;
+      padding:14px 16px 18px;
       border-top:1px solid rgba(255,255,255,.14);
       background:rgba(0,0,0,.10);
       text-align:center;
@@ -375,7 +385,7 @@
     .tip{
       margin:0 0 10px;
       padding:10px 12px;
-      border-radius:18px;
+      border-radius:16px;
       border:1px solid rgba(255,255,255,.14);
       background:rgba(0,0,0,.14);
       color:rgba(255,255,255,.86);
@@ -385,17 +395,16 @@
     .tip b{ color:rgba(255,255,255,.96); }
 
     .qrFrame{
-      margin:8px auto 0;
-      width:min(270px,80%);
+      margin:6px auto 0;
+      width:min(260px,78%); /* reduced */
       aspect-ratio:1/1;
       border-radius:22px;
       border:1px solid rgba(255,255,255,.12);
-      background:
-        radial-gradient(180px 180px at 30% 25%, rgba(255,255,255,.10), transparent 60%),
-        rgba(255,255,255,.06);
+      background:rgba(255,255,255,.06);
       display:flex;align-items:center;justify-content:center;
       overflow:hidden;
       position:relative;
+      isolation:isolate;
     }
 
     #qr{
@@ -403,60 +412,97 @@
       object-fit:contain;
       display:none;
       opacity:0;
-      transform:scale(.86) rotate(-4deg);
-      filter:drop-shadow(0 16px 42px rgba(0,0,0,.42));
+      transform:scale(.84);
+      filter:drop-shadow(0 16px 38px rgba(0,0,0,.42));
+      z-index:2;
     }
     #qr.reveal{
       display:block;
-      animation: reveal .68s cubic-bezier(.2,.9,.2,1) forwards;
+      animation: reveal .62s cubic-bezier(.2,.9,.2,1) forwards;
     }
     @keyframes reveal{
-      0%{opacity:0; transform:scale(.70) rotate(-7deg)}
-      60%{opacity:1; transform:scale(1.06) rotate(2deg)}
+      0%{opacity:0; transform:scale(.70) rotate(-6deg)}
+      58%{opacity:1; transform:scale(1.05) rotate(2deg)}
       100%{opacity:1; transform:scale(1) rotate(0)}
     }
 
-    /* particles */
-    .fx{
+    /* Spark + confetti */
+    .spark{
       position:absolute; inset:0;
       pointer-events:none;
-      overflow:hidden;
-    }
-    .p{
-      position:absolute;
-      width:10px;height:10px;border-radius:999px;
-      background:rgba(255,255,255,.85);
-      filter:drop-shadow(0 10px 18px rgba(0,0,0,.35));
       opacity:0;
-      transform:translate(-50%,-50%) scale(.8);
-      animation: none;
+      z-index:3;
     }
-    .p.star{
-      width:auto;height:auto;
-      background:transparent;
-      font-size:18px;
+    .spark.on{ animation:spark .72s ease forwards; }
+    @keyframes spark{
+      0%{opacity:0; transform:scale(.98)}
+      25%{opacity:1}
+      100%{opacity:0; transform:scale(1.03)}
     }
-    @keyframes puff{
-      0%{opacity:0; transform:translate(-50%,-50%) scale(.75) rotate(0deg)}
+    .spark:before,.spark:after{
+      content:"✨";
+      position:absolute;
+      font-size:20px;
+      opacity:.92;
+      filter:drop-shadow(0 10px 22px rgba(0,0,0,.40));
+      animation: floaty .72s ease forwards;
+    }
+    .spark:before{ left:14px; top:14px; }
+    .spark:after{ right:14px; bottom:14px; }
+    @keyframes floaty{
+      from{ transform:translateY(12px) scale(.9); opacity:0}
+      45%{opacity:1}
+      to{ transform:translateY(-14px) scale(1.08); opacity:0}
+    }
+
+    .confetti{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      z-index:1;
+      opacity:0;
+    }
+    .confetti.on{
+      opacity:1;
+      animation: confOn 900ms ease forwards;
+    }
+    @keyframes confOn{
+      0%{opacity:0}
       20%{opacity:1}
-      100%{opacity:0; transform:translate(-50%,-90px) scale(1.2) rotate(18deg)}
+      100%{opacity:0}
+    }
+    .confetti span{
+      position:absolute;
+      width:8px;height:12px;
+      border-radius:3px;
+      background:rgba(10,132,255,.95);
+      filter:drop-shadow(0 10px 18px rgba(0,0,0,.30));
+      transform:translateY(-20px) rotate(0deg);
+      animation: fall 900ms cubic-bezier(.2,.9,.2,1) forwards;
+      opacity:.92;
+    }
+    .confetti span:nth-child(3n){ background:rgba(255,45,85,.92); }
+    .confetti span:nth-child(3n+1){ background:rgba(88,86,214,.92); }
+    .confetti span:nth-child(3n+2){ background:rgba(52,199,89,.92); }
+
+    @keyframes fall{
+      0%{ transform:translateY(-28px) rotate(0deg); opacity:0 }
+      18%{ opacity:1 }
+      100%{ transform:translateY(280px) rotate(220deg); opacity:0 }
     }
 
-    .hint{
+    .hint{margin-top:10px;font-size:13px;color:var(--muted);line-height:1.45}
+    .payload{
       margin-top:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      text-align:left;
+      border:1px dashed rgba(255,255,255,.22);
+      background:rgba(0,0,0,.16);
+      word-break:break-word;
       font-size:13px;
-      color:var(--muted);
-      line-height:1.45;
-    }
-    #empty{ padding:14px; max-width:260px; }
-
-    /* reduce motion respect */
-    @media (prefers-reduced-motion: reduce){
-      .progressWrap.wave:after{display:none}
-      .node.active .dot:after{animation:none}
-      .line > i:after{animation:none}
-      #qr.reveal{animation:none; opacity:1; transform:none}
-      .stage{transition:none}
+      color:rgba(255,255,255,.82);
+      display:none;
     }
   </style>
 </head>
@@ -471,17 +517,17 @@
       </div>
 
       <div class="progressWrap" id="progressWrap">
-        <div class="qui" id="qui">
-          <div class="node active" data-i="0" aria-label="Étape 1"><div class="dot"></div></div>
+        <div class="qui">
+          <div class="node active" data-i="0"><div class="dot"></div></div>
           <div class="line" data-line="0"><i></i></div>
 
-          <div class="node" data-i="1" aria-label="Étape 2"><div class="dot"></div></div>
+          <div class="node" data-i="1"><div class="dot"></div></div>
           <div class="line" data-line="1"><i></i></div>
 
-          <div class="node" data-i="2" aria-label="Étape 3"><div class="dot"></div></div>
+          <div class="node" data-i="2"><div class="dot"></div></div>
           <div class="line" data-line="2"><i></i></div>
 
-          <div class="node" data-i="3" aria-label="Étape 4"><div class="dot"></div></div>
+          <div class="node" data-i="3"><div class="dot"></div></div>
         </div>
       </div>
 
@@ -489,7 +535,7 @@
         <div class="sheet">
           <div class="sheetTop">
             <div class="badge" id="badge">1</div>
-            <div class="titles">
+            <div>
               <p class="stepTitle" id="stepTitle">Nom</p>
               <p class="stepSub" id="stepSub">Le nom passe automatiquement en MAJ.</p>
             </div>
@@ -512,14 +558,17 @@
         <p class="tip">Astuce 👉 appui long sur le QR → <b>Enregistrer l’image</b></p>
 
         <div class="qrFrame">
-          <div class="fx" id="fx"></div>
+          <div class="confetti" id="confetti"></div>
+          <div class="spark" id="spark"></div>
           <img id="qr" alt="QR Code">
-          <div id="empty" class="hint">Le QR apparaîtra ici 🎉</div>
+          <div id="empty" class="hint" style="padding:14px;max-width:240px;">
+            Le QR apparaîtra ici 🎉
+          </div>
         </div>
 
         <div class="hint" id="hint"></div>
+        <div class="payload" id="payload"></div>
       </div>
-
     </div>
   </div>
 
@@ -536,123 +585,37 @@
       }
     }
 
-    class AudioFX {
-      // subtle "tink" sound (free, no asset)
-      static tink() {
-        try{
-          const Ctx = window.AudioContext || window.webkitAudioContext;
-          if (!Ctx) return;
-          const ctx = new Ctx();
-
-          const o1 = ctx.createOscillator();
-          const g1 = ctx.createGain();
-          o1.type = "sine";
-          o1.frequency.value = 1240;
-          g1.gain.value = 0.0001;
-
-          const o2 = ctx.createOscillator();
-          const g2 = ctx.createGain();
-          o2.type = "sine";
-          o2.frequency.value = 1760;
-          g2.gain.value = 0.0001;
-
-          o1.connect(g1); g1.connect(ctx.destination);
-          o2.connect(g2); g2.connect(ctx.destination);
-
-          const t = ctx.currentTime;
-          o1.start(t); o2.start(t);
-
-          g1.gain.exponentialRampToValueAtTime(0.10, t + 0.02);
-          g1.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
-
-          g2.gain.exponentialRampToValueAtTime(0.06, t + 0.02);
-          g2.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
-
-          o1.stop(t + 0.18);
-          o2.stop(t + 0.20);
-        }catch(e){}
-      }
-    }
-
-    class VoiceFX {
-      static ensureVoicesLoaded(){
-        if (!("speechSynthesis" in window)) return;
-        // iOS loads voices lazily
-        try { window.speechSynthesis.getVoices(); } catch(e){}
-      }
-
-      static pickJapaneseVoicePreferMale(){
-        if (!("speechSynthesis" in window)) return null;
-        const voices = window.speechSynthesis.getVoices?.() || [];
-        const ja = voices.filter(v => (v.lang || "").toLowerCase().startsWith("ja"));
-        if (!ja.length) return null;
-
-        // Heuristics: prefer names that often correspond to male Japanese voices (varies by OS)
-        const maleHints = ["keita","ichiro","otoya","ken","takumi","yamato","hiro","jun","male"];
-        const best = ja.find(v => maleHints.some(h => (v.name||"").toLowerCase().includes(h)));
-        return best || ja[0];
-      }
-
-      static hajimeManga(){
-        try{
+    class SoundService {
+      static playHajime() {
+        // iOS: needs user gesture -> called on "Terminer"
+        try {
           if (!("speechSynthesis" in window)) return;
           const u = new SpeechSynthesisUtterance("はじめ");
           u.lang = "ja-JP";
-          // make it more "masculin / manga" (depends on available voices)
-          u.pitch = 0.75;
-          u.rate  = 0.92;
+          u.rate = 0.95;
+          u.pitch = 1.05;
 
-          const v = VoiceFX.pickJapaneseVoicePreferMale();
-          if (v) u.voice = v;
+          const voices = window.speechSynthesis.getVoices?.() || [];
+          const ja = voices.find(v => (v.lang || "").toLowerCase().startsWith("ja"));
+          if (ja) u.voice = ja;
 
           window.speechSynthesis.cancel();
           window.speechSynthesis.speak(u);
-        }catch(e){}
-      }
-    }
-
-    class Particles {
-      static burst(container){
-        container.innerHTML = "";
-        const W = container.clientWidth || 300;
-        const H = container.clientHeight || 300;
-
-        const items = [];
-        // few tasteful particles
-        for (let i=0;i<7;i++){
-          const el = document.createElement("div");
-          const isStar = (i % 3 === 0);
-          el.className = "p" + (isStar ? " star" : "");
-          if (isStar) el.textContent = "✨";
-          container.appendChild(el);
-          items.push(el);
-        }
-
-        items.forEach((el, idx) => {
-          const x = 30 + Math.random()*40;   // % around center
-          const y = 55 + Math.random()*25;   // %
-          el.style.left = x + "%";
-          el.style.top  = y + "%";
-          el.style.animation = "none";
-          // restart animation
-          void el.offsetWidth;
-          el.style.animation = `puff ${520 + idx*35}ms cubic-bezier(.2,.9,.2,1) forwards`;
-          el.style.animationDelay = (idx*22) + "ms";
-        });
+        } catch(e) {}
       }
     }
 
     class App {
-      constructor(){
+      constructor() {
         this.progressWrap = document.getElementById("progressWrap");
         this.nodes = [...document.querySelectorAll(".node[data-i]")];
-        this.lines = [...document.querySelectorAll(".line[data-line] i")];
+        this.lines = [...document.querySelectorAll(".line[data-line]")];
 
         this.badge = document.getElementById("badge");
         this.stepTitle = document.getElementById("stepTitle");
         this.stepSub = document.getElementById("stepSub");
-        this.fieldArea = document.getElementById("fieldArea");
         this.stage = document.getElementById("stage");
+        this.fieldArea = document.getElementById("fieldArea");
 
         this.backBtn = document.getElementById("backBtn");
         this.nextBtn = document.getElementById("nextBtn");
@@ -660,89 +623,90 @@
         this.qr = document.getElementById("qr");
         this.empty = document.getElementById("empty");
         this.hint = document.getElementById("hint");
-        this.fx = document.getElementById("fx");
+        this.payloadBox = document.getElementById("payload");
+        this.spark = document.getElementById("spark");
+        this.confetti = document.getElementById("confetti");
 
         this.state = { nom:"", prenom:"", club:"", sexe:"" };
         this.current = 0;
-        this.spoken = false;
+        this.playedSound = false;
 
         this.steps = [
           {
             key:"nom",
             title:"Nom",
             sub:"Le nom passe automatiquement en MAJ.",
-            render: () => this.renderInput("nom","JORDAN","family-name"),
-            normalize: v => String(v||"").toUpperCase()
+            render: () => this.renderInput("nom", "JORDAN", "family-name"),
+            normalize: v => String(v||"").toUpperCase(),
           },
           {
             key:"prenom",
             title:"Prénom",
             sub:"Première lettre automatiquement en majuscule.",
-            render: () => this.renderInput("prenom","Mickael","given-name"),
+            render: () => this.renderInput("prenom", "Mickael", "given-name"),
             normalize: v => {
               v = String(v||"").trim();
               if (!v) return "";
               return v.charAt(0).toUpperCase() + v.slice(1);
-            }
+            },
           },
           {
             key:"club",
             title:"Club",
             sub:"Choisis ton club.",
-            render: () => this.renderSelect("club","— Sélectionne un club —", ClubsProvider.list()),
-            normalize: v => String(v||"").trim()
+            render: () => this.renderSelect("club", "— Sélectionne un club —", ClubsProvider.list()),
+            normalize: v => String(v||"").trim(),
           },
           {
             key:"sexe",
             title:"Sexe",
             sub:"Choisis Masculin ou Féminin.",
-            render: () => this.renderSelect("sexe","— Sélectionne —", ["Masculin","Féminin"]),
-            normalize: v => String(v||"").trim()
+            render: () => this.renderSelect("sexe", "— Sélectionne —", ["Masculin","Féminin"]),
+            normalize: v => String(v||"").trim(),
           }
         ];
       }
 
-      init(){
-        VoiceFX.ensureVoicesLoaded();
-
-        this.backBtn.addEventListener("click", () => this.go(this.current-1, true));
+      init() {
+        this.backBtn.addEventListener("click", () => this.go(this.current - 1, "back"));
         this.nextBtn.addEventListener("click", () => this.next());
 
-        // tap on reachable dots
         this.nodes.forEach(n => {
           n.addEventListener("click", () => {
             const i = Number(n.dataset.i);
             const max = this.maxReachableStep();
-            if (i <= max) this.go(i, true);
+            if (i <= max) this.go(i, "jump");
           });
         });
 
+        // iOS voices warm-up
+        if ("speechSynthesis" in window) {
+          window.speechSynthesis.getVoices?.();
+          window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices?.();
+        }
+
         this.renderStep(this.current, false);
-        this.refresh();
+        this.refresh(false);
       }
 
-      renderStep(i, animateIn=true){
+      renderStep(i, animateIn=true) {
         const step = this.steps[i];
-        this.badge.textContent = String(i+1);
+        this.badge.textContent = String(i + 1);
         this.stepTitle.textContent = step.title;
         this.stepSub.textContent = step.sub;
 
-        // animate old out then new in
-        if (animateIn){
+        this.stage.innerHTML = "";
+        step.render();
+
+        if (animateIn) {
           this.fieldArea.classList.add("in");
           requestAnimationFrame(() => {
-            this.stage.innerHTML = "";
-            step.render();
-            // allow layout
-            requestAnimationFrame(() => this.fieldArea.classList.remove("in"));
+            this.fieldArea.classList.remove("in");
           });
-        } else {
-          this.stage.innerHTML = "";
-          step.render();
         }
       }
 
-      renderInput(key, placeholder, autocomplete){
+      renderInput(key, placeholder, autocomplete) {
         this.stage.innerHTML = `
           <div class="field">
             <input id="field" placeholder="${this.esc(placeholder)}" autocomplete="${this.esc(autocomplete)}" />
@@ -761,8 +725,10 @@
           this.state[key] = input.value;
 
           const ok = this.isFilled(input.value);
+          input.classList.toggle("is-ok", ok);
           check.classList.toggle("show", ok);
-          this.refresh();
+
+          this.refresh(false);
         };
 
         input.addEventListener("input", onInput);
@@ -773,15 +739,16 @@
         }, 70);
       }
 
-      renderSelect(key, firstLabel, options){
+      renderSelect(key, firstLabel, options) {
         const opts = [
           `<option value="">${this.esc(firstLabel)}</option>`,
           ...options.map(o => `<option value="${this.esc(o)}">${this.esc(o)}</option>`)
         ].join("");
 
         this.stage.innerHTML = `
-          <div class="field select">
+          <div class="field">
             <select id="field">${opts}</select>
+            <span class="chev" aria-hidden="true"></span>
             <div class="check" id="check">✓</div>
           </div>
         `;
@@ -795,8 +762,10 @@
           this.state[key] = step.normalize ? step.normalize(select.value) : select.value;
 
           const ok = this.isFilled(select.value);
+          select.classList.toggle("is-ok", ok);
           check.classList.toggle("show", ok);
-          this.refresh();
+
+          this.refresh(false);
         };
 
         select.addEventListener("change", onChange);
@@ -808,127 +777,146 @@
         }, 70);
       }
 
-      next(){
+      next() {
         if (!this.isStepOk(this.current)) return;
 
-        AudioFX.tink();
+        // wave feedback when validating a step
+        this.wave();
 
-        // mark progress wave + dot pop when the step becomes done
-        this.progressWrap.classList.remove("wave");
-        void this.progressWrap.offsetWidth;
-        this.progressWrap.classList.add("wave");
-
-        // animate field out
+        // animate out
         this.fieldArea.classList.add("out");
         setTimeout(() => {
-          this.fieldArea.classList.remove("out");
-
-          if (this.current < this.steps.length - 1){
-            const prev = this.current;
+          if (this.current < this.steps.length - 1) {
             this.current++;
-            // pop the previous dot as "done"
-            this.nodes[prev]?.classList.add("pop");
-            setTimeout(() => this.nodes[prev]?.classList.remove("pop"), 280);
-
+            this.fieldArea.classList.remove("out");
             this.renderStep(this.current, true);
-            this.refresh();
+            this.refresh(false);
           } else {
-            this.showQR(); // final
+            this.fieldArea.classList.remove("out");
+            this.showQR(); // also plays sound on user gesture
           }
         }, 220);
       }
 
-      go(i, animate){
-        i = Math.max(0, Math.min(this.steps.length-1, i));
+      go(i, mode="jump") {
+        i = Math.max(0, Math.min(this.steps.length - 1, i));
         const max = this.maxReachableStep();
         if (i > max) return;
 
-        if (animate){
-          this.fieldArea.classList.add("out");
-          setTimeout(() => {
-            this.fieldArea.classList.remove("out");
-            this.current = i;
-            this.renderStep(this.current, true);
-            this.refresh();
-          }, 200);
-        } else {
+        // animate out then in
+        this.fieldArea.classList.add("out");
+        setTimeout(() => {
           this.current = i;
-          this.renderStep(this.current, false);
-          this.refresh();
-        }
+          this.fieldArea.classList.remove("out");
+          this.renderStep(this.current, true);
+          this.refresh(false);
+        }, 220);
       }
 
-      maxReachableStep(){
-        for (let i=0;i<this.steps.length;i++){
+      wave() {
+        this.progressWrap.classList.remove("wave");
+        void this.progressWrap.offsetWidth;
+        this.progressWrap.classList.add("wave");
+        setTimeout(() => this.progressWrap.classList.remove("wave"), 750);
+      }
+
+      maxReachableStep() {
+        for (let i = 0; i < this.steps.length; i++) {
           if (!this.isStepOk(i)) return i;
         }
-        return this.steps.length-1;
+        return this.steps.length - 1;
       }
 
-      isFilled(v){ return String(v||"").trim().length > 0; }
-      isStepOk(i){ return this.isFilled(this.state[this.steps[i].key]); }
-      isAllComplete(){ return this.steps.every((_,i)=>this.isStepOk(i)); }
+      isFilled(v) { return String(v || "").trim().length > 0; }
+      isStepOk(i) { return this.isFilled(this.state[this.steps[i].key]); }
+      isAllComplete() { return this.steps.every((_, i) => this.isStepOk(i)); }
 
-      refresh(){
+      refresh(shouldWave=false) {
         const ok = this.isStepOk(this.current);
 
         this.backBtn.disabled = (this.current === 0);
         this.nextBtn.disabled = !ok;
-        this.nextBtn.textContent = (this.current === this.steps.length-1) ? "Terminer" : "Suivant";
+        this.nextBtn.textContent = (this.current === this.steps.length - 1) ? "Terminer" : "Suivant";
 
-        // progress dots + lines (keep done states)
-        this.nodes.forEach((n, i) => {
-          n.classList.toggle("active", i === this.current);
-          n.classList.toggle("done", this.isStepOk(i));
+        // progress state
+        this.nodes.forEach((node, i) => {
+          node.classList.toggle("active", i === this.current);
+          node.classList.toggle("done", this.isStepOk(i));
         });
-        this.lines.forEach((lineFill, idx) => {
-          // line is filled if left step is done
-          lineFill.style.width = this.isStepOk(idx) ? "100%" : "0%";
+        this.lines.forEach((line, idx) => {
+          line.classList.toggle("filled", this.isStepOk(idx));
         });
 
-        // if user edits => hide QR
-        if (!this.isAllComplete()){
-          this.hideQR();
-        }
+        if (!this.isAllComplete()) this.hideQR();
       }
 
-      buildPayload(){
-        const n = (this.state.nom||"").trim();
-        const p = (this.state.prenom||"").trim();
-        const c = (this.state.club||"").trim();
-        const s = (this.state.sexe||"").trim();
+      buildPayload() {
+        const n = (this.state.nom || "").trim();
+        const p = (this.state.prenom || "").trim();
+        const c = (this.state.club || "").trim();
+        const s = (this.state.sexe || "").trim();
         return `${n};${p};${c};${s};`;
       }
 
-      showQR(){
+      fireConfetti() {
+        // create a few pieces each time
+        this.confetti.innerHTML = "";
+        const pieces = 10;
+        for (let i=0;i<pieces;i++){
+          const sp = document.createElement("span");
+          const left = Math.random()*90 + 5; // 5..95
+          const delay = Math.random()*120;   // slight staggering
+          const w = 6 + Math.random()*6;
+          const h = 8 + Math.random()*10;
+          sp.style.left = left + "%";
+          sp.style.top = (-10 - Math.random()*20) + "px";
+          sp.style.width = w + "px";
+          sp.style.height = h + "px";
+          sp.style.animationDelay = delay + "ms";
+          this.confetti.appendChild(sp);
+        }
+        this.confetti.classList.remove("on");
+        void this.confetti.offsetWidth;
+        this.confetti.classList.add("on");
+      }
+
+      showQR() {
         if (!this.isAllComplete()) return;
 
         const payload = this.buildPayload();
-
         this.qr.src = QrService.url(payload, 320);
+
+        // reveal
         this.qr.classList.remove("reveal");
         void this.qr.offsetWidth;
         this.qr.classList.add("reveal");
 
-        Particles.burst(this.fx);
+        // spark + confetti
+        this.spark.classList.remove("on");
+        void this.spark.offsetWidth;
+        this.spark.classList.add("on");
+        this.fireConfetti();
 
         this.qr.style.display = "block";
         this.empty.style.display = "none";
-        this.hint.textContent = "QR prêt ✨";
 
-        // final voice (needs user gesture: Terminer click is one)
-        if (!this.spoken){
-          this.spoken = true;
-          setTimeout(() => VoiceFX.hajimeManga(), 120);
+        this.hint.textContent = "Données encodées :";
+        this.payloadBox.textContent = payload;
+        this.payloadBox.style.display = "block";
+
+        if (!this.playedSound) {
+          this.playedSound = true;
+          SoundService.playHajime();
         }
       }
 
-      hideQR(){
+      hideQR() {
         this.qr.style.display = "none";
         this.qr.classList.remove("reveal");
         this.empty.style.display = "block";
         this.hint.textContent = "";
-        this.spoken = false;
+        this.payloadBox.style.display = "none";
+        this.playedSound = false;
       }
 
       esc(s){
@@ -939,14 +927,6 @@
           .replaceAll('"',"&quot;")
           .replaceAll("'","&#039;");
       }
-    }
-
-    // iOS voices lazy load
-    if ("speechSynthesis" in window){
-      try { window.speechSynthesis.getVoices?.(); } catch(e){}
-      window.speechSynthesis.onvoiceschanged = () => {
-        try { window.speechSynthesis.getVoices?.(); } catch(e){}
-      };
     }
 
     new App().init();
