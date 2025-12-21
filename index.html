@@ -7,23 +7,35 @@
 
   <style>
     :root{
-      --bg:#07070a;
-      --stroke:rgba(255,255,255,.14);
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.64);
-      --shadow:0 22px 70px rgba(0,0,0,.55);
+      /* Daylight / iOS widget glass */
+      --bg1:#eef2ff;
+      --bg2:#f7f8ff;
+
+      --stroke:rgba(15,20,35,.10);
+      --stroke2:rgba(255,255,255,.55);
+
+      --text:rgba(10,12,22,.92);
+      --muted:rgba(10,12,22,.62);
+
+      --shadow:0 22px 70px rgba(12,18,40,.14);
+      --shadow2:0 10px 28px rgba(12,18,40,.10);
+
       --r:24px;
 
       --ok: rgba(52,199,89,1);
       --blue: rgba(10,132,255,1);
-      --violet: rgba(88,86,214,1);
-      --pink: rgba(255,45,85,1);
+      --violet: rgba(94,92,230,1);
+      --pink: rgba(255,55,95,1);
 
-      --glass1: rgba(255,255,255,.14);
-      --glass2: rgba(255,255,255,.08);
-      --sep: rgba(255,255,255,.10);
+      --glass1: rgba(255,255,255,.70);
+      --glass2: rgba(255,255,255,.46);
+      --glass3: rgba(255,255,255,.26);
+      --sep: rgba(15,20,35,.10);
 
-      --danger: rgba(255,95,95,.95);
+      --danger: rgba(255,69,69,.95);
+      --dangerRing: rgba(255,69,69,.18);
+      --focusRing: rgba(10,132,255,.18);
+      --okRing: rgba(52,199,89,.16);
     }
 
     *{box-sizing:border-box}
@@ -34,34 +46,50 @@
       padding:
         calc(14px + env(safe-area-inset-top))
         14px
-        calc(104px + env(safe-area-inset-bottom))
+        calc(112px + env(safe-area-inset-bottom))
         14px;
       font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Arial,sans-serif;
       color:var(--text);
+
+      /* Soft daylight background */
       background:
-        radial-gradient(1200px 650px at 12% 10%, rgba(120,80,255,.46), transparent 60%),
-        radial-gradient(900px 720px at 88% 18%, rgba(0,200,255,.34), transparent 60%),
-        radial-gradient(1000px 800px at 45% 95%, rgba(255,80,160,.26), transparent 65%),
-        var(--bg);
+        radial-gradient(1200px 700px at 10% 10%, rgba(120,130,255,.32), transparent 62%),
+        radial-gradient(900px 700px at 90% 18%, rgba(50,200,255,.26), transparent 62%),
+        radial-gradient(1000px 780px at 45% 95%, rgba(255,125,200,.18), transparent 68%),
+        radial-gradient(1100px 700px at 50% 50%, rgba(255,255,255,.75), rgba(255,255,255,0) 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
       overflow-x:hidden;
     }
 
-    .wrap{width:100%;max-width:680px;margin:0 auto}
+    .wrap{width:100%;max-width:720px;margin:0 auto}
     .card{
       border-radius:var(--r);
       border:1px solid var(--stroke);
       background:linear-gradient(180deg, var(--glass1), var(--glass2));
       box-shadow:var(--shadow);
       overflow:hidden;
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
       position:relative;
     }
 
+    /* subtle “widget sheen” */
+    .card:before{
+      content:"";
+      position:absolute; inset:-2px;
+      pointer-events:none;
+      background:
+        radial-gradient(800px 180px at 30% 0%, rgba(255,255,255,.55), rgba(255,255,255,0) 70%),
+        radial-gradient(900px 220px at 70% 10%, rgba(255,255,255,.32), rgba(255,255,255,0) 74%);
+      opacity:.75;
+      mix-blend-mode: screen;
+    }
+
     .cardHead{
+      position:relative;
       padding:18px 16px 14px;
-      border-bottom:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.10);
+      border-bottom:1px solid rgba(15,20,35,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.38));
       text-align:center;
     }
     .title{
@@ -78,15 +106,14 @@
       line-height:1.35;
     }
 
-    /* ===== Premium progress + back ===== */
+    /* ===== Premium progress + back (daylight) ===== */
     .progressWrap{
-      padding:14px 14px 16px;
-      border-bottom:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.06);
       position:relative;
+      padding:14px 14px 16px;
+      border-bottom:1px solid rgba(15,20,35,.08);
+      background:rgba(255,255,255,.35);
       overflow:hidden;
 
-      /* Apple-like: gestures are scoped here only */
       touch-action: pan-y;
       user-select:none;
       -webkit-user-select:none;
@@ -104,33 +131,19 @@
     .backMini{
       width:38px;height:38px;
       border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.12);
-      color:rgba(255,255,255,.92);
+      border:1px solid rgba(15,20,35,.10);
+      background:rgba(255,255,255,.58);
+      color:rgba(10,12,22,.92);
       display:flex;
       align-items:center;
       justify-content:center;
       cursor:pointer;
-      box-shadow:0 16px 40px rgba(0,0,0,.22);
+      box-shadow:var(--shadow2);
       transition:transform .08s ease, opacity .16s ease;
       flex:0 0 auto;
     }
     .backMini:active{ transform:scale(.99); }
     .backMini[disabled]{ opacity:.35; cursor:not-allowed; }
-    .backMini svg{ width:18px;height:18px; opacity:.95; }
-
-    .progressWrap::before{
-      content:"";
-      position:absolute; inset:0;
-      pointer-events:none;
-      opacity:.14;
-      background-image:
-        radial-gradient(1px 1px at 12px 18px, rgba(255,255,255,.25) 50%, transparent 51%),
-        radial-gradient(1px 1px at 32px 42px, rgba(255,255,255,.18) 50%, transparent 51%),
-        radial-gradient(1px 1px at 58px 28px, rgba(255,255,255,.14) 50%, transparent 51%);
-      background-size: 64px 64px;
-      mix-blend-mode: overlay;
-    }
 
     .progressWrap::after{
       content:"";
@@ -139,7 +152,7 @@
       pointer-events:none;
       background:linear-gradient(90deg,
         rgba(255,255,255,0) 0%,
-        rgba(255,255,255,.16) 46%,
+        rgba(255,255,255,.65) 46%,
         rgba(255,255,255,0) 100%);
       transform:translateX(-120%);
       opacity:0;
@@ -171,53 +184,55 @@
       position:absolute;
       inset:0;
       border-radius:999px;
-      background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow:0 18px 44px rgba(0,0,0,.20);
-      opacity:.85;
+      background:linear-gradient(180deg, rgba(255,255,255,.70), rgba(255,255,255,.38));
+      border:1px solid rgba(15,20,35,.10);
+      box-shadow:0 14px 34px rgba(12,18,40,.10);
+      opacity:.98;
       transform:scale(.94);
     }
 
     .dot{
       width:24px;height:24px;
       border-radius:999px;
-      border:2px solid rgba(255,255,255,.28);
-      background:rgba(0,0,0,.22);
+      border:2px solid rgba(15,20,35,.16);
+      background:rgba(255,255,255,.52);
       position:relative;
-      box-shadow: 0 14px 28px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.10);
+      box-shadow:
+        0 12px 24px rgba(12,18,40,.10),
+        inset 0 1px 0 rgba(255,255,255,.70);
       transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
     }
 
     .node.active .dot{
-      border-color:rgba(10,132,255,.98);
-      background:rgba(0,0,0,.10);
+      border-color:rgba(10,132,255,.55);
+      background:rgba(255,255,255,.70);
       box-shadow:
-        0 0 0 7px rgba(10,132,255,.14),
-        0 18px 38px rgba(0,0,0,.26),
-        inset 0 1px 0 rgba(255,255,255,.14);
-      transform:scale(1.04);
+        0 0 0 8px rgba(10,132,255,.12),
+        0 16px 30px rgba(12,18,40,.12),
+        inset 0 1px 0 rgba(255,255,255,.80);
+      transform:scale(1.05);
     }
     .node.active .dot::after{
       content:"";
       position:absolute;
       inset:-12px;
       border-radius:999px;
-      background:radial-gradient(circle at 50% 50%, rgba(10,132,255,.24), rgba(10,132,255,0) 62%);
+      background:radial-gradient(circle at 50% 50%, rgba(10,132,255,.18), rgba(10,132,255,0) 62%);
       animation:pulse 1.25s ease-in-out infinite;
       pointer-events:none;
     }
     @keyframes pulse{
-      0%,100%{ transform:scale(.88); opacity:.72 }
+      0%,100%{ transform:scale(.88); opacity:.65 }
       50%{ transform:scale(1.08); opacity:1 }
     }
 
     .node.done .dot{
-      background:linear-gradient(180deg, rgba(90,255,150,.98), rgba(30,175,70,.92));
-      border-color:rgba(52,199,89,.96);
+      background:linear-gradient(180deg, rgba(95,255,165,.98), rgba(35,185,80,.92));
+      border-color:rgba(52,199,89,.70);
       box-shadow:
-        0 0 0 7px rgba(52,199,89,.14),
-        0 18px 38px rgba(0,0,0,.26),
-        inset 0 1px 0 rgba(255,255,255,.22);
+        0 0 0 8px rgba(52,199,89,.12),
+        0 16px 30px rgba(12,18,40,.12),
+        inset 0 1px 0 rgba(255,255,255,.30);
       transform:scale(1.02);
     }
     .node.done .dot::before{
@@ -230,7 +245,7 @@
       font-weight:1000;
       font-size:13px;
       color:#fff;
-      text-shadow:0 12px 24px rgba(0,0,0,.35);
+      text-shadow:0 10px 22px rgba(0,0,0,.18);
     }
     .node.done.pop .dot{ animation: pop 260ms cubic-bezier(.2,.9,.2,1) both; }
     @keyframes pop{
@@ -241,59 +256,64 @@
 
     .line{
       flex:1;
-      height:6px;
+      height:7px;
       border-radius:999px;
-      background:rgba(255,255,255,.12);
+      background:rgba(15,20,35,.08);
       position:relative;
       overflow:hidden;
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      border:1px solid rgba(15,20,35,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
     }
     .line > i{
       display:block;
       height:100%;
       width:0%;
       border-radius:999px;
-      background:linear-gradient(90deg, rgba(10,132,255,.98), rgba(88,86,214,.96), rgba(255,45,85,.92));
+      background:linear-gradient(90deg, rgba(10,132,255,.92), rgba(94,92,230,.88), rgba(255,55,95,.86));
       transition:width .32s cubic-bezier(.2,.9,.2,1);
       position:relative;
     }
     .line > i::after{
       content:"";
       position:absolute; inset:0;
-      background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.18), rgba(255,255,255,0));
+      background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.32), rgba(255,255,255,0));
       transform:translateX(-55%);
       animation: shine 1.65s linear infinite;
-      opacity:.95;
+      opacity:.90;
     }
     @keyframes shine{ to{ transform:translateX(55%);} }
     .line.filled > i{ width:100%; }
 
-    /* ===== Sheet / step ===== */
+    /* ===== Step sheet ===== */
     .sec{ padding:16px; }
     .sheet{
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(0,0,0,.14);
+      border:1px solid rgba(15,20,35,.10);
+      background:linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.42));
       border-radius:22px;
       overflow:hidden;
+      box-shadow:0 12px 34px rgba(12,18,40,.10);
+      position:relative;
     }
+
     .sheetTop{
       padding:14px 14px 12px;
       display:flex;
       align-items:flex-start;
       gap:12px;
     }
+
     .badge{
       width:34px;height:34px;border-radius:999px;
       display:flex;align-items:center;justify-content:center;
-      background:rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.14);
-      color:rgba(255,255,255,.92);
+      background:rgba(255,255,255,.60);
+      border:1px solid rgba(15,20,35,.10);
+      color:rgba(10,12,22,.92);
       font-weight:950;
       font-size:13px;
-      box-shadow:0 14px 34px rgba(0,0,0,.22);
+      box-shadow:0 12px 26px rgba(12,18,40,.10);
       flex:0 0 auto;
     }
+
     .stepTitle{ margin:0; font-size:18px; font-weight:950; letter-spacing:-.02em; line-height:1.15; }
     .stepSub{ margin:6px 0 0; font-size:13px; color:var(--muted); line-height:1.35; }
 
@@ -324,37 +344,39 @@
       padding:14px 44px 14px 14px;
       font-size:16px;
       border-radius:16px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.18);
-      color:var(--text);
+      border:1px solid rgba(15,20,35,.12);
+      background:rgba(255,255,255,.76);
+      color:rgba(10,12,22,.92);
       outline:none;
       -webkit-appearance:none;
       appearance:none;
-      transition:border-color .2s ease, box-shadow .2s ease, transform .12s ease;
+      transition:border-color .2s ease, box-shadow .2s ease, transform .12s ease, background .2s ease;
     }
     input:focus, select:focus{
-      border-color:rgba(10,132,255,.60);
-      box-shadow:0 0 0 7px rgba(10,132,255,.14);
+      border-color:rgba(10,132,255,.45);
+      box-shadow:0 0 0 8px var(--focusRing);
+      background:rgba(255,255,255,.86);
     }
-    input::placeholder{ color:rgba(255,255,255,.28); }
+    input::placeholder{ color:rgba(10,12,22,.30); }
 
     .chev{
       position:absolute; right:14px; top:50%;
       transform:translateY(-50%);
       width:16px;height:16px;
-      opacity:.78; pointer-events:none;
-      background:conic-gradient(from 180deg, rgba(255,255,255,.0), rgba(255,255,255,.85), rgba(255,255,255,.0));
+      opacity:.65; pointer-events:none;
+      background:conic-gradient(from 180deg, rgba(10,12,22,0), rgba(10,12,22,.82), rgba(10,12,22,0));
       -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="black" d="M5.6 7.4a1 1 0 0 1 1.4 0L10 10.4l3-3a1 1 0 1 1 1.4 1.4l-3.7 3.7a1 1 0 0 1-1.4 0L5.6 8.8a1 1 0 0 1 0-1.4Z"/></svg>') center/contain no-repeat;
               mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="black" d="M5.6 7.4a1 1 0 0 1 1.4 0L10 10.4l3-3a1 1 0 1 1 1.4 1.4l-3.7 3.7a1 1 0 0 1-1.4 0L5.6 8.8a1 1 0 0 1 0-1.4Z"/></svg>') center/contain no-repeat;
     }
 
     .is-ok{
-      border-color:rgba(52,199,89,.45) !important;
-      box-shadow:0 0 0 7px rgba(52,199,89,.12);
+      border-color:rgba(52,199,89,.40) !important;
+      box-shadow:0 0 0 8px var(--okRing);
     }
+
     .invalid{
-      border-color:rgba(255,95,95,.55) !important;
-      box-shadow:0 0 0 7px rgba(255,95,95,.10);
+      border-color:rgba(255,69,69,.55) !important;
+      box-shadow:0 0 0 8px var(--dangerRing);
       animation: shake 320ms ease both;
     }
     @keyframes shake{
@@ -373,9 +395,9 @@
       width:24px;height:24px;
       border-radius:999px;
       display:flex;align-items:center;justify-content:center;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.16);
-      color:rgba(255,255,255,.92);
+      border:1px solid rgba(15,20,35,.12);
+      background:rgba(255,255,255,.72);
+      color:rgba(10,12,22,.92);
       font-size:14px;
       opacity:0;
       transition:opacity .18s ease, transform .18s ease;
@@ -384,36 +406,37 @@
     .check.show{
       opacity:1;
       transform:translateY(-50%) scale(1);
-      border-color:rgba(52,199,89,.42);
-      box-shadow:0 0 0 7px rgba(52,199,89,.10);
+      border-color:rgba(52,199,89,.40);
+      box-shadow:0 0 0 8px var(--okRing);
     }
 
     /* ===== QR ===== */
     .qrBox{
       padding:14px 16px 18px;
-      border-top:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.10);
+      border-top:1px solid rgba(15,20,35,.08);
+      background:rgba(255,255,255,.34);
       text-align:center;
     }
+
     .tip{
       margin:0 0 10px;
       padding:10px 12px;
       border-radius:16px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.14);
-      color:rgba(255,255,255,.86);
+      border:1px solid rgba(15,20,35,.10);
+      background:rgba(255,255,255,.55);
+      color:rgba(10,12,22,.78);
       font-size:13px;
       line-height:1.35;
     }
-    .tip b{ color:rgba(255,255,255,.96); }
+    .tip b{ color:rgba(10,12,22,.92); }
 
     .qrFrame{
       margin:6px auto 0;
-      width:min(260px,78%);
+      width:min(240px,74%);
       aspect-ratio:1/1;
       border-radius:22px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.06);
+      border:1px solid rgba(15,20,35,.10);
+      background:rgba(255,255,255,.52);
       display:flex;align-items:center;justify-content:center;
       overflow:hidden;
       position:relative;
@@ -426,7 +449,7 @@
       display:none;
       opacity:0;
       transform:scale(.84);
-      filter:drop-shadow(0 16px 38px rgba(0,0,0,.42));
+      filter:drop-shadow(0 14px 30px rgba(12,18,40,.18));
       z-index:2;
     }
     #qr.reveal{
@@ -456,7 +479,7 @@
       position:absolute;
       font-size:20px;
       opacity:.92;
-      filter:drop-shadow(0 10px 22px rgba(0,0,0,.40));
+      filter:drop-shadow(0 10px 18px rgba(12,18,40,.16));
       animation: floaty .72s ease forwards;
     }
     .spark:before{ left:14px; top:14px; }
@@ -473,15 +496,15 @@
       padding:10px 12px;
       border-radius:14px;
       text-align:left;
-      border:1px dashed rgba(255,255,255,.22);
-      background:rgba(0,0,0,.16);
+      border:1px dashed rgba(15,20,35,.16);
+      background:rgba(255,255,255,.52);
       word-break:break-word;
       font-size:13px;
-      color:rgba(255,255,255,.82);
+      color:rgba(10,12,22,.82);
       display:none;
     }
 
-    /* ===== Sticky CTA (single) ===== */
+    /* ===== Sticky CTA ===== */
     .ctaBar{
       position:fixed;
       left:0; right:0;
@@ -493,13 +516,13 @@
       pointer-events:none;
     }
     .ctaGlass{
-      width:min(680px, calc(100% - 28px));
+      width:min(720px, calc(100% - 28px));
       border-radius:22px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.22);
-      box-shadow:0 18px 70px rgba(0,0,0,.55);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      border:1px solid rgba(15,20,35,.10);
+      background:rgba(255,255,255,.64);
+      box-shadow:0 18px 70px rgba(12,18,40,.16);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
       padding:10px;
       pointer-events:auto;
     }
@@ -507,28 +530,30 @@
       width:100%;
       padding:14px 14px;
       border-radius:18px;
-      border:1px solid rgba(255,255,255,.18);
-      color:rgba(255,255,255,.94);
+      border:1px solid rgba(15,20,35,.10);
+      color:rgba(10,12,22,.92);
       font-weight:950;
       font-size:16px;
       letter-spacing:-.01em;
       cursor:pointer;
-      background:linear-gradient(180deg, rgba(10,132,255,.26), rgba(0,0,0,.16));
-      box-shadow:0 16px 46px rgba(10,132,255,.12);
+
+      /* Apple-ish: subtle blue tint, not neon */
+      background:linear-gradient(180deg, rgba(10,132,255,.18), rgba(255,255,255,.55));
+      box-shadow:0 14px 40px rgba(10,132,255,.10);
       position:relative;
       overflow:hidden;
       transition:transform .08s ease, opacity .16s ease;
     }
     .ctaBtn:active{ transform:scale(.995); }
-    .ctaBtn[disabled]{ opacity:.42; cursor:not-allowed; box-shadow:none; }
+    .ctaBtn[disabled]{ opacity:.45; cursor:not-allowed; box-shadow:none; }
     .ctaBtn::after{
       content:"";
       position:absolute; inset:0;
-      background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.14), rgba(255,255,255,0));
+      background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.32), rgba(255,255,255,0));
       transform:translateX(-60%);
       animation: btnshine 2.1s linear infinite;
       pointer-events:none;
-      opacity:.92;
+      opacity:.95;
     }
     @keyframes btnshine{ to{ transform:translateX(60%);} }
 
@@ -551,8 +576,8 @@
       <div class="progressWrap" id="progressWrap" aria-label="Progression">
         <div class="progressTopRow">
           <button class="backMini" id="backMini" disabled aria-label="Retour">
-            <svg viewBox="0 0 20 20" fill="none">
-              <path d="M12.8 4.5a1 1 0 0 1 0 1.4L8.7 10l4.1 4.1a1 1 0 1 1-1.4 1.4L6.6 10.7a1 1 0 0 1 0-1.4l4.8-4.8a1 1 0 0 1 1.4 0Z" fill="rgba(255,255,255,.92)"/>
+            <svg viewBox="0 0 20 20" fill="none" width="18" height="18" aria-hidden="true">
+              <path d="M12.8 4.5a1 1 0 0 1 0 1.4L8.7 10l4.1 4.1a1 1 0 1 1-1.4 1.4L6.6 10.7a1 1 0 0 1 0-1.4l4.8-4.8a1 1 0 0 1 1.4 0Z" fill="rgba(10,12,22,.92)"/>
             </svg>
           </button>
 
@@ -618,7 +643,7 @@
     }
 
     class QrService {
-      static url(payload, size = 320) {
+      static url(payload, size = 300) {
         return "https://api.qrserver.com/v1/create-qr-code/?size="
           + size + "x" + size
           + "&data=" + encodeURIComponent(payload);
@@ -626,7 +651,6 @@
     }
 
     class Haptics {
-      // iOS Safari often ignores vibrate; harmless fallback.
       static light(){ try{ navigator.vibrate?.(10); }catch(e){} }
       static success(){ try{ navigator.vibrate?.([12, 18, 12]); }catch(e){} }
       static error(){ try{ navigator.vibrate?.([20, 30, 20]); }catch(e){} }
@@ -700,7 +724,6 @@
         this.state = { nom:"", prenom:"", club:"", sexe:"" };
         this.current = 0;
         this.playedSound = false;
-
         this.currentFieldEl = null;
 
         this.steps = [
@@ -725,7 +748,6 @@
         this.backMini.addEventListener("click", () => this.prev());
         this.ctaBtn.addEventListener("click", () => this.next());
 
-        // Click on nodes (only up to reachable)
         this.nodes.forEach(n => {
           n.addEventListener("click", () => {
             const i = Number(n.dataset.i);
@@ -734,7 +756,6 @@
           });
         });
 
-        // Apple-like: swipe ONLY on progress bar area
         this.bindSwipeOnProgress();
 
         this.renderStep(this.current, false);
@@ -756,11 +777,7 @@
           const t = e.touches ? e.touches[0] : e;
           const dx = t.clientX - startX;
           const dy = t.clientY - startY;
-
-          // Only prevent default if clearly horizontal (keeps scroll natural)
-          if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 16) {
-            e.preventDefault?.();
-          }
+          if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 16) e.preventDefault?.();
         };
 
         const onEnd = (e) => {
@@ -772,7 +789,6 @@
           const dy = t.clientY - startY;
 
           if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy)) return;
-
           if (dx < 0) this.next(); else this.prev();
         };
 
@@ -896,7 +912,6 @@
       prev() {
         if (this.current === 0) return;
         Haptics.light();
-
         this.fieldArea.classList.add("out");
         setTimeout(() => {
           this.current--;
@@ -912,7 +927,6 @@
         if (i > max) return;
 
         Haptics.light();
-
         this.fieldArea.classList.add("out");
         setTimeout(() => {
           this.current = i;
@@ -987,7 +1001,7 @@
         if (!this.isAllComplete()) return;
 
         const payload = this.buildPayload();
-        this.qr.src = QrService.url(payload, 320);
+        this.qr.src = QrService.url(payload, 300);
 
         this.qr.classList.remove("reveal");
         void this.qr.offsetWidth;
