@@ -16,7 +16,9 @@
 
       --ok: rgba(60,220,140,.95);
       --warn: rgba(255,205,80,.95);
-      --bad: rgba(255,105,105,.95);
+
+      --glass1: rgba(255,255,255,.12);
+      --glass2: rgba(255,255,255,.08);
     }
 
     *{box-sizing:border-box}
@@ -40,19 +42,18 @@
     .card{
       border-radius:var(--r);
       border:1px solid var(--stroke);
-      background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.08));
+      background:linear-gradient(180deg, var(--glass1), var(--glass2));
       box-shadow:var(--shadow);
       overflow:hidden;
       backdrop-filter:blur(14px);
       -webkit-backdrop-filter:blur(14px);
     }
 
-    /* Progress bar */
+    /* Progress */
     .topbar{
       height:8px;
       background:rgba(255,255,255,.08);
       border-bottom:1px solid rgba(255,255,255,.08);
-      position:relative;
       overflow:hidden;
     }
     .topbar > div{
@@ -64,142 +65,71 @@
 
     .sec{padding:18px}
 
-    /* ===== ROADMAP / STEPPER (Apple-like) ===== */
-    .roadmap{
-      position:relative;
-      margin-top:8px;
-      padding-left:10px;
-    }
-    .roadmap:before{
-      content:"";
-      position:absolute;
-      left:18px;
-      top:10px;
-      bottom:10px;
-      width:2px;
-      background:linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
-      border-radius:999px;
-    }
-
-    .step{
-      position:relative;
-      display:grid;
-      grid-template-columns:42px 1fr;
-      gap:12px;
-      padding:10px 0;
-      cursor:pointer;
-    }
-    .step.locked{opacity:.55; cursor:default}
-    .step.locked *{pointer-events:none}
-
-    .marker{
-      width:42px;
+    /* Step header (small / compact) */
+    .stepHeader{
       display:flex;
-      justify-content:center;
-      align-items:flex-start;
-      padding-top:2px;
-    }
-    .dot{
-      width:18px;height:18px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.18);
-      background:rgba(0,0,0,.18);
-      box-shadow:0 0 0 6px rgba(255,255,255,.06);
-      display:flex;align-items:center;justify-content:center;
-      font-size:12px;
-      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-    }
-    .step.active .dot{
-      border-color:rgba(120,180,255,.55);
-      box-shadow:0 0 0 7px rgba(120,180,255,.12);
-      transform:scale(1.03);
-    }
-    .step.done .dot{
-      border-color:rgba(60,220,140,.55);
-      box-shadow:0 0 0 7px rgba(60,220,140,.12);
-    }
-
-    .stepHead{
-      display:flex;
-      align-items:flex-start;
       justify-content:space-between;
-      gap:10px;
-      margin-bottom:8px;
+      align-items:flex-start;
+      gap:12px;
+      margin-bottom:10px;
     }
     .stepTitle{
       margin:0;
-      font-size:14px;
-      font-weight:760;
+      font-size:15px;
+      font-weight:800;
       letter-spacing:-.01em;
-      line-height:1.15;
+      line-height:1.2;
+    }
+    .stepSub{
+      margin:4px 0 0;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
     }
 
-    .chip{
+    .pill{
       display:inline-flex;
       align-items:center;
-      gap:6px;
-      padding:4px 10px;
+      gap:8px;
+      padding:6px 10px;
       border-radius:999px;
       border:1px solid rgba(255,255,255,.16);
       background:rgba(0,0,0,.18);
-      color:rgba(255,255,255,.82);
-      font-size:11px;
+      font-size:12px;
       white-space:nowrap;
     }
-    .chip .miniDot{
-      width:7px;height:7px;border-radius:99px;
-      background: var(--warn);
+    .pill .dot{
+      width:8px;height:8px;border-radius:999px;
+      background:var(--warn);
       box-shadow:0 0 0 3px rgba(255,205,80,.18);
-      flex:0 0 auto;
     }
-    .step.done .chip .miniDot{
-      background: var(--ok);
+    .pill.ok .dot{
+      background:var(--ok);
       box-shadow:0 0 0 3px rgba(60,220,140,.18);
     }
 
-    /* Summary pill when step is done and not active */
-    .summary{
-      display:none;
-      padding:10px 12px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(0,0,0,.14);
-      color:rgba(255,255,255,.86);
-      font-size:14px;
-      line-height:1.25;
-      word-break:break-word;
-    }
-    .summary small{
-      display:block;
-      margin-top:4px;
-      color:rgba(255,255,255,.62);
-      font-size:12px;
-    }
-    .step.done:not(.active) .summary{ display:block; }
-
-    /* Expandable content (only active step) */
-    .content{
+    /* Panel that slides in/out */
+    .panel{
       border:1px solid rgba(255,255,255,.12);
       border-radius:18px;
       background:rgba(0,0,0,.14);
       padding:12px;
+      overflow:hidden;
     }
-    .contentInner{
+    .panelInner{
       display:grid;
       gap:10px;
-      overflow:hidden;
-      transition:max-height .22s ease, opacity .18s ease, transform .18s ease;
-      max-height:260px;
+      transition:opacity .18s ease, transform .22s ease;
       opacity:1;
       transform:translateY(0);
     }
-    .step:not(.active) .contentInner{
-      max-height:0px;
+    .panel.hide .panelInner{
       opacity:0;
-      transform:translateY(-4px);
+      transform:translateY(-6px);
       pointer-events:none;
     }
 
-    .field{ position:relative; }
+    .field{position:relative}
     .check{
       position:absolute;
       right:12px;
@@ -207,9 +137,7 @@
       transform:translateY(-50%) scale(.92);
       width:22px;height:22px;
       border-radius:999px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      display:flex;align-items:center;justify-content:center;
       border:1px solid rgba(255,255,255,.14);
       background:rgba(0,0,0,.18);
       color:rgba(255,255,255,.88);
@@ -253,6 +181,12 @@
       box-shadow:0 0 0 6px rgba(60,220,140,.10);
     }
 
+    .mini{
+      font-size:12px;
+      color:rgba(255,255,255,.72);
+      line-height:1.4;
+    }
+
     .nav{
       display:flex;
       gap:10px;
@@ -269,18 +203,11 @@
       cursor:pointer;
       user-select:none;
     }
-    .btn:active{transform:scale(.99)}
     .btn.secondary{opacity:.9}
     .btn[disabled]{opacity:.45; cursor:not-allowed}
+    .btn:active{transform:scale(.99)}
 
-    .mini{
-      margin-top:10px;
-      font-size:12px;
-      color:rgba(255,255,255,.72);
-      line-height:1.4;
-    }
-
-    /* ===== QR area ===== */
+    /* QR */
     .qrBox{
       padding:16px 18px 18px;
       border-top:1px solid rgba(255,255,255,.14);
@@ -294,13 +221,10 @@
       border-radius:22px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(255,255,255,.06);
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      display:flex;align-items:center;justify-content:center;
       overflow:hidden;
       position:relative;
     }
-
     #qr{
       width:100%;height:100%;
       object-fit:contain;
@@ -309,8 +233,6 @@
       transform:scale(.86) rotate(-2deg);
       filter:drop-shadow(0 12px 30px rgba(0,0,0,.35));
     }
-
-    /* FUN reveal */
     #qr.pop{
       display:block;
       animation: popIn .55s cubic-bezier(.2,.9,.2,1) forwards;
@@ -320,23 +242,18 @@
       60%{opacity:1; transform:scale(1.05) rotate(2deg)}
       100%{opacity:1; transform:scale(1) rotate(0deg)}
     }
-
-    /* Sparkles */
     .spark{
-      position:absolute;
-      inset:0;
+      position:absolute; inset:0;
       pointer-events:none;
       opacity:0;
     }
-    .spark.on{
-      animation: spark .65s ease forwards;
-    }
+    .spark.on{ animation:spark .65s ease forwards; }
     @keyframes spark{
       0%{opacity:0; transform:scale(.98)}
       25%{opacity:1}
       100%{opacity:0; transform:scale(1.02)}
     }
-    .spark:before, .spark:after{
+    .spark:before,.spark:after{
       content:"✨";
       position:absolute;
       font-size:18px;
@@ -372,123 +289,27 @@
   <div class="wrap">
     <div class="header">
       <h1 class="title">🏆 Pré-inscription 🥋</h1>
-      <p class="sub">Roadmap guidée + résumé compact des étapes validées</p>
+      <p class="sub">Saisie “une zone à la fois” → page très compacte</p>
     </div>
 
     <div class="card">
       <div class="topbar"><div id="progressBar"></div></div>
 
       <div class="sec">
-        <div class="roadmap" id="roadmap">
-
-          <!-- STEP 1 -->
-          <div class="step active" data-step="0">
-            <div class="marker"><div class="dot">1</div></div>
-            <div>
-              <div class="stepHead">
-                <p class="stepTitle">Nom</p>
-                <span class="chip"><span class="miniDot"></span><span class="txt" id="chip-0">Requis</span></span>
-              </div>
-
-              <div class="summary" id="sum-0">
-                <div id="sumv-0">—</div>
-                <small>Tape pour modifier</small>
-              </div>
-
-              <div class="content">
-                <div class="contentInner">
-                  <div class="field">
-                    <input id="nom" placeholder="JORDAN" autocomplete="family-name" required>
-                    <div class="check" id="check-nom">✓</div>
-                  </div>
-                  <div class="mini">Le nom passe automatiquement en MAJ.</div>
-                </div>
-              </div>
-            </div>
+        <div class="stepHeader">
+          <div>
+            <p class="stepTitle" id="stepTitle">Nom</p>
+            <p class="stepSub" id="stepSub">Saisis le nom de famille (en MAJ).</p>
           </div>
-
-          <!-- STEP 2 -->
-          <div class="step locked" data-step="1">
-            <div class="marker"><div class="dot">2</div></div>
-            <div>
-              <div class="stepHead">
-                <p class="stepTitle">Prénom</p>
-                <span class="chip"><span class="miniDot"></span><span class="txt" id="chip-1">Requis</span></span>
-              </div>
-
-              <div class="summary" id="sum-1">
-                <div id="sumv-1">—</div>
-                <small>Tape pour modifier</small>
-              </div>
-
-              <div class="content">
-                <div class="contentInner">
-                  <div class="field">
-                    <input id="prenom" placeholder="Mickael" autocomplete="given-name" required disabled>
-                    <div class="check" id="check-prenom">✓</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="pill" id="pill">
+            <span class="dot"></span><span id="pillTxt">Requis</span>
           </div>
+        </div>
 
-          <!-- STEP 3 -->
-          <div class="step locked" data-step="2">
-            <div class="marker"><div class="dot">3</div></div>
-            <div>
-              <div class="stepHead">
-                <p class="stepTitle">Club</p>
-                <span class="chip"><span class="miniDot"></span><span class="txt" id="chip-2">Requis</span></span>
-              </div>
-
-              <div class="summary" id="sum-2">
-                <div id="sumv-2">—</div>
-                <small>Tape pour modifier</small>
-              </div>
-
-              <div class="content">
-                <div class="contentInner">
-                  <div class="field">
-                    <select id="club" required disabled>
-                      <option value="">— Sélectionne un club —</option>
-                    </select>
-                    <div class="check" id="check-club">✓</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div class="panel" id="panel">
+          <div class="panelInner" id="panelInner">
+            <!-- dynamic field goes here -->
           </div>
-
-          <!-- STEP 4 -->
-          <div class="step locked" data-step="3">
-            <div class="marker"><div class="dot">4</div></div>
-            <div>
-              <div class="stepHead">
-                <p class="stepTitle">Sexe</p>
-                <span class="chip"><span class="miniDot"></span><span class="txt" id="chip-3">Requis</span></span>
-              </div>
-
-              <div class="summary" id="sum-3">
-                <div id="sumv-3">—</div>
-                <small>Tape pour modifier</small>
-              </div>
-
-              <div class="content">
-                <div class="contentInner">
-                  <div class="field">
-                    <select id="sexe" required disabled>
-                      <option value="">— Sélectionne —</option>
-                      <option value="Masculin">Masculin</option>
-                      <option value="Féminin">Féminin</option>
-                    </select>
-                    <div class="check" id="check-sexe">✓</div>
-                  </div>
-                  <div class="mini">Une fois tout validé → QR + “はじめ / Hajime”.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div>
 
         <div class="nav">
@@ -508,7 +329,7 @@
           <div class="spark" id="spark"></div>
           <img id="qr" alt="QR Code">
           <div id="empty" class="hint" style="padding:18px;max-width:340px;">
-            Suis la roadmap ci-dessus : à la fin, le QR apparaît 🎉
+            Termine les étapes pour afficher le QR 🎉
           </div>
         </div>
 
@@ -536,10 +357,9 @@
     }
 
     class SoundService {
-      // Tente un “はじめ / Hajime” (voice synth). Sinon beep.
       static playHajime() {
         try {
-          const text = "はじめ";
+          const text = "はじめ"; // Hajime (tu disais "adjime")
           if (!("speechSynthesis" in window)) return SoundService.beep();
 
           const u = new SpeechSynthesisUtterance(text);
@@ -577,229 +397,304 @@
 
     class App {
       constructor() {
-        this.nom = document.getElementById("nom");
-        this.prenom = document.getElementById("prenom");
-        this.club = document.getElementById("club");
-        this.sexe = document.getElementById("sexe");
+        // UI
+        this.stepTitle = document.getElementById("stepTitle");
+        this.stepSub   = document.getElementById("stepSub");
+        this.pill      = document.getElementById("pill");
+        this.pillTxt   = document.getElementById("pillTxt");
 
-        this.checkNom = document.getElementById("check-nom");
-        this.checkPrenom = document.getElementById("check-prenom");
-        this.checkClub = document.getElementById("check-club");
-        this.checkSexe = document.getElementById("check-sexe");
+        this.panel     = document.getElementById("panel");
+        this.panelInner= document.getElementById("panelInner");
 
-        this.steps = [...document.querySelectorAll(".step[data-step]")];
+        this.progressBar = document.getElementById("progressBar");
+        this.formHint = document.getElementById("formHint");
 
-        this.chipTxt = [
-          document.getElementById("chip-0"),
-          document.getElementById("chip-1"),
-          document.getElementById("chip-2"),
-          document.getElementById("chip-3"),
-        ];
-
-        // summaries
-        this.sumV = [
-          document.getElementById("sumv-0"),
-          document.getElementById("sumv-1"),
-          document.getElementById("sumv-2"),
-          document.getElementById("sumv-3"),
-        ];
-
-        this.backBtn = document.getElementById("backBtn");
-        this.nextBtn = document.getElementById("nextBtn");
+        this.backBtn  = document.getElementById("backBtn");
+        this.nextBtn  = document.getElementById("nextBtn");
         this.resetBtn = document.getElementById("resetBtn");
 
-        this.formHint = document.getElementById("formHint");
-        this.progressBar = document.getElementById("progressBar");
-
+        // QR
         this.qr = document.getElementById("qr");
         this.empty = document.getElementById("empty");
         this.hint = document.getElementById("hint");
         this.payloadBox = document.getElementById("payload");
         this.spark = document.getElementById("spark");
 
+        // data
+        this.state = { nom:"", prenom:"", club:"", sexe:"" };
         this.current = 0;
         this.playedSound = false;
 
-        this.fields = [
-          { id:"nom",    el:this.nom,    check:this.checkNom },
-          { id:"prenom", el:this.prenom, check:this.checkPrenom },
-          { id:"club",   el:this.club,   check:this.checkClub },
-          { id:"sexe",   el:this.sexe,   check:this.checkSexe },
+        // steps definition
+        this.steps = [
+          {
+            key:"nom",
+            title:"Nom",
+            sub:"Saisis le nom de famille (en MAJ).",
+            render: () => this.renderInput("nom", "JORDAN", "family-name", true),
+            normalize: (v) => (v || "").toUpperCase(),
+          },
+          {
+            key:"prenom",
+            title:"Prénom",
+            sub:"Saisis le prénom (première lettre en maj).",
+            render: () => this.renderInput("prenom", "Mickael", "given-name", true),
+            normalize: (v) => {
+              v = String(v||"");
+              v = v.trim();
+              if (!v) return "";
+              return v.charAt(0).toUpperCase() + v.slice(1);
+            }
+          },
+          {
+            key:"club",
+            title:"Club",
+            sub:"Choisis le club dans la liste.",
+            render: () => this.renderSelect("club", "— Sélectionne un club —", ClubsProvider.list()),
+            normalize: (v) => String(v||"").trim()
+          },
+          {
+            key:"sexe",
+            title:"Sexe",
+            sub:"Choisis Masculin ou Féminin.",
+            render: () => this.renderSelect("sexe", "— Sélectionne —", ["Masculin","Féminin"]),
+            normalize: (v) => String(v||"").trim()
+          }
         ];
       }
 
       init() {
-        this.populateClubs();
-
-        this.nom.addEventListener("input", () => { this.normalize(); this.onFieldChange(0); });
-        this.prenom.addEventListener("input", () => { this.normalize(); this.onFieldChange(1); });
-
-        [this.club, this.sexe].forEach((el, idx) => {
-          el.addEventListener("change", () => this.onFieldChange(idx + 2));
-          el.addEventListener("input",  () => this.onFieldChange(idx + 2));
-        });
-
-        this.backBtn.addEventListener("click", () => this.go(this.current - 1));
-        this.nextBtn.addEventListener("click", () => this.go(this.current + 1));
+        // nav
+        this.backBtn.addEventListener("click", () => this.go(this.current - 1, true));
+        this.nextBtn.addEventListener("click", () => this.next());
         this.resetBtn.addEventListener("click", () => this.reset());
 
-        // click step to edit (only if not locked)
-        this.steps.forEach((st, i) => {
-          st.addEventListener("click", (e) => {
-            const locked = st.classList.contains("locked");
-            if (locked) return;
+        this.renderStep(this.current);
+        this.refresh();
+      }
 
-            // don't hijack inner controls
-            const tag = (e.target.tagName || "").toUpperCase();
-            if (["INPUT","SELECT","OPTION","BUTTON"].includes(tag)) return;
+      // ===== renderers =====
+      renderInput(key, placeholder, autocomplete, showMini) {
+        this.panelInner.innerHTML = `
+          <div class="field">
+            <input id="field" placeholder="${this.escapeHtml(placeholder)}" autocomplete="${this.escapeHtml(autocomplete)}" />
+            <div class="check" id="check">✓</div>
+          </div>
+          ${showMini ? `<div class="mini" id="mini"></div>` : ``}
+        `;
 
-            this.go(i);
-          });
+        const input = document.getElementById("field");
+        const check = document.getElementById("check");
+        const mini  = document.getElementById("mini");
+
+        input.value = this.state[key] || "";
+
+        input.addEventListener("input", () => {
+          const step = this.steps[this.current];
+          const raw = input.value;
+          const norm = step.normalize ? step.normalize(raw) : raw;
+          if (norm !== raw) input.value = norm;
+
+          this.state[key] = input.value;
+
+          // per-field hint
+          if (mini) {
+            if (key === "nom") mini.textContent = "Auto: MAJUSCULES ✅";
+            if (key === "prenom") mini.textContent = "Auto: Première lettre en maj ✅";
+          }
+
+          // update visuals
+          const ok = this.isFilled(input.value);
+          input.classList.toggle("is-ok", ok);
+          input.classList.toggle("is-empty", !ok);
+          check.classList.toggle("show", ok);
+
+          this.refresh();
         });
 
-        this.refreshAll();
-        this.go(0);
-      }
+        // initial state class
+        const ok0 = this.isFilled(input.value);
+        input.classList.toggle("is-ok", ok0);
+        input.classList.toggle("is-empty", !ok0);
+        check.classList.toggle("show", ok0);
 
-      populateClubs() {
-        ClubsProvider.list().forEach(c => {
-          const opt = document.createElement("option");
-          opt.value = c;
-          opt.textContent = c;
-          this.club.appendChild(opt);
-        });
-      }
-
-      normalize() {
-        this.nom.value = (this.nom.value || "").toUpperCase();
-        const p = (this.prenom.value || "");
-        if (p) this.prenom.value = p.charAt(0).toUpperCase() + p.slice(1);
-      }
-
-      isFilled(el) {
-        return String(el.value || "").trim().length > 0;
-      }
-
-      buildPayload() {
-        const n = this.nom.value.trim();
-        const p = this.prenom.value.trim();
-        const c = this.club.value.trim();
-        const s = this.sexe.value.trim();
-        const payload = `${n};${p};${c};${s};`;
-        return { n, p, c, s, payload };
-      }
-
-      allComplete() {
-        return this.fields.every(f => this.isFilled(f.el));
-      }
-
-      setSummary() {
-        const n = this.nom.value.trim();
-        const p = this.prenom.value.trim();
-        const c = this.club.value.trim();
-        const s = this.sexe.value.trim();
-
-        this.sumV[0].textContent = n || "—";
-        this.sumV[1].textContent = p || "—";
-        this.sumV[2].textContent = c || "—";
-        this.sumV[3].textContent = s || "—";
-      }
-
-      onFieldChange(i) {
-        this.refreshAll();
-
-        const ok = this.isFilled(this.fields[i].el);
-        if (!ok) return;
-
-        if (this.current === i && i < this.fields.length - 1) {
-          setTimeout(() => this.go(i + 1), 140);
-        }
-
-        if (this.allComplete()) this.showQR();
-        else this.hideQR();
-      }
-
-      refreshAll() {
-        // update summary
-        this.setSummary();
-
-        // per-field visuals
-        this.fields.forEach((f, idx) => {
-          const ok = this.isFilled(f.el);
-          f.el.classList.toggle("is-ok", ok);
-          f.el.classList.toggle("is-empty", !ok);
-          f.check.classList.toggle("show", ok);
-
-          this.chipTxt[idx].textContent = ok ? "✓ OK" : "Requis";
-
-          const st = this.steps[idx];
-          st.classList.toggle("done", ok);
-        });
-
-        // lock/unlock sequentially
-        for (let i = 0; i < this.steps.length; i++) {
-          const prevOk = (i === 0) ? true : this.isFilled(this.fields[i-1].el);
-          const canAccess = prevOk;
-
-          this.steps[i].classList.toggle("locked", !canAccess);
-          this.fields[i].el.disabled = !canAccess;
-        }
-
-        // progress
-        const filled = this.fields.reduce((acc, f) => acc + (this.isFilled(f.el) ? 1 : 0), 0);
-        this.progressBar.style.width = `${Math.round((filled / this.fields.length) * 100)}%`;
-
-        // nav
-        this.backBtn.disabled = (this.current === 0);
-        this.nextBtn.disabled = !this.canGoNext();
-
-        // hint
-        if (!this.allComplete()) {
-          const miss = [];
-          if (!this.isFilled(this.nom)) miss.push("Nom");
-          if (!this.isFilled(this.prenom)) miss.push("Prénom");
-          if (!this.isFilled(this.club)) miss.push("Club");
-          if (!this.isFilled(this.sexe)) miss.push("Sexe");
-          this.formHint.textContent = "➡️ Étape par étape — manque : " + miss.join(", ");
-        } else {
-          this.formHint.textContent = "✅ Tout est OK — QR généré";
-        }
-      }
-
-      canGoNext() {
-        const currentOk = this.isFilled(this.fields[this.current].el);
-        if (!currentOk) return false;
-        if (this.current >= this.steps.length - 1) return false;
-        return !this.steps[this.current + 1].classList.contains("locked");
-      }
-
-      go(i) {
-        i = Math.max(0, Math.min(this.steps.length - 1, i));
-        if (this.steps[i].classList.contains("locked")) return;
-
-        this.current = i;
-        this.steps.forEach((st, idx) => st.classList.toggle("active", idx === i));
-
-        this.backBtn.disabled = (i === 0);
-        this.nextBtn.disabled = !this.canGoNext();
-
-        const el = this.fields[i].el;
         setTimeout(() => {
-          try { el.focus({ preventScroll:true }); } catch(e) { el.focus(); }
+          try { input.focus({ preventScroll:true }); } catch(e) { input.focus(); }
         }, 60);
       }
 
+      renderSelect(key, firstLabel, options) {
+        const opts = [
+          `<option value="">${this.escapeHtml(firstLabel)}</option>`,
+          ...options.map(o => `<option value="${this.escapeHtml(o)}">${this.escapeHtml(o)}</option>`)
+        ].join("");
+
+        this.panelInner.innerHTML = `
+          <div class="field">
+            <select id="field">${opts}</select>
+            <div class="check" id="check">✓</div>
+          </div>
+          <div class="mini">iOS: la sélection déclenche la suite automatiquement.</div>
+        `;
+
+        const select = document.getElementById("field");
+        const check = document.getElementById("check");
+
+        select.value = this.state[key] || "";
+
+        const onChange = () => {
+          const step = this.steps[this.current];
+          this.state[key] = step.normalize ? step.normalize(select.value) : select.value;
+
+          const ok = this.isFilled(select.value);
+          select.classList.toggle("is-ok", ok);
+          select.classList.toggle("is-empty", !ok);
+          check.classList.toggle("show", ok);
+
+          this.refresh();
+
+          // auto next if ok
+          if (ok) setTimeout(() => this.next(), 120);
+        };
+
+        select.addEventListener("change", onChange);
+        select.addEventListener("input", onChange);
+
+        const ok0 = this.isFilled(select.value);
+        select.classList.toggle("is-ok", ok0);
+        select.classList.toggle("is-empty", !ok0);
+        check.classList.toggle("show", ok0);
+
+        setTimeout(() => {
+          try { select.focus({ preventScroll:true }); } catch(e) { select.focus(); }
+        }, 60);
+      }
+
+      // ===== flow =====
+      renderStep(i) {
+        const step = this.steps[i];
+        this.stepTitle.textContent = step.title;
+        this.stepSub.textContent = step.sub;
+
+        // (re)render current control
+        step.render();
+
+        this.refresh();
+      }
+
+      next() {
+        // if current not ok -> do nothing
+        if (!this.isStepOk(this.current)) return;
+
+        // animate panel out (the "zone disappears")
+        this.panel.classList.add("hide");
+
+        setTimeout(() => {
+          // move to next
+          if (this.current < this.steps.length - 1) {
+            this.current++;
+            this.panel.classList.remove("hide");
+            this.renderStep(this.current);
+          } else {
+            // finished -> show QR
+            this.panel.classList.remove("hide");
+            this.showQR();
+          }
+        }, 180);
+      }
+
+      go(i, animate) {
+        i = Math.max(0, Math.min(this.steps.length - 1, i));
+        // you can only go back freely; forward only up to last completed+1
+        const max = this.maxReachableStep();
+        if (i > max) return;
+
+        if (animate) {
+          this.panel.classList.add("hide");
+          setTimeout(() => {
+            this.current = i;
+            this.panel.classList.remove("hide");
+            this.renderStep(this.current);
+          }, 180);
+        } else {
+          this.current = i;
+          this.renderStep(this.current);
+        }
+      }
+
+      maxReachableStep() {
+        // You can reach current step or previous completed ones
+        // forward limited to first missing step
+        for (let i = 0; i < this.steps.length; i++) {
+          if (!this.isStepOk(i)) return i; // first missing is reachable
+        }
+        return this.steps.length - 1;
+      }
+
+      isStepOk(i) {
+        const key = this.steps[i].key;
+        return this.isFilled(this.state[key]);
+      }
+
+      isFilled(v) {
+        return String(v || "").trim().length > 0;
+      }
+
+      refresh() {
+        // pill state
+        const ok = this.isStepOk(this.current);
+        this.pill.classList.toggle("ok", ok);
+        this.pillTxt.textContent = ok ? "✓ OK" : "Requis";
+
+        // progress
+        const filled = this.steps.reduce((acc, st, i) => acc + (this.isStepOk(i) ? 1 : 0), 0);
+        const pct = Math.round((filled / this.steps.length) * 100);
+        this.progressBar.style.width = `${pct}%`;
+
+        // buttons
+        this.backBtn.disabled = (this.current === 0);
+        this.nextBtn.disabled = !ok;
+
+        // global hint
+        if (this.isAllComplete()) {
+          this.formHint.textContent = "✅ Tout est OK — QR généré";
+        } else {
+          const missing = [];
+          if (!this.isFilled(this.state.nom)) missing.push("Nom");
+          if (!this.isFilled(this.state.prenom)) missing.push("Prénom");
+          if (!this.isFilled(this.state.club)) missing.push("Club");
+          if (!this.isFilled(this.state.sexe)) missing.push("Sexe");
+          this.formHint.textContent = `➡️ Étape ${this.current+1}/${this.steps.length} — manque : ${missing.join(", ")}`;
+        }
+
+        // hide QR if user edits / not complete
+        if (!this.isAllComplete()) this.hideQR();
+      }
+
+      isAllComplete() {
+        return this.steps.every((_, i) => this.isStepOk(i));
+      }
+
+      buildPayload() {
+        const n = (this.state.nom || "").trim();
+        const p = (this.state.prenom || "").trim();
+        const c = (this.state.club || "").trim();
+        const s = (this.state.sexe || "").trim();
+        const payload = `${n};${p};${c};${s};`;
+        return { payload };
+      }
+
       showQR() {
+        if (!this.isAllComplete()) return;
+
         const { payload } = this.buildPayload();
 
         this.qr.src = QrService.url(payload, 520);
 
-        // retrigger animation
         this.qr.classList.remove("pop");
         void this.qr.offsetWidth;
         this.qr.classList.add("pop");
 
-        // sparkles
         this.spark.classList.remove("on");
         void this.spark.offsetWidth;
         this.spark.classList.add("on");
@@ -827,13 +722,19 @@
       }
 
       reset() {
-        this.nom.value = "";
-        this.prenom.value = "";
-        this.club.value = "";
-        this.sexe.value = "";
+        this.state = { nom:"", prenom:"", club:"", sexe:"" };
+        this.current = 0;
         this.hideQR();
-        this.refreshAll();
-        this.go(0);
+        this.renderStep(this.current);
+      }
+
+      escapeHtml(s){
+        return String(s)
+          .replaceAll("&","&amp;")
+          .replaceAll("<","&lt;")
+          .replaceAll(">","&gt;")
+          .replaceAll('"',"&quot;")
+          .replaceAll("'","&#039;");
       }
     }
 
