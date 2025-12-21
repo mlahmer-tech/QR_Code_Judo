@@ -63,16 +63,76 @@
     }
 
     .sec{padding:18px}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media (max-width:420px){.row{grid-template-columns:1fr}}
 
-    .label{
-      font-size:12px;color:var(--muted);
-      margin:0 0 8px;padding-left:4px;
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
+    /* ===== ROADMAP / STEPPER (Apple-like) ===== */
+    .roadmap{
+      position:relative;
+      margin-top:8px;
+      padding-left:10px;
+    }
+    .roadmap:before{
+      content:"";
+      position:absolute;
+      left:18px;
+      top:10px;
+      bottom:10px;
+      width:2px;
+      background:linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
+      border-radius:999px;
     }
 
-    /* Apple-like chip */
+    .step{
+      position:relative;
+      display:grid;
+      grid-template-columns:42px 1fr;
+      gap:12px;
+      padding:10px 0;
+      cursor:pointer;
+    }
+    .step.locked{opacity:.55; cursor:default}
+    .step.locked *{pointer-events:none}
+
+    .marker{
+      width:42px;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      padding-top:2px;
+    }
+    .dot{
+      width:18px;height:18px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(0,0,0,.18);
+      box-shadow:0 0 0 6px rgba(255,255,255,.06);
+      display:flex;align-items:center;justify-content:center;
+      font-size:12px;
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .step.active .dot{
+      border-color:rgba(120,180,255,.55);
+      box-shadow:0 0 0 7px rgba(120,180,255,.12);
+      transform:scale(1.03);
+    }
+    .step.done .dot{
+      border-color:rgba(60,220,140,.55);
+      box-shadow:0 0 0 7px rgba(60,220,140,.12);
+    }
+
+    .stepHead{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .stepTitle{
+      margin:0;
+      font-size:14px;
+      font-weight:760;
+      letter-spacing:-.01em;
+      line-height:1.15;
+    }
+
     .chip{
       display:inline-flex;
       align-items:center;
@@ -84,26 +144,61 @@
       color:rgba(255,255,255,.82);
       font-size:11px;
       white-space:nowrap;
-
-      transition:opacity .18s ease, transform .18s ease;
     }
-    .chip .dot{
+    .chip .miniDot{
       width:7px;height:7px;border-radius:99px;
       background: var(--warn);
       box-shadow:0 0 0 3px rgba(255,205,80,.18);
       flex:0 0 auto;
     }
-    .chip.ok .dot{
+    .step.done .chip .miniDot{
       background: var(--ok);
       box-shadow:0 0 0 3px rgba(60,220,140,.18);
     }
-    .chip.hidden{
+
+    /* Summary pill when step is done and not active */
+    .summary{
+      display:none;
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.14);
+      color:rgba(255,255,255,.86);
+      font-size:14px;
+      line-height:1.25;
+      word-break:break-word;
+    }
+    .summary small{
+      display:block;
+      margin-top:4px;
+      color:rgba(255,255,255,.62);
+      font-size:12px;
+    }
+    .step.done:not(.active) .summary{ display:block; }
+
+    /* Expandable content (only active step) */
+    .content{
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      background:rgba(0,0,0,.14);
+      padding:12px;
+    }
+    .contentInner{
+      display:grid;
+      gap:10px;
+      overflow:hidden;
+      transition:max-height .22s ease, opacity .18s ease, transform .18s ease;
+      max-height:260px;
+      opacity:1;
+      transform:translateY(0);
+    }
+    .step:not(.active) .contentInner{
+      max-height:0px;
       opacity:0;
-      transform:translateY(-2px) scale(.98);
+      transform:translateY(-4px);
       pointer-events:none;
     }
 
-    /* Field wrapper for checkmark */
     .field{ position:relative; }
     .check{
       position:absolute;
@@ -133,7 +228,7 @@
     input, select{
       width:100%;
       padding:14px;
-      padding-right:44px; /* place for check */
+      padding-right:44px;
       font-size:16px;
       border-radius:16px;
       border:1px solid rgba(255,255,255,.14);
@@ -149,8 +244,6 @@
       border-color:rgba(120,180,255,.55);
       box-shadow:0 0 0 6px rgba(120,180,255,.12);
     }
-
-    /* States */
     .is-empty{
       border-color:rgba(255,205,80,.40) !important;
       box-shadow:0 0 0 6px rgba(255,205,80,.09);
@@ -160,7 +253,7 @@
       box-shadow:0 0 0 6px rgba(60,220,140,.10);
     }
 
-    .actions{
+    .nav{
       display:flex;
       gap:10px;
       margin-top:12px;
@@ -174,8 +267,11 @@
       color:rgba(255,255,255,.92);
       font-size:15px;
       cursor:pointer;
+      user-select:none;
     }
     .btn:active{transform:scale(.99)}
+    .btn.secondary{opacity:.9}
+    .btn[disabled]{opacity:.45; cursor:not-allowed}
 
     .mini{
       margin-top:10px;
@@ -184,6 +280,7 @@
       line-height:1.4;
     }
 
+    /* ===== QR area ===== */
     .qrBox{
       padding:16px 18px 18px;
       border-top:1px solid rgba(255,255,255,.14);
@@ -201,20 +298,58 @@
       align-items:center;
       justify-content:center;
       overflow:hidden;
+      position:relative;
     }
+
     #qr{
       width:100%;height:100%;
       object-fit:contain;
       display:none;
       opacity:0;
-      transform:scale(.98);
+      transform:scale(.86) rotate(-2deg);
+      filter:drop-shadow(0 12px 30px rgba(0,0,0,.35));
     }
-    #qr.show{
+
+    /* FUN reveal */
+    #qr.pop{
       display:block;
-      animation: qrIn .26s ease forwards;
+      animation: popIn .55s cubic-bezier(.2,.9,.2,1) forwards;
     }
-    @keyframes qrIn{
-      to{ opacity:1; transform:scale(1); }
+    @keyframes popIn{
+      0%{opacity:0; transform:scale(.72) rotate(-6deg)}
+      60%{opacity:1; transform:scale(1.05) rotate(2deg)}
+      100%{opacity:1; transform:scale(1) rotate(0deg)}
+    }
+
+    /* Sparkles */
+    .spark{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:0;
+    }
+    .spark.on{
+      animation: spark .65s ease forwards;
+    }
+    @keyframes spark{
+      0%{opacity:0; transform:scale(.98)}
+      25%{opacity:1}
+      100%{opacity:0; transform:scale(1.02)}
+    }
+    .spark:before, .spark:after{
+      content:"✨";
+      position:absolute;
+      font-size:18px;
+      opacity:.9;
+      filter:drop-shadow(0 8px 18px rgba(0,0,0,.35));
+      animation: floaty .65s ease forwards;
+    }
+    .spark:before{ left:18px; top:18px; }
+    .spark:after{ right:18px; bottom:18px; }
+    @keyframes floaty{
+      from{ transform:translateY(8px) scale(.9); opacity:0}
+      45%{opacity:1}
+      to{ transform:translateY(-10px) scale(1.08); opacity:0}
     }
 
     .hint{margin-top:12px;font-size:13px;color:var(--muted);line-height:1.45}
@@ -237,67 +372,132 @@
   <div class="wrap">
     <div class="header">
       <h1 class="title">🏆 Pré-inscription 🥋</h1>
-      <p class="sub">Mise à jour en direct du QR Code 😃</p>
+      <p class="sub">Roadmap guidée + résumé compact des étapes validées</p>
     </div>
 
     <div class="card">
       <div class="topbar"><div id="progressBar"></div></div>
 
       <div class="sec">
-        <div class="row">
-          <div>
-            <div class="label">
-              <span>Nom</span>
-              <span class="chip" data-for="nom"><span class="dot"></span><span class="txt">Requis</span></span>
-            </div>
-            <div class="field">
-              <input id="nom" placeholder="JORDAN" autocomplete="family-name" required>
-              <div class="check" id="check-nom">✓</div>
+        <div class="roadmap" id="roadmap">
+
+          <!-- STEP 1 -->
+          <div class="step active" data-step="0">
+            <div class="marker"><div class="dot">1</div></div>
+            <div>
+              <div class="stepHead">
+                <p class="stepTitle">Nom</p>
+                <span class="chip"><span class="miniDot"></span><span class="txt" id="chip-0">Requis</span></span>
+              </div>
+
+              <div class="summary" id="sum-0">
+                <div id="sumv-0">—</div>
+                <small>Tape pour modifier</small>
+              </div>
+
+              <div class="content">
+                <div class="contentInner">
+                  <div class="field">
+                    <input id="nom" placeholder="JORDAN" autocomplete="family-name" required>
+                    <div class="check" id="check-nom">✓</div>
+                  </div>
+                  <div class="mini">Le nom passe automatiquement en MAJ.</div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div>
-            <div class="label">
-              <span>Prénom</span>
-              <span class="chip" data-for="prenom"><span class="dot"></span><span class="txt">Requis</span></span>
-            </div>
-            <div class="field">
-              <input id="prenom" placeholder="Mickael" autocomplete="given-name" required>
-              <div class="check" id="check-prenom">✓</div>
+          <!-- STEP 2 -->
+          <div class="step locked" data-step="1">
+            <div class="marker"><div class="dot">2</div></div>
+            <div>
+              <div class="stepHead">
+                <p class="stepTitle">Prénom</p>
+                <span class="chip"><span class="miniDot"></span><span class="txt" id="chip-1">Requis</span></span>
+              </div>
+
+              <div class="summary" id="sum-1">
+                <div id="sumv-1">—</div>
+                <small>Tape pour modifier</small>
+              </div>
+
+              <div class="content">
+                <div class="contentInner">
+                  <div class="field">
+                    <input id="prenom" placeholder="Mickael" autocomplete="given-name" required disabled>
+                    <div class="check" id="check-prenom">✓</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+
+          <!-- STEP 3 -->
+          <div class="step locked" data-step="2">
+            <div class="marker"><div class="dot">3</div></div>
+            <div>
+              <div class="stepHead">
+                <p class="stepTitle">Club</p>
+                <span class="chip"><span class="miniDot"></span><span class="txt" id="chip-2">Requis</span></span>
+              </div>
+
+              <div class="summary" id="sum-2">
+                <div id="sumv-2">—</div>
+                <small>Tape pour modifier</small>
+              </div>
+
+              <div class="content">
+                <div class="contentInner">
+                  <div class="field">
+                    <select id="club" required disabled>
+                      <option value="">— Sélectionne un club —</option>
+                    </select>
+                    <div class="check" id="check-club">✓</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 4 -->
+          <div class="step locked" data-step="3">
+            <div class="marker"><div class="dot">4</div></div>
+            <div>
+              <div class="stepHead">
+                <p class="stepTitle">Sexe</p>
+                <span class="chip"><span class="miniDot"></span><span class="txt" id="chip-3">Requis</span></span>
+              </div>
+
+              <div class="summary" id="sum-3">
+                <div id="sumv-3">—</div>
+                <small>Tape pour modifier</small>
+              </div>
+
+              <div class="content">
+                <div class="contentInner">
+                  <div class="field">
+                    <select id="sexe" required disabled>
+                      <option value="">— Sélectionne —</option>
+                      <option value="Masculin">Masculin</option>
+                      <option value="Féminin">Féminin</option>
+                    </select>
+                    <div class="check" id="check-sexe">✓</div>
+                  </div>
+                  <div class="mini">Une fois tout validé → QR + “はじめ / Hajime”.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <div style="margin-top:12px">
-          <div class="label">
-            <span>Club</span>
-            <span class="chip" data-for="club"><span class="dot"></span><span class="txt">Requis</span></span>
-          </div>
-          <div class="field">
-            <select id="club" required>
-              <option value="">— Sélectionne un club —</option>
-            </select>
-            <div class="check" id="check-club">✓</div>
-          </div>
+        <div class="nav">
+          <button class="btn secondary" id="backBtn" disabled>← Retour</button>
+          <button class="btn" id="nextBtn" disabled>Suivant →</button>
         </div>
 
-        <div style="margin-top:12px">
-          <div class="label">
-            <span>Sexe</span>
-            <span class="chip" data-for="sexe"><span class="dot"></span><span class="txt">Requis</span></span>
-          </div>
-          <div class="field">
-            <select id="sexe" required>
-              <option value="">— Sélectionne —</option>
-              <option value="Masculin">Masculin</option>
-              <option value="Féminin">Féminin</option>
-            </select>
-            <div class="check" id="check-sexe">✓</div>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn" id="resetBtn">Réinitialiser ✏️</button>
+        <div class="nav" style="margin-top:10px">
+          <button class="btn secondary" id="resetBtn">Réinitialiser ✏️</button>
         </div>
 
         <div class="mini" id="formHint"></div>
@@ -305,9 +505,10 @@
 
       <div class="qrBox">
         <div class="qrFrame">
+          <div class="spark" id="spark"></div>
           <img id="qr" alt="QR Code">
           <div id="empty" class="hint" style="padding:18px;max-width:340px;">
-            Renseigne <b>Nom</b>, <b>Prénom</b>, <b>Club</b> et <b>Sexe</b> pour afficher le QR code.
+            Suis la roadmap ci-dessus : à la fin, le QR apparaît 🎉
           </div>
         </div>
 
@@ -334,6 +535,46 @@
       }
     }
 
+    class SoundService {
+      // Tente un “はじめ / Hajime” (voice synth). Sinon beep.
+      static playHajime() {
+        try {
+          const text = "はじめ";
+          if (!("speechSynthesis" in window)) return SoundService.beep();
+
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = "ja-JP";
+          u.rate = 0.95;
+          u.pitch = 1.05;
+
+          const voices = window.speechSynthesis.getVoices?.() || [];
+          const ja = voices.find(v => (v.lang || "").toLowerCase().startsWith("ja"));
+          if (ja) u.voice = ja;
+
+          window.speechSynthesis.cancel();
+          window.speechSynthesis.speak(u);
+        } catch(e) {
+          SoundService.beep();
+        }
+      }
+
+      static beep() {
+        try{
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = "sine";
+          o.frequency.value = 880;
+          g.gain.value = 0.0001;
+          o.connect(g); g.connect(ctx.destination);
+          o.start();
+          g.gain.exponentialRampToValueAtTime(0.15, ctx.currentTime + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.22);
+          o.stop(ctx.currentTime + 0.25);
+        }catch(e){}
+      }
+    }
+
     class App {
       constructor() {
         this.nom = document.getElementById("nom");
@@ -346,43 +587,78 @@
         this.checkClub = document.getElementById("check-club");
         this.checkSexe = document.getElementById("check-sexe");
 
+        this.steps = [...document.querySelectorAll(".step[data-step]")];
+
+        this.chipTxt = [
+          document.getElementById("chip-0"),
+          document.getElementById("chip-1"),
+          document.getElementById("chip-2"),
+          document.getElementById("chip-3"),
+        ];
+
+        // summaries
+        this.sumV = [
+          document.getElementById("sumv-0"),
+          document.getElementById("sumv-1"),
+          document.getElementById("sumv-2"),
+          document.getElementById("sumv-3"),
+        ];
+
+        this.backBtn = document.getElementById("backBtn");
+        this.nextBtn = document.getElementById("nextBtn");
+        this.resetBtn = document.getElementById("resetBtn");
+
+        this.formHint = document.getElementById("formHint");
+        this.progressBar = document.getElementById("progressBar");
+
         this.qr = document.getElementById("qr");
         this.empty = document.getElementById("empty");
         this.hint = document.getElementById("hint");
         this.payloadBox = document.getElementById("payload");
+        this.spark = document.getElementById("spark");
 
-        this.resetBtn = document.getElementById("resetBtn");
-        this.formHint = document.getElementById("formHint");
-
-        this.chips = document.querySelectorAll(".chip[data-for]");
-        this.progressBar = document.getElementById("progressBar");
+        this.current = 0;
+        this.playedSound = false;
 
         this.fields = [
-          { id:"nom",   el:this.nom,   check:this.checkNom },
-          { id:"prenom",el:this.prenom,check:this.checkPrenom },
-          { id:"club",  el:this.club,  check:this.checkClub },
-          { id:"sexe",  el:this.sexe,  check:this.checkSexe },
+          { id:"nom",    el:this.nom,    check:this.checkNom },
+          { id:"prenom", el:this.prenom, check:this.checkPrenom },
+          { id:"club",   el:this.club,   check:this.checkClub },
+          { id:"sexe",   el:this.sexe,   check:this.checkSexe },
         ];
-
-        this.qrShown = false;
       }
 
       init() {
         this.populateClubs();
 
-        // Text
-        this.nom.addEventListener("input", () => { this.normalize(); this.update(); });
-        this.prenom.addEventListener("input", () => { this.normalize(); this.update(); });
+        this.nom.addEventListener("input", () => { this.normalize(); this.onFieldChange(0); });
+        this.prenom.addEventListener("input", () => { this.normalize(); this.onFieldChange(1); });
 
-        // iOS: select → change + input
-        [this.club, this.sexe].forEach(el => {
-          el.addEventListener("change", () => this.update());
-          el.addEventListener("input", () => this.update());
+        [this.club, this.sexe].forEach((el, idx) => {
+          el.addEventListener("change", () => this.onFieldChange(idx + 2));
+          el.addEventListener("input",  () => this.onFieldChange(idx + 2));
         });
 
+        this.backBtn.addEventListener("click", () => this.go(this.current - 1));
+        this.nextBtn.addEventListener("click", () => this.go(this.current + 1));
         this.resetBtn.addEventListener("click", () => this.reset());
 
-        this.update();
+        // click step to edit (only if not locked)
+        this.steps.forEach((st, i) => {
+          st.addEventListener("click", (e) => {
+            const locked = st.classList.contains("locked");
+            if (locked) return;
+
+            // don't hijack inner controls
+            const tag = (e.target.tagName || "").toUpperCase();
+            if (["INPUT","SELECT","OPTION","BUTTON"].includes(tag)) return;
+
+            this.go(i);
+          });
+        });
+
+        this.refreshAll();
+        this.go(0);
       }
 
       populateClubs() {
@@ -395,10 +671,7 @@
       }
 
       normalize() {
-        // Nom MAJ
         this.nom.value = (this.nom.value || "").toUpperCase();
-
-        // Prénom: capitalise
         const p = (this.prenom.value || "");
         if (p) this.prenom.value = p.charAt(0).toUpperCase() + p.slice(1);
       }
@@ -416,87 +689,141 @@
         return { n, p, c, s, payload };
       }
 
-      updateUIStates() {
-        // Chips + checks + input states
-        this.fields.forEach(f => {
+      allComplete() {
+        return this.fields.every(f => this.isFilled(f.el));
+      }
+
+      setSummary() {
+        const n = this.nom.value.trim();
+        const p = this.prenom.value.trim();
+        const c = this.club.value.trim();
+        const s = this.sexe.value.trim();
+
+        this.sumV[0].textContent = n || "—";
+        this.sumV[1].textContent = p || "—";
+        this.sumV[2].textContent = c || "—";
+        this.sumV[3].textContent = s || "—";
+      }
+
+      onFieldChange(i) {
+        this.refreshAll();
+
+        const ok = this.isFilled(this.fields[i].el);
+        if (!ok) return;
+
+        if (this.current === i && i < this.fields.length - 1) {
+          setTimeout(() => this.go(i + 1), 140);
+        }
+
+        if (this.allComplete()) this.showQR();
+        else this.hideQR();
+      }
+
+      refreshAll() {
+        // update summary
+        this.setSummary();
+
+        // per-field visuals
+        this.fields.forEach((f, idx) => {
           const ok = this.isFilled(f.el);
           f.el.classList.toggle("is-ok", ok);
           f.el.classList.toggle("is-empty", !ok);
           f.check.classList.toggle("show", ok);
+
+          this.chipTxt[idx].textContent = ok ? "✓ OK" : "Requis";
+
+          const st = this.steps[idx];
+          st.classList.toggle("done", ok);
         });
 
-        this.chips.forEach(chip => {
-          const id = chip.dataset.for;
-          const field = document.getElementById(id);
-          const ok = this.isFilled(field);
-          const txt = chip.querySelector(".txt");
+        // lock/unlock sequentially
+        for (let i = 0; i < this.steps.length; i++) {
+          const prevOk = (i === 0) ? true : this.isFilled(this.fields[i-1].el);
+          const canAccess = prevOk;
 
-          if (ok) {
-            chip.classList.add("ok");
-            if (txt) txt.textContent = "✓ OK";
-            // disparaît
-            chip.classList.add("hidden");
-          } else {
-            chip.classList.remove("ok");
-            chip.classList.remove("hidden");
-            if (txt) txt.textContent = "Requis";
-          }
-        });
+          this.steps[i].classList.toggle("locked", !canAccess);
+          this.fields[i].el.disabled = !canAccess;
+        }
 
-        // Progress
-        const total = this.fields.length;
+        // progress
         const filled = this.fields.reduce((acc, f) => acc + (this.isFilled(f.el) ? 1 : 0), 0);
-        const pct = Math.round((filled / total) * 100);
-        this.progressBar.style.width = `${pct}%`;
-      }
+        this.progressBar.style.width = `${Math.round((filled / this.fields.length) * 100)}%`;
 
-      setQrVisible(visible) {
-        if (visible) {
-          if (!this.qrShown) {
-            // première apparition: animation
-            this.qr.classList.remove("show");
-            // petit reset pour relancer l'animation
-            void this.qr.offsetWidth;
-            this.qr.classList.add("show");
-            this.qrShown = true;
-          } else {
-            this.qr.style.display = "block";
-          }
-          this.empty.style.display = "none";
+        // nav
+        this.backBtn.disabled = (this.current === 0);
+        this.nextBtn.disabled = !this.canGoNext();
+
+        // hint
+        if (!this.allComplete()) {
+          const miss = [];
+          if (!this.isFilled(this.nom)) miss.push("Nom");
+          if (!this.isFilled(this.prenom)) miss.push("Prénom");
+          if (!this.isFilled(this.club)) miss.push("Club");
+          if (!this.isFilled(this.sexe)) miss.push("Sexe");
+          this.formHint.textContent = "➡️ Étape par étape — manque : " + miss.join(", ");
         } else {
-          this.qr.classList.remove("show");
-          this.qr.style.display = "none";
-          this.empty.style.display = "block";
-          this.qrShown = false;
+          this.formHint.textContent = "✅ Tout est OK — QR généré";
         }
       }
 
-      update() {
-        this.updateUIStates();
+      canGoNext() {
+        const currentOk = this.isFilled(this.fields[this.current].el);
+        if (!currentOk) return false;
+        if (this.current >= this.steps.length - 1) return false;
+        return !this.steps[this.current + 1].classList.contains("locked");
+      }
 
-        const { n, p, c, s, payload } = this.buildPayload();
+      go(i) {
+        i = Math.max(0, Math.min(this.steps.length - 1, i));
+        if (this.steps[i].classList.contains("locked")) return;
 
-        const missing = [];
-        if (!n) missing.push("Nom");
-        if (!p) missing.push("Prénom");
-        if (!c) missing.push("Club");
-        if (!s) missing.push("Sexe");
+        this.current = i;
+        this.steps.forEach((st, idx) => st.classList.toggle("active", idx === i));
 
-        if (missing.length > 0) {
-          this.setQrVisible(false);
-          this.hint.textContent = "";
-          this.payloadBox.style.display = "none";
-          this.formHint.textContent = "⛔ Champs manquants : " + missing.join(", ");
-          return;
-        }
+        this.backBtn.disabled = (i === 0);
+        this.nextBtn.disabled = !this.canGoNext();
 
-        this.formHint.textContent = "✅ OK — QR prêt";
+        const el = this.fields[i].el;
+        setTimeout(() => {
+          try { el.focus({ preventScroll:true }); } catch(e) { el.focus(); }
+        }, 60);
+      }
+
+      showQR() {
+        const { payload } = this.buildPayload();
+
         this.qr.src = QrService.url(payload, 520);
-        this.setQrVisible(true);
+
+        // retrigger animation
+        this.qr.classList.remove("pop");
+        void this.qr.offsetWidth;
+        this.qr.classList.add("pop");
+
+        // sparkles
+        this.spark.classList.remove("on");
+        void this.spark.offsetWidth;
+        this.spark.classList.add("on");
+
+        this.qr.style.display = "block";
+        this.empty.style.display = "none";
 
         this.hint.textContent = "Données encodées :";
         this.payloadBox.textContent = payload;
         this.payloadBox.style.display = "block";
+
+        if (!this.playedSound) {
+          this.playedSound = true;
+          SoundService.playHajime();
+        }
+      }
+
+      hideQR() {
+        this.qr.style.display = "none";
+        this.qr.classList.remove("pop");
+        this.empty.style.display = "block";
+        this.hint.textContent = "";
+        this.payloadBox.style.display = "none";
+        this.playedSound = false;
       }
 
       reset() {
@@ -504,8 +831,16 @@
         this.prenom.value = "";
         this.club.value = "";
         this.sexe.value = "";
-        this.update();
+        this.hideQR();
+        this.refreshAll();
+        this.go(0);
       }
+    }
+
+    // iOS: voices can load async
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.getVoices?.();
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices?.();
     }
 
     new App().init();
