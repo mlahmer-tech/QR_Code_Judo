@@ -22,6 +22,8 @@
       --glass1: rgba(255,255,255,.14);
       --glass2: rgba(255,255,255,.08);
       --sep: rgba(255,255,255,.10);
+
+      --danger: rgba(255,95,95,.95);
     }
 
     *{box-sizing:border-box}
@@ -30,10 +32,10 @@
       margin:0;
       min-height:100vh;
       padding:
-        calc(16px + env(safe-area-inset-top))
-        16px
-        calc(18px + env(safe-area-inset-bottom))
-        16px;
+        calc(14px + env(safe-area-inset-top))
+        14px
+        calc(98px + env(safe-area-inset-bottom)) /* reserve for sticky CTA */
+        14px;
       font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Arial,sans-serif;
       color:var(--text);
       background:
@@ -44,7 +46,7 @@
       overflow-x:hidden;
     }
 
-    .wrap{width:100%;max-width:650px;margin:0 auto}
+    .wrap{width:100%;max-width:680px;margin:0 auto}
     .card{
       border-radius:var(--r);
       border:1px solid var(--stroke);
@@ -61,6 +63,7 @@
       border-bottom:1px solid rgba(255,255,255,.10);
       background:rgba(0,0,0,.10);
       text-align:center;
+      position:relative;
     }
     .title{
       margin:0 0 6px;
@@ -77,22 +80,50 @@
     }
 
     /* =======================
-       PREMIUM PROGRESS (WOW)
+       PREMIUM PROGRESS + BACK
        ======================= */
     .progressWrap{
-      padding:16px;
+      padding:14px 14px 16px;
       border-bottom:1px solid rgba(255,255,255,.10);
       background:rgba(0,0,0,.06);
       position:relative;
       overflow:hidden;
     }
 
+    .progressTopRow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:12px;
+    }
+
+    /* Small back chevron button (top-left near progress) */
+    .backMini{
+      width:38px;height:38px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.12);
+      color:rgba(255,255,255,.92);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      user-select:none;
+      box-shadow:0 16px 40px rgba(0,0,0,.22);
+      transition:transform .08s ease, opacity .16s ease, border-color .16s ease;
+      flex:0 0 auto;
+    }
+    .backMini:active{ transform:scale(.99); }
+    .backMini[disabled]{ opacity:.35; cursor:not-allowed; }
+
+    .backMini svg{ width:18px;height:18px; opacity:.95; }
+
     /* subtle grain */
     .progressWrap::before{
       content:"";
       position:absolute; inset:0;
       pointer-events:none;
-      opacity:.16;
+      opacity:.14;
       background-image:
         radial-gradient(1px 1px at 12px 18px, rgba(255,255,255,.25) 50%, transparent 51%),
         radial-gradient(1px 1px at 32px 42px, rgba(255,255,255,.18) 50%, transparent 51%),
@@ -129,6 +160,7 @@
       gap:14px;
       position:relative;
       z-index:1;
+      width:100%;
     }
 
     .node{
@@ -252,7 +284,6 @@
       transition:width .32s cubic-bezier(.2,.9,.2,1);
       position:relative;
     }
-    /* glossy moving highlight */
     .line > i::after{
       content:"";
       position:absolute;
@@ -278,6 +309,7 @@
       background:rgba(0,0,0,.14);
       border-radius:22px;
       overflow:hidden;
+      position:relative;
     }
 
     .sheetTop{
@@ -321,7 +353,8 @@
       gap:10px;
       transform:translateY(0);
       opacity:1;
-      transition:transform 340ms cubic-bezier(.2,.9,.2,1), opacity 240ms ease;
+      transition:transform 360ms cubic-bezier(.2,.9,.2,1), opacity 240ms ease;
+      will-change: transform, opacity;
     }
     .fieldArea.out .stage{
       transform:translateY(-12px) scale(.985);
@@ -331,6 +364,13 @@
     .fieldArea.in .stage{
       transform:translateY(12px) scale(.985);
       opacity:0;
+    }
+
+    /* swipe hint overlay (invisible, but captures touch) */
+    .swipeZone{
+      position:absolute;
+      inset:0;
+      background:transparent;
     }
 
     .field{ position:relative; }
@@ -345,7 +385,7 @@
       outline:none;
       -webkit-appearance:none;
       appearance:none;
-      transition:border-color .2s ease, box-shadow .2s ease;
+      transition:border-color .2s ease, box-shadow .2s ease, transform .12s ease;
     }
     input:focus, select:focus{
       border-color:rgba(10,132,255,.60);
@@ -371,6 +411,20 @@
       box-shadow:0 0 0 7px rgba(52,199,89,.12);
     }
 
+    /* invalid micro feedback: shake + soft red glow */
+    .invalid{
+      border-color:rgba(255,95,95,.55) !important;
+      box-shadow:0 0 0 7px rgba(255,95,95,.10);
+      animation: shake 320ms ease both;
+    }
+    @keyframes shake{
+      0%,100%{ transform:translateX(0); }
+      20%{ transform:translateX(-6px); }
+      40%{ transform:translateX(6px); }
+      60%{ transform:translateX(-4px); }
+      80%{ transform:translateX(4px); }
+    }
+
     .check{
       position:absolute;
       right:12px;
@@ -394,47 +448,9 @@
       box-shadow:0 0 0 7px rgba(52,199,89,.10);
     }
 
-    .nav{
-      display:flex;
-      gap:10px;
-      padding:14px;
-      border-top:1px solid var(--sep);
-      background:rgba(0,0,0,.08);
-    }
-    .btn{
-      flex:1;
-      padding:12px 14px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.16);
-      background:rgba(0,0,0,.16);
-      color:rgba(255,255,255,.92);
-      font-size:15px;
-      font-weight:950;
-      cursor:pointer;
-      user-select:none;
-      transition:transform .08s ease, box-shadow .16s ease, border-color .16s ease;
-      position:relative;
-      overflow:hidden;
-    }
-    .btn:active{ transform:scale(.99); }
-    .btn[disabled]{ opacity:.45; cursor:not-allowed; box-shadow:none; }
-    .btn.primary{
-      border-color:rgba(10,132,255,.38);
-      background:linear-gradient(180deg, rgba(10,132,255,.22), rgba(0,0,0,.16));
-      box-shadow:0 14px 40px rgba(10,132,255,.10);
-    }
-    .btn.primary::after{
-      content:"";
-      position:absolute; inset:0;
-      background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.14), rgba(255,255,255,0));
-      transform:translateX(-60%);
-      animation: btnshine 2.0s linear infinite;
-      pointer-events:none;
-      opacity:.9;
-    }
-    @keyframes btnshine{ to{ transform:translateX(60%);} }
-
-    /* QR */
+    /* =======================
+       QR
+       ======================= */
     .qrBox{
       padding:14px 16px 18px;
       border-top:1px solid rgba(255,255,255,.14);
@@ -526,6 +542,71 @@
       color:rgba(255,255,255,.82);
       display:none;
     }
+
+    /* =======================
+       Sticky CTA bar (single)
+       ======================= */
+    .ctaBar{
+      position:fixed;
+      left:0; right:0;
+      bottom:0;
+      padding:
+        12px
+        14px
+        calc(12px + env(safe-area-inset-bottom))
+        14px;
+      display:flex;
+      justify-content:center;
+      z-index:9999;
+      pointer-events:none; /* allow only button to receive */
+    }
+    .ctaGlass{
+      width:min(680px, calc(100% - 28px));
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.22);
+      box-shadow:0 18px 70px rgba(0,0,0,.55);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      padding:10px;
+      pointer-events:auto;
+    }
+    .ctaBtn{
+      width:100%;
+      padding:14px 14px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.18);
+      color:rgba(255,255,255,.94);
+      font-weight:950;
+      font-size:16px;
+      letter-spacing:-.01em;
+      cursor:pointer;
+      user-select:none;
+      background:
+        linear-gradient(180deg, rgba(10,132,255,.26), rgba(0,0,0,.16));
+      box-shadow:0 16px 46px rgba(10,132,255,.12);
+      position:relative;
+      overflow:hidden;
+      transition:transform .08s ease, opacity .16s ease;
+    }
+    .ctaBtn:active{ transform:scale(.995); }
+    .ctaBtn[disabled]{ opacity:.42; cursor:not-allowed; box-shadow:none; }
+    .ctaBtn::after{
+      content:"";
+      position:absolute; inset:0;
+      background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.14), rgba(255,255,255,0));
+      transform:translateX(-60%);
+      animation: btnshine 2.1s linear infinite;
+      pointer-events:none;
+      opacity:.92;
+    }
+    @keyframes btnshine{ to{ transform:translateX(60%);} }
+
+    /* Prefer reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      *{ animation:none !important; transition:none !important; }
+      .progressWrap::after{ display:none; }
+    }
   </style>
 </head>
 
@@ -539,22 +620,30 @@
       </div>
 
       <div class="progressWrap" id="progressWrap">
-        <div class="qui">
-          <div class="node active" data-i="0"><div class="dot"></div></div>
-          <div class="line" data-line="0"><i></i></div>
+        <div class="progressTopRow">
+          <button class="backMini" id="backMini" disabled aria-label="Retour">
+            <svg viewBox="0 0 20 20" fill="none">
+              <path d="M12.8 4.5a1 1 0 0 1 0 1.4L8.7 10l4.1 4.1a1 1 0 1 1-1.4 1.4L6.6 10.7a1 1 0 0 1 0-1.4l4.8-4.8a1 1 0 0 1 1.4 0Z" fill="rgba(255,255,255,.92)"/>
+            </svg>
+          </button>
 
-          <div class="node" data-i="1"><div class="dot"></div></div>
-          <div class="line" data-line="1"><i></i></div>
+          <div class="qui">
+            <div class="node active" data-i="0"><div class="dot"></div></div>
+            <div class="line" data-line="0"><i></i></div>
 
-          <div class="node" data-i="2"><div class="dot"></div></div>
-          <div class="line" data-line="2"><i></i></div>
+            <div class="node" data-i="1"><div class="dot"></div></div>
+            <div class="line" data-line="1"><i></i></div>
 
-          <div class="node" data-i="3"><div class="dot"></div></div>
+            <div class="node" data-i="2"><div class="dot"></div></div>
+            <div class="line" data-line="2"><i></i></div>
+
+            <div class="node" data-i="3"><div class="dot"></div></div>
+          </div>
         </div>
       </div>
 
       <div class="sec">
-        <div class="sheet">
+        <div class="sheet" id="sheet">
           <div class="sheetTop">
             <div class="badge" id="badge">1</div>
             <div>
@@ -567,11 +656,7 @@
 
           <div class="fieldArea" id="fieldArea">
             <div class="stage" id="stage"></div>
-          </div>
-
-          <div class="nav">
-            <button class="btn" id="backBtn" disabled>Retour</button>
-            <button class="btn primary" id="nextBtn" disabled>Suivant</button>
+            <div class="swipeZone" id="swipeZone" aria-hidden="true"></div>
           </div>
         </div>
       </div>
@@ -590,6 +675,13 @@
         <div class="hint" id="hint"></div>
         <div class="payload" id="payload"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- Sticky single CTA -->
+  <div class="ctaBar">
+    <div class="ctaGlass">
+      <button class="ctaBtn" id="ctaBtn" disabled>Continuer</button>
     </div>
   </div>
 
@@ -640,9 +732,8 @@
           const v = this._cachedVoice || this.pickVoice(voices);
           const u = new SpeechSynthesisUtterance("はじめ！");
           u.lang = "ja-JP";
-          // Manga-ish: lower pitch + a bit faster
-          u.rate = 1.10;
-          u.pitch = 0.72;
+          u.rate = 1.10;   // energetic
+          u.pitch = 0.72;  // deeper (male-ish)
           u.volume = 1.0;
           if (v) u.voice = v;
           window.speechSynthesis.cancel();
@@ -657,14 +748,16 @@
         this.nodes = [...document.querySelectorAll(".node[data-i]")];
         this.lines = [...document.querySelectorAll(".line[data-line]")];
 
+        this.backMini = document.getElementById("backMini");
         this.badge = document.getElementById("badge");
         this.stepTitle = document.getElementById("stepTitle");
         this.stepSub = document.getElementById("stepSub");
+
         this.stage = document.getElementById("stage");
         this.fieldArea = document.getElementById("fieldArea");
+        this.swipeZone = document.getElementById("swipeZone");
 
-        this.backBtn = document.getElementById("backBtn");
-        this.nextBtn = document.getElementById("nextBtn");
+        this.ctaBtn = document.getElementById("ctaBtn");
 
         this.qr = document.getElementById("qr");
         this.empty = document.getElementById("empty");
@@ -676,6 +769,7 @@
         this.current = 0;
         this.playedSound = false;
 
+        this.currentFieldEl = null; // input/select
         this.steps = [
           { key:"nom", title:"Nom", sub:"Le nom passe automatiquement en MAJ.",
             render: () => this.renderInput("nom","JORDAN","family-name"),
@@ -693,9 +787,12 @@
       }
 
       init() {
-        this.backBtn.addEventListener("click", () => this.go(this.current - 1));
-        this.nextBtn.addEventListener("click", () => this.next());
+        SoundService.warmupVoices();
 
+        // mini back
+        this.backMini.addEventListener("click", () => this.prev());
+
+        // click nodes to jump (only up to reachable)
         this.nodes.forEach(n => {
           n.addEventListener("click", () => {
             const i = Number(n.dataset.i);
@@ -704,9 +801,60 @@
           });
         });
 
-        SoundService.warmupVoices();
+        // sticky CTA
+        this.ctaBtn.addEventListener("click", () => this.next());
+
+        // swipe gestures
+        this.bindSwipe();
+
         this.renderStep(this.current, false);
         this.refresh();
+      }
+
+      bindSwipe() {
+        let startX = 0, startY = 0, tracking = false;
+
+        const onStart = (e) => {
+          const t = e.touches ? e.touches[0] : e;
+          startX = t.clientX;
+          startY = t.clientY;
+          tracking = true;
+        };
+
+        const onMove = (e) => {
+          if (!tracking) return;
+          const t = e.touches ? e.touches[0] : e;
+          const dx = t.clientX - startX;
+          const dy = t.clientY - startY;
+          // If mostly horizontal, prevent scroll bounce
+          if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 16) {
+            e.preventDefault?.();
+          }
+        };
+
+        const onEnd = (e) => {
+          if (!tracking) return;
+          tracking = false;
+          const t = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0] : e;
+          const dx = t.clientX - startX;
+          const dy = t.clientY - startY;
+
+          // threshold
+          if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy)) return;
+
+          if (dx < 0) {
+            // swipe left -> next
+            this.next();
+          } else {
+            // swipe right -> prev
+            this.prev();
+          }
+        };
+
+        // Use swipeZone so inputs still usable; touch events on overlay (transparent)
+        this.swipeZone.addEventListener("touchstart", onStart, { passive:true });
+        this.swipeZone.addEventListener("touchmove", onMove, { passive:false });
+        this.swipeZone.addEventListener("touchend", onEnd, { passive:true });
       }
 
       renderStep(i, animateIn=true) {
@@ -714,6 +862,7 @@
         this.badge.textContent = String(i + 1);
         this.stepTitle.textContent = step.title;
         this.stepSub.textContent = step.sub;
+
         this.stage.innerHTML = "";
         step.render();
 
@@ -732,6 +881,8 @@
         `;
         const input = document.getElementById("field");
         const check = document.getElementById("check");
+        this.currentFieldEl = input;
+
         input.value = this.state[key] || "";
 
         const onInput = () => {
@@ -745,13 +896,16 @@
           input.classList.toggle("is-ok", ok);
           check.classList.toggle("show", ok);
 
+          // remove invalid state if user is typing
+          input.classList.remove("invalid");
+
           this.refresh();
         };
 
         input.addEventListener("input", onInput);
         onInput();
 
-        setTimeout(() => { try{ input.focus({preventScroll:true}); }catch(e){ input.focus(); } }, 70);
+        setTimeout(() => { try{ input.focus({preventScroll:true}); }catch(e){ input.focus(); } }, 80);
       }
 
       renderSelect(key, firstLabel, options) {
@@ -769,6 +923,8 @@
         `;
         const select = document.getElementById("field");
         const check = document.getElementById("check");
+        this.currentFieldEl = select;
+
         select.value = this.state[key] || "";
 
         const onChange = () => {
@@ -779,6 +935,9 @@
           select.classList.toggle("is-ok", ok);
           check.classList.toggle("show", ok);
 
+          // remove invalid state when user chooses
+          select.classList.remove("invalid");
+
           this.refresh();
         };
 
@@ -786,15 +945,20 @@
         select.addEventListener("input", onChange);
         onChange();
 
-        setTimeout(() => { try{ select.focus({preventScroll:true}); }catch(e){ select.focus(); } }, 70);
+        setTimeout(() => { try{ select.focus({preventScroll:true}); }catch(e){ select.focus(); } }, 80);
       }
 
       next() {
-        if (!this.isStepOk(this.current)) return;
+        if (!this.isStepOk(this.current)) {
+          this.invalidNudge();
+          return;
+        }
 
+        // micro animations: sweep + dot pop
         this.wave();
         this.popDone(this.current);
 
+        // spring transition to next
         this.fieldArea.classList.add("out");
         setTimeout(() => {
           if (this.current < this.steps.length - 1) {
@@ -806,7 +970,18 @@
             this.fieldArea.classList.remove("out");
             this.showQR();
           }
-        }, 220);
+        }, 230);
+      }
+
+      prev() {
+        if (this.current === 0) return;
+        this.fieldArea.classList.add("out");
+        setTimeout(() => {
+          this.current--;
+          this.fieldArea.classList.remove("out");
+          this.renderStep(this.current, true);
+          this.refresh();
+        }, 230);
       }
 
       go(i) {
@@ -820,7 +995,16 @@
           this.fieldArea.classList.remove("out");
           this.renderStep(this.current, true);
           this.refresh();
-        }, 220);
+        }, 230);
+      }
+
+      invalidNudge() {
+        // shake + soft red glow on the field
+        const el = this.currentFieldEl;
+        if (!el) return;
+        el.classList.remove("invalid");
+        void el.offsetWidth;
+        el.classList.add("invalid");
       }
 
       popDone(i){
@@ -829,14 +1013,14 @@
         node.classList.remove("pop");
         void node.offsetWidth;
         node.classList.add("pop");
-        setTimeout(() => node.classList.remove("pop"), 300);
+        setTimeout(() => node.classList.remove("pop"), 320);
       }
 
       wave() {
         this.progressWrap.classList.remove("wave");
         void this.progressWrap.offsetWidth;
         this.progressWrap.classList.add("wave");
-        setTimeout(() => this.progressWrap.classList.remove("wave"), 800);
+        setTimeout(() => this.progressWrap.classList.remove("wave"), 900);
       }
 
       maxReachableStep() {
@@ -852,10 +1036,16 @@
 
       refresh() {
         const ok = this.isStepOk(this.current);
-        this.backBtn.disabled = (this.current === 0);
-        this.nextBtn.disabled = !ok;
-        this.nextBtn.textContent = (this.current === this.steps.length - 1) ? "Terminer" : "Suivant";
 
+        // back mini
+        this.backMini.disabled = (this.current === 0);
+
+        // single CTA label and enabled state
+        this.ctaBtn.disabled = !ok;
+        this.ctaBtn.textContent =
+          (this.current === this.steps.length - 1) ? "Terminer" : "Continuer";
+
+        // progress visuals
         this.nodes.forEach((node, i) => {
           node.classList.toggle("active", i === this.current);
           node.classList.toggle("done", this.isStepOk(i));
@@ -879,7 +1069,7 @@
         if (!this.isAllComplete()) return;
 
         const payload = this.buildPayload();
-        this.qr.src = "https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=" + encodeURIComponent(payload);
+        this.qr.src = QrService.url(payload, 320);
 
         this.qr.classList.remove("reveal");
         void this.qr.offsetWidth;
