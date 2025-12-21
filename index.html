@@ -14,23 +14,25 @@
       --shadow:0 18px 50px rgba(0,0,0,.45);
       --r:22px;
 
-      --ok: rgba(52,199,89,1);     /* iOS green */
-      --warn: rgba(255,204,0,1);   /* iOS yellow */
-      --bad: rgba(255,59,48,1);    /* iOS red */
-      --blue: rgba(10,132,255,1);  /* iOS blue */
+      --ok: rgba(52,199,89,1);      /* iOS green */
+      --blue: rgba(10,132,255,1);   /* iOS blue */
       --pink: rgba(255,45,85,1);
 
       --glass1: rgba(255,255,255,.14);
       --glass2: rgba(255,255,255,.08);
       --sep: rgba(255,255,255,.10);
-      --chip: rgba(0,0,0,.16);
     }
 
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; padding:20px;
-      display:flex; justify-content:center; align-items:center;
+      margin:0;
+      min-height:100vh;
+      padding:
+        calc(16px + env(safe-area-inset-top))
+        16px
+        calc(18px + env(safe-area-inset-bottom))
+        16px;
       font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Arial,sans-serif;
       color:var(--text);
       background:
@@ -38,13 +40,10 @@
         radial-gradient(900px 700px at 88% 16%, rgba(0,200,255,.34), transparent 60%),
         radial-gradient(900px 700px at 40% 92%, rgba(255,80,160,.26), transparent 65%),
         var(--bg);
+      overflow-x:hidden;
     }
 
-    .wrap{width:100%;max-width:620px}
-    .header{ text-align:center; margin-bottom:14px; }
-    .title{ margin:0 0 6px; font-weight:950; letter-spacing:-.03em; font-size:32px; }
-    .sub{ margin:0; color:var(--muted); font-size:14px; line-height:1.35; }
-
+    .wrap{width:100%;max-width:620px;margin:0 auto}
     .card{
       border-radius:var(--r);
       border:1px solid var(--stroke);
@@ -55,11 +54,32 @@
       -webkit-backdrop-filter: blur(18px);
     }
 
-    /* ===== BIG FUN PROGRESS (with steps) ===== */
-    .progressWrap{
-      padding:14px 14px 12px;
+    /* ===== Header INSIDE card (avoid truncation) ===== */
+    .cardHead{
+      padding:16px 16px 12px;
       border-bottom:1px solid rgba(255,255,255,.10);
       background:rgba(0,0,0,.08);
+      text-align:center;
+    }
+    .title{
+      margin:0 0 4px;
+      font-weight:950;
+      letter-spacing:-.03em;
+      font-size:30px;
+      line-height:1.1;
+    }
+    .sub{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.3;
+    }
+
+    /* ===== Progress: only 1/4.. + valid icon ===== */
+    .progressWrap{
+      padding:14px 16px 14px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.06);
     }
 
     .stepsRow{
@@ -67,72 +87,66 @@
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      margin-bottom:10px;
+      margin-bottom:12px;
     }
 
-    .s{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-width:0;
+    .stepDot{
+      position:relative;
       flex:1;
+      display:flex;
+      justify-content:center;
     }
 
     .bubble{
-      width:30px;height:30px;border-radius:999px;
+      width:56px;height:40px;
+      border-radius:999px;
       display:flex;align-items:center;justify-content:center;
-      font-weight:900;
+      font-weight:950;
       font-size:13px;
       border:1px solid rgba(255,255,255,.14);
       background:rgba(0,0,0,.16);
-      box-shadow:0 12px 28px rgba(0,0,0,.25);
-      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
-      flex:0 0 auto;
+      box-shadow:0 12px 28px rgba(0,0,0,.22);
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      user-select:none;
+      cursor:pointer;
     }
-    .s.active .bubble{
-      border-color:rgba(10,132,255,.5);
-      box-shadow:0 0 0 7px rgba(10,132,255,.14), 0 16px 34px rgba(0,0,0,.30);
-      transform:scale(1.05);
-    }
-    .s.done .bubble{
-      border-color:rgba(52,199,89,.50);
-      box-shadow:0 0 0 7px rgba(52,199,89,.12), 0 16px 34px rgba(0,0,0,.28);
-    }
-    .s.done .bubble::after{
-      content:"✓";
-      font-size:13px;
-      font-weight:1000;
-    }
-    .s.done .bubble span{ display:none; }
 
-    .lbl{
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-      min-width:0;
+    .stepDot.active .bubble{
+      border-color:rgba(10,132,255,.55);
+      box-shadow:0 0 0 8px rgba(10,132,255,.14), 0 16px 34px rgba(0,0,0,.28);
+      transform:scale(1.03);
     }
-    .lbl strong{
-      font-size:12px;
-      letter-spacing:-.01em;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+
+    /* keep text always; add a small "valid" badge when done */
+    .valid{
+      position:absolute;
+      right:calc(50% - 30px);
+      top:-6px;
+      width:22px;height:22px;
+      border-radius:999px;
+      display:flex;align-items:center;justify-content:center;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.22);
+      color:white;
+      font-size:13px;
+      opacity:0;
+      transform:scale(.92);
+      transition:opacity .18s ease, transform .18s ease;
+      pointer-events:none;
+      box-shadow:0 10px 24px rgba(0,0,0,.25);
     }
-    .lbl em{
-      font-style:normal;
-      font-size:11px;
-      color:rgba(255,255,255,.60);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+    .stepDot.done .valid{
+      opacity:1;
+      transform:scale(1);
+      border-color:rgba(52,199,89,.50);
+      box-shadow:0 0 0 7px rgba(52,199,89,.12), 0 12px 24px rgba(0,0,0,.22);
     }
 
     .bar{
-      height:12px;
+      height:16px; /* bigger + more visible */
       border-radius:999px;
       background:rgba(255,255,255,.07);
       overflow:hidden;
-      position:relative;
       border:1px solid rgba(255,255,255,.10);
     }
     .bar > div{
@@ -147,18 +161,16 @@
       content:"";
       position:absolute;
       inset:0;
-      background:linear-gradient(90deg, rgba(255,255,255,.0), rgba(255,255,255,.14), rgba(255,255,255,.0));
-      transform:translateX(-40%);
+      background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.16), rgba(255,255,255,0));
+      transform:translateX(-45%);
       animation: shine 1.6s linear infinite;
-      opacity:.9;
+      opacity:.95;
     }
-    @keyframes shine{
-      to{ transform:translateX(40%); }
-    }
+    @keyframes shine{ to{ transform:translateX(45%);} }
 
-    .sec{ padding:18px; }
+    .sec{ padding:16px; }
 
-    /* ===== Apple-ish "sheet" ===== */
+    /* ===== Apple-ish sheet ===== */
     .sheet{
       border:1px solid rgba(255,255,255,.12);
       background:rgba(0,0,0,.14);
@@ -170,15 +182,7 @@
       padding:14px 14px 12px;
       display:flex;
       align-items:flex-start;
-      justify-content:space-between;
       gap:12px;
-    }
-
-    .kicker{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width:0;
     }
 
     .badge{
@@ -186,17 +190,17 @@
       display:flex;align-items:center;justify-content:center;
       background:rgba(255,255,255,.10);
       border:1px solid rgba(255,255,255,.14);
-      color:rgba(255,255,255,.9);
-      font-weight:900;
+      color:rgba(255,255,255,.92);
+      font-weight:950;
       font-size:13px;
-      box-shadow:0 12px 28px rgba(0,0,0,.25);
+      box-shadow:0 12px 28px rgba(0,0,0,.22);
       flex:0 0 auto;
     }
 
     .titles{ min-width:0; }
     .stepTitle{
       margin:0;
-      font-size:16px;
+      font-size:18px;
       font-weight:950;
       letter-spacing:-.02em;
       line-height:1.15;
@@ -206,32 +210,9 @@
     }
     .stepSub{
       margin:6px 0 0;
-      font-size:12px;
+      font-size:13px;
       color:var(--muted);
       line-height:1.35;
-    }
-
-    .status{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:7px 10px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background:var(--chip);
-      color:rgba(255,255,255,.86);
-      font-size:12px;
-      white-space:nowrap;
-      flex:0 0 auto;
-    }
-    .status .dot{
-      width:8px;height:8px;border-radius:999px;
-      background:var(--warn);
-      box-shadow:0 0 0 3px rgba(255,204,0,.16);
-    }
-    .status.ok .dot{
-      background:var(--ok);
-      box-shadow:0 0 0 3px rgba(52,199,89,.16);
     }
 
     .divider{ height:1px; background:var(--sep); }
@@ -274,13 +255,13 @@
     }
     input::placeholder{ color:rgba(255,255,255,.28); }
 
-    .is-empty{
-      border-color:rgba(255,204,0,.42) !important;
-      box-shadow:0 0 0 6px rgba(255,204,0,.10);
-    }
     .is-ok{
       border-color:rgba(52,199,89,.42) !important;
       box-shadow:0 0 0 6px rgba(52,199,89,.12);
+    }
+    .is-empty{
+      border-color:rgba(255,255,255,.14) !important;
+      box-shadow:none !important;
     }
 
     .check{
@@ -321,7 +302,7 @@
       background:rgba(0,0,0,.16);
       color:rgba(255,255,255,.92);
       font-size:15px;
-      font-weight:800;
+      font-weight:900;
       cursor:pointer;
       user-select:none;
       transition:transform .08s ease, box-shadow .16s ease, border-color .16s ease;
@@ -335,7 +316,7 @@
 
     /* QR */
     .qrBox{
-      padding:16px 18px 18px;
+      padding:14px 16px 16px;
       border-top:1px solid rgba(255,255,255,.14);
       background:rgba(0,0,0,.10);
       text-align:center;
@@ -350,35 +331,34 @@
       font-size:13px;
       line-height:1.35;
     }
-    .tip b{ color:rgba(255,255,255,.95); }
+    .tip b{ color:rgba(255,255,255,.96); }
 
     .qrFrame{
-      margin:8px auto 0;
-      width:min(380px,94%);
+      margin:6px auto 0;
+      width:min(300px,82%); /* reduced */
       aspect-ratio:1/1;
-      border-radius:24px;
+      border-radius:22px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(255,255,255,.06);
       display:flex;align-items:center;justify-content:center;
       overflow:hidden;
       position:relative;
     }
-
     #qr{
       width:100%;height:100%;
       object-fit:contain;
       display:none;
       opacity:0;
       transform:scale(.86);
-      filter:drop-shadow(0 16px 40px rgba(0,0,0,.40));
+      filter:drop-shadow(0 14px 34px rgba(0,0,0,.40));
     }
     #qr.reveal{
       display:block;
       animation: reveal .62s cubic-bezier(.2,.9,.2,1) forwards;
     }
     @keyframes reveal{
-      0%{opacity:0; transform:scale(.70) rotate(-5deg)}
-      58%{opacity:1; transform:scale(1.06) rotate(2deg)}
+      0%{opacity:0; transform:scale(.72) rotate(-5deg)}
+      58%{opacity:1; transform:scale(1.05) rotate(2deg)}
       100%{opacity:1; transform:scale(1) rotate(0)}
     }
 
@@ -401,15 +381,15 @@
       filter:drop-shadow(0 10px 22px rgba(0,0,0,.40));
       animation: floaty .72s ease forwards;
     }
-    .spark:before{ left:18px; top:18px; }
-    .spark:after{ right:18px; bottom:18px; }
+    .spark:before{ left:14px; top:14px; }
+    .spark:after{ right:14px; bottom:14px; }
     @keyframes floaty{
       from{ transform:translateY(12px) scale(.9); opacity:0}
       45%{opacity:1}
       to{ transform:translateY(-14px) scale(1.08); opacity:0}
     }
 
-    .hint{margin-top:12px;font-size:13px;color:var(--muted);line-height:1.45}
+    .hint{margin-top:10px;font-size:13px;color:var(--muted);line-height:1.45}
     .payload{
       margin-top:10px;
       padding:10px 12px;
@@ -427,31 +407,30 @@
 
 <body>
   <div class="wrap">
-    <div class="header">
-      <h1 class="title">🏆 Pré-inscription 🥋</h1>
-      <p class="sub">Remplis les champs, puis récupère ton QR.</p>
-    </div>
-
     <div class="card">
 
-      <!-- Big fun progress with steps -->
+      <div class="cardHead">
+        <h1 class="title">🏆 Pré-inscription 🥋</h1>
+        <p class="sub">Renseigne les infos, puis récupère ton QR.</p>
+      </div>
+
       <div class="progressWrap">
         <div class="stepsRow" id="stepsRow">
-          <div class="s active" data-i="0">
-            <div class="bubble"><span>1</span></div>
-            <div class="lbl"><strong>Nom</strong><em id="pv-0">…</em></div>
+          <div class="stepDot active" data-i="0">
+            <div class="bubble">1/4</div>
+            <div class="valid">✓</div>
           </div>
-          <div class="s" data-i="1">
-            <div class="bubble"><span>2</span></div>
-            <div class="lbl"><strong>Prénom</strong><em id="pv-1">…</em></div>
+          <div class="stepDot" data-i="1">
+            <div class="bubble">2/4</div>
+            <div class="valid">✓</div>
           </div>
-          <div class="s" data-i="2">
-            <div class="bubble"><span>3</span></div>
-            <div class="lbl"><strong>Club</strong><em id="pv-2">…</em></div>
+          <div class="stepDot" data-i="2">
+            <div class="bubble">3/4</div>
+            <div class="valid">✓</div>
           </div>
-          <div class="s" data-i="3">
-            <div class="bubble"><span>4</span></div>
-            <div class="lbl"><strong>Sexe</strong><em id="pv-3">…</em></div>
+          <div class="stepDot" data-i="3">
+            <div class="bubble">4/4</div>
+            <div class="valid">✓</div>
           </div>
         </div>
 
@@ -461,16 +440,10 @@
       <div class="sec">
         <div class="sheet">
           <div class="sheetTop">
-            <div class="kicker">
-              <div class="badge" id="badge">1</div>
-              <div class="titles">
-                <p class="stepTitle" id="stepTitle">Nom</p>
-                <p class="stepSub" id="stepSub">Le nom passe automatiquement en MAJ.</p>
-              </div>
-            </div>
-
-            <div class="status" id="status">
-              <span class="dot"></span><span id="statusTxt">Requis</span>
+            <div class="badge" id="badge">1</div>
+            <div class="titles">
+              <p class="stepTitle" id="stepTitle">Nom</p>
+              <p class="stepSub" id="stepSub">Le nom passe automatiquement en MAJ.</p>
             </div>
           </div>
 
@@ -493,8 +466,8 @@
         <div class="qrFrame">
           <div class="spark" id="spark"></div>
           <img id="qr" alt="QR Code">
-          <div id="empty" class="hint" style="padding:18px;max-width:360px;">
-            Le QR apparaîtra ici à la fin 🎉
+          <div id="empty" class="hint" style="padding:14px;max-width:260px;">
+            Le QR apparaîtra ici 🎉
           </div>
         </div>
 
@@ -510,7 +483,7 @@
     }
 
     class QrService {
-      static url(payload, size = 560) {
+      static url(payload, size = 360) {
         return "https://api.qrserver.com/v1/create-qr-code/?size="
           + size + "x" + size
           + "&data=" + encodeURIComponent(payload);
@@ -522,16 +495,13 @@
         try {
           const text = "はじめ";
           if (!("speechSynthesis" in window)) return;
-
           const u = new SpeechSynthesisUtterance(text);
           u.lang = "ja-JP";
           u.rate = 0.95;
           u.pitch = 1.05;
-
           const voices = window.speechSynthesis.getVoices?.() || [];
           const ja = voices.find(v => (v.lang || "").toLowerCase().startsWith("ja"));
           if (ja) u.voice = ja;
-
           window.speechSynthesis.cancel();
           window.speechSynthesis.speak(u);
         } catch(e) {}
@@ -540,23 +510,14 @@
 
     class App {
       constructor() {
-        // progress steps
-        this.stepsRow = document.getElementById("stepsRow");
-        this.stepNodes = [...document.querySelectorAll(".s[data-i]")];
-        this.preview = [
-          document.getElementById("pv-0"),
-          document.getElementById("pv-1"),
-          document.getElementById("pv-2"),
-          document.getElementById("pv-3"),
-        ];
+        // progress
+        this.stepDots = [...document.querySelectorAll(".stepDot[data-i]")];
         this.progressBar = document.getElementById("progressBar");
 
         // sheet
         this.badge = document.getElementById("badge");
         this.stepTitle = document.getElementById("stepTitle");
         this.stepSub = document.getElementById("stepSub");
-        this.status = document.getElementById("status");
-        this.statusTxt = document.getElementById("statusTxt");
         this.stage = document.getElementById("stage");
         this.fieldArea = document.getElementById("fieldArea");
 
@@ -571,7 +532,6 @@
         this.payloadBox = document.getElementById("payload");
         this.spark = document.getElementById("spark");
 
-        // state
         this.state = { nom:"", prenom:"", club:"", sexe:"" };
         this.current = 0;
         this.playedSound = false;
@@ -583,7 +543,6 @@
             sub:"Le nom passe automatiquement en MAJ.",
             render: () => this.renderInput("nom", "JORDAN", "family-name"),
             normalize: (v)=> String(v||"").toUpperCase(),
-            preview: (v)=> v ? v : "…",
           },
           {
             key:"prenom",
@@ -595,7 +554,6 @@
               if (!v) return "";
               return v.charAt(0).toUpperCase() + v.slice(1);
             },
-            preview: (v)=> v ? v : "…",
           },
           {
             key:"club",
@@ -603,7 +561,6 @@
             sub:"Choisis ton club.",
             render: () => this.renderSelect("club", "— Sélectionne un club —", ClubsProvider.list()),
             normalize: (v)=> String(v||"").trim(),
-            preview: (v)=> v ? v : "…",
           },
           {
             key:"sexe",
@@ -611,7 +568,6 @@
             sub:"Choisis Masculin ou Féminin.",
             render: () => this.renderSelect("sexe", "— Sélectionne —", ["Masculin","Féminin"]),
             normalize: (v)=> String(v||"").trim(),
-            preview: (v)=> v ? v : "…",
           }
         ];
       }
@@ -620,8 +576,8 @@
         this.backBtn.addEventListener("click", () => this.go(this.current - 1, true));
         this.nextBtn.addEventListener("click", () => this.next());
 
-        // allow tapping on already reached steps
-        this.stepNodes.forEach(node => {
+        // tap on reachable step bubbles
+        this.stepDots.forEach(node => {
           node.addEventListener("click", () => {
             const i = Number(node.dataset.i);
             const max = this.maxReachableStep();
@@ -653,7 +609,6 @@
 
         const input = document.getElementById("field");
         const check = document.getElementById("check");
-
         input.value = this.state[key] || "";
 
         const onInput = () => {
@@ -694,7 +649,6 @@
 
         const select = document.getElementById("field");
         const check = document.getElementById("check");
-
         select.value = this.state[key] || "";
 
         const onChange = () => {
@@ -711,7 +665,6 @@
 
         select.addEventListener("change", onChange);
         select.addEventListener("input", onChange);
-
         onChange();
 
         setTimeout(() => {
@@ -723,7 +676,6 @@
         if (!this.isStepOk(this.current)) return;
 
         this.fieldArea.classList.add("hiding");
-
         setTimeout(() => {
           if (this.current < this.steps.length - 1) {
             this.current++;
@@ -762,45 +714,26 @@
       }
 
       isFilled(v) { return String(v || "").trim().length > 0; }
-
-      isStepOk(i) {
-        const key = this.steps[i].key;
-        return this.isFilled(this.state[key]);
-      }
+      isStepOk(i) { return this.isFilled(this.state[this.steps[i].key]); }
+      isAllComplete() { return this.steps.every((_, i) => this.isStepOk(i)); }
 
       refresh() {
-        // status
         const ok = this.isStepOk(this.current);
-        this.status.classList.toggle("ok", ok);
-        this.statusTxt.textContent = ok ? "✓ OK" : "Requis";
 
-        // buttons
         this.backBtn.disabled = (this.current === 0);
         this.nextBtn.disabled = !ok;
         this.nextBtn.textContent = (this.current === this.steps.length - 1) ? "Terminer" : "Suivant";
 
-        // previews in progress row
-        this.preview[0].textContent = this.steps[0].preview(this.state.nom);
-        this.preview[1].textContent = this.steps[1].preview(this.state.prenom);
-        this.preview[2].textContent = this.steps[2].preview(this.state.club);
-        this.preview[3].textContent = this.steps[3].preview(this.state.sexe);
-
-        // step states
-        this.stepNodes.forEach((node, i) => {
+        // progress dots (keep "x/4" always; just add valid badge when done)
+        this.stepDots.forEach((node, i) => {
           node.classList.toggle("active", i === this.current);
           node.classList.toggle("done", this.isStepOk(i));
         });
 
-        // progress bar
         const filled = this.steps.reduce((acc, _, i) => acc + (this.isStepOk(i) ? 1 : 0), 0);
         this.progressBar.style.width = `${Math.round((filled / this.steps.length) * 100)}%`;
 
-        // QR visibility
         if (!this.isAllComplete()) this.hideQR();
-      }
-
-      isAllComplete() {
-        return this.steps.every((_, i) => this.isStepOk(i));
       }
 
       buildPayload() {
@@ -815,7 +748,7 @@
         if (!this.isAllComplete()) return;
 
         const payload = this.buildPayload();
-        this.qr.src = QrService.url(payload, 560);
+        this.qr.src = QrService.url(payload, 360);
 
         this.qr.classList.remove("reveal");
         void this.qr.offsetWidth;
@@ -865,5 +798,5 @@
 
     new App().init();
   </script>
-</body> 
+</body>
 </html>
