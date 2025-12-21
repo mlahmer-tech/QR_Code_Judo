@@ -8,36 +8,43 @@
   <style>
     :root{
       --bg:#0b0b0f;
+      --card:rgba(255,255,255,.10);
       --stroke:rgba(255,255,255,.14);
       --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.68);
+      --muted:rgba(255,255,255,.64);
       --shadow:0 18px 50px rgba(0,0,0,.45);
       --r:22px;
 
-      --ok: rgba(60,220,140,.95);
-      --warn: rgba(255,205,80,.95);
+      --ok: rgba(52, 199, 89, 1);      /* iOS green */
+      --warn: rgba(255, 204, 0, 1);    /* iOS yellow */
+      --bad: rgba(255, 59, 48, 1);     /* iOS red */
+      --blue: rgba(10, 132, 255, 1);   /* iOS blue */
 
       --glass1: rgba(255,255,255,.12);
-      --glass2: rgba(255,255,255,.08);
+      --glass2: rgba(255,255,255,.07);
+
+      --sep: rgba(255,255,255,.10);
+      --chip: rgba(0,0,0,.16);
     }
 
     *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      margin:0; min-height:100vh; padding:22px;
+      margin:0; padding:20px;
       display:flex; justify-content:center; align-items:center;
       font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Arial,sans-serif;
       color:var(--text);
       background:
-        radial-gradient(1200px 600px at 10% 10%, rgba(120,80,255,.40), transparent 60%),
-        radial-gradient(900px 700px at 90% 20%, rgba(0,200,255,.35), transparent 60%),
-        radial-gradient(900px 700px at 40% 90%, rgba(255,80,160,.28), transparent 65%),
+        radial-gradient(1200px 600px at 12% 8%, rgba(120,80,255,.38), transparent 60%),
+        radial-gradient(900px 700px at 88% 16%, rgba(0,200,255,.30), transparent 60%),
+        radial-gradient(900px 700px at 40% 92%, rgba(255,80,160,.22), transparent 65%),
         var(--bg);
     }
 
     .wrap{width:100%;max-width:560px}
-    .header{text-align:center;margin-bottom:14px}
-    .title{margin:0 0 6px;font-weight:850;letter-spacing:-.02em;font-size:30px}
-    .sub{margin:0;color:var(--muted);font-size:14px;line-height:1.35}
+    .header{ text-align:center; margin-bottom:14px; }
+    .title{ margin:0 0 6px; font-weight:900; letter-spacing:-.03em; font-size:30px; }
+    .sub{ margin:0; color:var(--muted); font-size:14px; line-height:1.35; }
 
     .card{
       border-radius:var(--r);
@@ -45,103 +52,177 @@
       background:linear-gradient(180deg, var(--glass1), var(--glass2));
       box-shadow:var(--shadow);
       overflow:hidden;
-      backdrop-filter:blur(14px);
-      -webkit-backdrop-filter:blur(14px);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
     }
 
-    /* Progress */
+    /* iOS-like top progress */
     .topbar{
-      height:8px;
-      background:rgba(255,255,255,.08);
+      height:10px;
+      background:rgba(255,255,255,.07);
       border-bottom:1px solid rgba(255,255,255,.08);
       overflow:hidden;
     }
     .topbar > div{
       height:100%;
       width:0%;
-      background:linear-gradient(90deg, rgba(0,200,255,.9), rgba(120,80,255,.9), rgba(255,80,160,.9));
-      transition:width .25s ease;
+      border-radius:999px;
+      background:linear-gradient(90deg, rgba(10,132,255,.95), rgba(88,86,214,.95), rgba(255,45,85,.92));
+      transition:width .28s ease;
     }
 
-    .sec{padding:18px}
+    .sec{ padding:18px; }
 
-    /* Step header (small / compact) */
-    .stepHeader{
+    /* ===== Apple-ish "stacked sheet" step container ===== */
+    .sheet{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.14);
+      border-radius:20px;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .sheetTop{
+      padding:14px 14px 12px;
       display:flex;
-      justify-content:space-between;
       align-items:flex-start;
+      justify-content:space-between;
       gap:12px;
-      margin-bottom:10px;
     }
+
+    .kicker{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    /* iOS-like step badge */
+    .badge{
+      width:28px;height:28px;border-radius:999px;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      color:rgba(255,255,255,.9);
+      font-weight:800;
+      font-size:13px;
+      box-shadow:0 10px 26px rgba(0,0,0,.25);
+      flex:0 0 auto;
+    }
+
+    .titles{ min-width:0; }
     .stepTitle{
       margin:0;
       font-size:15px;
-      font-weight:800;
-      letter-spacing:-.01em;
-      line-height:1.2;
+      font-weight:900;
+      letter-spacing:-.02em;
+      line-height:1.15;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
     .stepSub{
-      margin:4px 0 0;
+      margin:6px 0 0;
       font-size:12px;
       color:var(--muted);
       line-height:1.35;
     }
 
-    .pill{
+    /* iOS-like "status capsule" */
+    .status{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:6px 10px;
+      padding:7px 10px;
       border-radius:999px;
-      border:1px solid rgba(255,255,255,.16);
-      background:rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.14);
+      background:var(--chip);
+      color:rgba(255,255,255,.86);
       font-size:12px;
       white-space:nowrap;
+      flex:0 0 auto;
     }
-    .pill .dot{
+    .status .dot{
       width:8px;height:8px;border-radius:999px;
       background:var(--warn);
-      box-shadow:0 0 0 3px rgba(255,205,80,.18);
+      box-shadow:0 0 0 3px rgba(255,204,0,.16);
     }
-    .pill.ok .dot{
+    .status.ok .dot{
       background:var(--ok);
-      box-shadow:0 0 0 3px rgba(60,220,140,.18);
+      box-shadow:0 0 0 3px rgba(52,199,89,.16);
+    }
+    .status.bad .dot{
+      background:var(--bad);
+      box-shadow:0 0 0 3px rgba(255,59,48,.14);
     }
 
-    /* Panel that slides in/out */
-    .panel{
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:18px;
-      background:rgba(0,0,0,.14);
-      padding:12px;
+    .divider{
+      height:1px;
+      background:var(--sep);
+    }
+
+    /* Animated field area (appears/disappears) */
+    .fieldArea{
+      padding:14px;
+      position:relative;
       overflow:hidden;
     }
-    .panelInner{
+
+    .stage{
       display:grid;
       gap:10px;
-      transition:opacity .18s ease, transform .22s ease;
+      transition:opacity .22s ease, transform .26s ease;
       opacity:1;
       transform:translateY(0);
     }
-    .panel.hide .panelInner{
+    .fieldArea.hiding .stage{
       opacity:0;
-      transform:translateY(-6px);
+      transform:translateY(-8px);
       pointer-events:none;
     }
 
-    .field{position:relative}
+    /* iOS-like input */
+    .field{ position:relative; }
+    input, select{
+      width:100%;
+      padding:14px 44px 14px 14px;
+      font-size:16px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.18);
+      color:var(--text);
+      outline:none;
+      -webkit-appearance:none;
+      appearance:none;
+      transition:border-color .2s ease, box-shadow .2s ease, transform .12s ease;
+    }
+    input:focus, select:focus{
+      border-color:rgba(10,132,255,.55);
+      box-shadow:0 0 0 6px rgba(10,132,255,.14);
+    }
+    input::placeholder{ color:rgba(255,255,255,.28); }
+
+    .is-empty{
+      border-color:rgba(255,204,0,.42) !important;
+      box-shadow:0 0 0 6px rgba(255,204,0,.10);
+    }
+    .is-ok{
+      border-color:rgba(52,199,89,.42) !important;
+      box-shadow:0 0 0 6px rgba(52,199,89,.12);
+    }
+
     .check{
       position:absolute;
       right:12px;
       top:50%;
       transform:translateY(-50%) scale(.92);
-      width:22px;height:22px;
+      width:24px;height:24px;
       border-radius:999px;
       display:flex;align-items:center;justify-content:center;
       border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.18);
-      color:rgba(255,255,255,.88);
-      font-size:13px;
+      background:rgba(0,0,0,.16);
+      color:rgba(255,255,255,.9);
+      font-size:14px;
       opacity:0;
       transition:opacity .18s ease, transform .18s ease;
       pointer-events:none;
@@ -149,69 +230,52 @@
     .check.show{
       opacity:1;
       transform:translateY(-50%) scale(1);
-      border-color:rgba(60,220,140,.35);
-      box-shadow:0 0 0 6px rgba(60,220,140,.10);
+      border-color:rgba(52,199,89,.42);
+      box-shadow:0 0 0 6px rgba(52,199,89,.10);
     }
 
-    input, select{
-      width:100%;
-      padding:14px;
-      padding-right:44px;
-      font-size:16px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.22);
-      color:var(--text);
-      outline:none;
-      -webkit-appearance:none;
-      appearance:none;
-      transition:border-color .2s ease, box-shadow .2s ease;
-    }
-    input::placeholder{color:rgba(255,255,255,.35)}
-    input:focus, select:focus{
-      border-color:rgba(120,180,255,.55);
-      box-shadow:0 0 0 6px rgba(120,180,255,.12);
-    }
-    .is-empty{
-      border-color:rgba(255,205,80,.40) !important;
-      box-shadow:0 0 0 6px rgba(255,205,80,.09);
-    }
-    .is-ok{
-      border-color:rgba(60,220,140,.45) !important;
-      box-shadow:0 0 0 6px rgba(60,220,140,.10);
-    }
-
+    /* Tiny iOS hint */
     .mini{
       font-size:12px;
-      color:rgba(255,255,255,.72);
+      color:rgba(255,255,255,.70);
       line-height:1.4;
     }
 
+    /* iOS-like nav buttons */
     .nav{
       display:flex;
       gap:10px;
-      margin-top:12px;
+      padding:14px;
+      border-top:1px solid var(--sep);
+      background:rgba(0,0,0,.08);
     }
+
     .btn{
       flex:1;
       padding:12px 14px;
       border-radius:16px;
       border:1px solid rgba(255,255,255,.16);
-      background:rgba(0,0,0,.18);
+      background:rgba(0,0,0,.16);
       color:rgba(255,255,255,.92);
       font-size:15px;
+      font-weight:700;
       cursor:pointer;
       user-select:none;
+      transition:transform .08s ease, box-shadow .16s ease, border-color .16s ease;
     }
-    .btn.secondary{opacity:.9}
-    .btn[disabled]{opacity:.45; cursor:not-allowed}
-    .btn:active{transform:scale(.99)}
+    .btn:active{ transform:scale(.99); }
+    .btn.primary{
+      border-color:rgba(10,132,255,.35);
+      box-shadow:0 10px 30px rgba(10,132,255,.08);
+    }
+    .btn.secondary{ opacity:.92; }
+    .btn[disabled]{ opacity:.45; cursor:not-allowed; box-shadow:none; }
 
-    /* QR */
+    /* QR area */
     .qrBox{
       padding:16px 18px 18px;
       border-top:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.12);
+      background:rgba(0,0,0,.10);
       text-align:center;
     }
     .qrFrame{
@@ -225,29 +289,33 @@
       overflow:hidden;
       position:relative;
     }
+
     #qr{
       width:100%;height:100%;
       object-fit:contain;
       display:none;
       opacity:0;
-      transform:scale(.86) rotate(-2deg);
-      filter:drop-shadow(0 12px 30px rgba(0,0,0,.35));
+      transform:scale(.86);
+      filter:drop-shadow(0 14px 34px rgba(0,0,0,.38));
     }
-    #qr.pop{
+
+    /* Fun + still "clean" */
+    #qr.reveal{
       display:block;
-      animation: popIn .55s cubic-bezier(.2,.9,.2,1) forwards;
+      animation: reveal .62s cubic-bezier(.2,.9,.2,1) forwards;
     }
-    @keyframes popIn{
-      0%{opacity:0; transform:scale(.72) rotate(-6deg)}
-      60%{opacity:1; transform:scale(1.05) rotate(2deg)}
-      100%{opacity:1; transform:scale(1) rotate(0deg)}
+    @keyframes reveal{
+      0%{opacity:0; transform:scale(.72) rotate(-4deg)}
+      58%{opacity:1; transform:scale(1.05) rotate(1.5deg)}
+      100%{opacity:1; transform:scale(1) rotate(0)}
     }
+
     .spark{
       position:absolute; inset:0;
       pointer-events:none;
       opacity:0;
     }
-    .spark.on{ animation:spark .65s ease forwards; }
+    .spark.on{ animation:spark .7s ease forwards; }
     @keyframes spark{
       0%{opacity:0; transform:scale(.98)}
       25%{opacity:1}
@@ -257,16 +325,16 @@
       content:"✨";
       position:absolute;
       font-size:18px;
-      opacity:.9;
-      filter:drop-shadow(0 8px 18px rgba(0,0,0,.35));
-      animation: floaty .65s ease forwards;
+      opacity:.92;
+      filter:drop-shadow(0 10px 22px rgba(0,0,0,.40));
+      animation: floaty .7s ease forwards;
     }
     .spark:before{ left:18px; top:18px; }
     .spark:after{ right:18px; bottom:18px; }
     @keyframes floaty{
-      from{ transform:translateY(8px) scale(.9); opacity:0}
+      from{ transform:translateY(10px) scale(.9); opacity:0}
       45%{opacity:1}
-      to{ transform:translateY(-10px) scale(1.08); opacity:0}
+      to{ transform:translateY(-12px) scale(1.08); opacity:0}
     }
 
     .hint{margin-top:12px;font-size:13px;color:var(--muted);line-height:1.45}
@@ -276,7 +344,7 @@
       border-radius:14px;
       text-align:left;
       border:1px dashed rgba(255,255,255,.22);
-      background:rgba(0,0,0,.18);
+      background:rgba(0,0,0,.16);
       word-break:break-word;
       font-size:13px;
       color:rgba(255,255,255,.82);
@@ -289,39 +357,45 @@
   <div class="wrap">
     <div class="header">
       <h1 class="title">🏆 Pré-inscription 🥋</h1>
-      <p class="sub">Saisie “une zone à la fois” → page très compacte</p>
+      <p class="sub">Ultra compact · une étape à la fois · style iOS</p>
     </div>
 
     <div class="card">
       <div class="topbar"><div id="progressBar"></div></div>
 
       <div class="sec">
-        <div class="stepHeader">
-          <div>
-            <p class="stepTitle" id="stepTitle">Nom</p>
-            <p class="stepSub" id="stepSub">Saisis le nom de famille (en MAJ).</p>
+        <div class="sheet">
+          <div class="sheetTop">
+            <div class="kicker">
+              <div class="badge" id="badge">1</div>
+              <div class="titles">
+                <p class="stepTitle" id="stepTitle">Nom</p>
+                <p class="stepSub" id="stepSub">Le nom passe automatiquement en MAJ.</p>
+              </div>
+            </div>
+
+            <div class="status" id="status">
+              <span class="dot"></span><span id="statusTxt">Requis</span>
+            </div>
           </div>
-          <div class="pill" id="pill">
-            <span class="dot"></span><span id="pillTxt">Requis</span>
+
+          <div class="divider"></div>
+
+          <div class="fieldArea" id="fieldArea">
+            <div class="stage" id="stage"></div>
+          </div>
+
+          <div class="nav">
+            <button class="btn secondary" id="backBtn" disabled>Retour</button>
+            <button class="btn primary" id="nextBtn" disabled>Suivant</button>
           </div>
         </div>
 
-        <div class="panel" id="panel">
-          <div class="panelInner" id="panelInner">
-            <!-- dynamic field goes here -->
-          </div>
+        <div style="margin-top:10px; display:flex; gap:10px;">
+          <button class="btn secondary" id="resetBtn" style="flex:1;">Réinitialiser</button>
         </div>
 
-        <div class="nav">
-          <button class="btn secondary" id="backBtn" disabled>← Retour</button>
-          <button class="btn" id="nextBtn" disabled>Suivant →</button>
-        </div>
-
-        <div class="nav" style="margin-top:10px">
-          <button class="btn secondary" id="resetBtn">Réinitialiser ✏️</button>
-        </div>
-
-        <div class="mini" id="formHint"></div>
+        <div class="mini" id="formHint" style="margin-top:10px;"></div>
       </div>
 
       <div class="qrBox">
@@ -329,7 +403,7 @@
           <div class="spark" id="spark"></div>
           <img id="qr" alt="QR Code">
           <div id="empty" class="hint" style="padding:18px;max-width:340px;">
-            Termine les étapes pour afficher le QR 🎉
+            Complète les 4 étapes pour afficher le QR ✨
           </div>
         </div>
 
@@ -357,9 +431,10 @@
     }
 
     class SoundService {
+      // “はじめ / Hajime” via SpeechSynthesis (gratuit). Fallback beep.
       static playHajime() {
         try {
-          const text = "はじめ"; // Hajime (tu disais "adjime")
+          const text = "はじめ";
           if (!("speechSynthesis" in window)) return SoundService.beep();
 
           const u = new SpeechSynthesisUtterance(text);
@@ -388,7 +463,7 @@
           g.gain.value = 0.0001;
           o.connect(g); g.connect(ctx.destination);
           o.start();
-          g.gain.exponentialRampToValueAtTime(0.15, ctx.currentTime + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.14, ctx.currentTime + 0.02);
           g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.22);
           o.stop(ctx.currentTime + 0.25);
         }catch(e){}
@@ -398,19 +473,19 @@
     class App {
       constructor() {
         // UI
+        this.badge = document.getElementById("badge");
         this.stepTitle = document.getElementById("stepTitle");
-        this.stepSub   = document.getElementById("stepSub");
-        this.pill      = document.getElementById("pill");
-        this.pillTxt   = document.getElementById("pillTxt");
-
-        this.panel     = document.getElementById("panel");
-        this.panelInner= document.getElementById("panelInner");
+        this.stepSub = document.getElementById("stepSub");
+        this.status = document.getElementById("status");
+        this.statusTxt = document.getElementById("statusTxt");
+        this.stage = document.getElementById("stage");
+        this.fieldArea = document.getElementById("fieldArea");
 
         this.progressBar = document.getElementById("progressBar");
         this.formHint = document.getElementById("formHint");
 
-        this.backBtn  = document.getElementById("backBtn");
-        this.nextBtn  = document.getElementById("nextBtn");
+        this.backBtn = document.getElementById("backBtn");
+        this.nextBtn = document.getElementById("nextBtn");
         this.resetBtn = document.getElementById("resetBtn");
 
         // QR
@@ -420,28 +495,26 @@
         this.payloadBox = document.getElementById("payload");
         this.spark = document.getElementById("spark");
 
-        // data
+        // state
         this.state = { nom:"", prenom:"", club:"", sexe:"" };
         this.current = 0;
         this.playedSound = false;
 
-        // steps definition
         this.steps = [
           {
             key:"nom",
             title:"Nom",
-            sub:"Saisis le nom de famille (en MAJ).",
-            render: () => this.renderInput("nom", "JORDAN", "family-name", true),
-            normalize: (v) => (v || "").toUpperCase(),
+            sub:"Le nom passe automatiquement en MAJ.",
+            render: () => this.renderInput("nom", "JORDAN", "family-name"),
+            normalize: (v)=> String(v||"").toUpperCase()
           },
           {
             key:"prenom",
             title:"Prénom",
-            sub:"Saisis le prénom (première lettre en maj).",
-            render: () => this.renderInput("prenom", "Mickael", "given-name", true),
-            normalize: (v) => {
-              v = String(v||"");
-              v = v.trim();
+            sub:"Première lettre automatiquement en majuscule.",
+            render: () => this.renderInput("prenom", "Mickael", "given-name"),
+            normalize: (v)=> {
+              v = String(v||"").trim();
               if (!v) return "";
               return v.charAt(0).toUpperCase() + v.slice(1);
             }
@@ -449,22 +522,21 @@
           {
             key:"club",
             title:"Club",
-            sub:"Choisis le club dans la liste.",
+            sub:"Choisis ton club.",
             render: () => this.renderSelect("club", "— Sélectionne un club —", ClubsProvider.list()),
-            normalize: (v) => String(v||"").trim()
+            normalize: (v)=> String(v||"").trim()
           },
           {
             key:"sexe",
             title:"Sexe",
             sub:"Choisis Masculin ou Féminin.",
             render: () => this.renderSelect("sexe", "— Sélectionne —", ["Masculin","Féminin"]),
-            normalize: (v) => String(v||"").trim()
+            normalize: (v)=> String(v||"").trim()
           }
         ];
       }
 
       init() {
-        // nav
         this.backBtn.addEventListener("click", () => this.go(this.current - 1, true));
         this.nextBtn.addEventListener("click", () => this.next());
         this.resetBtn.addEventListener("click", () => this.reset());
@@ -473,68 +545,70 @@
         this.refresh();
       }
 
-      // ===== renderers =====
-      renderInput(key, placeholder, autocomplete, showMini) {
-        this.panelInner.innerHTML = `
+      renderStep(i) {
+        const step = this.steps[i];
+        this.badge.textContent = String(i + 1);
+        this.stepTitle.textContent = step.title;
+        this.stepSub.textContent = step.sub;
+
+        // build control
+        this.stage.innerHTML = "";
+        step.render();
+
+        this.refresh();
+      }
+
+      renderInput(key, placeholder, autocomplete) {
+        this.stage.innerHTML = `
           <div class="field">
-            <input id="field" placeholder="${this.escapeHtml(placeholder)}" autocomplete="${this.escapeHtml(autocomplete)}" />
+            <input id="field" placeholder="${this.esc(placeholder)}" autocomplete="${this.esc(autocomplete)}" />
             <div class="check" id="check">✓</div>
           </div>
-          ${showMini ? `<div class="mini" id="mini"></div>` : ``}
+          <div class="mini">Astuce : tu peux juste coller le texte.</div>
         `;
 
         const input = document.getElementById("field");
         const check = document.getElementById("check");
-        const mini  = document.getElementById("mini");
 
         input.value = this.state[key] || "";
 
-        input.addEventListener("input", () => {
+        const onInput = () => {
           const step = this.steps[this.current];
           const raw = input.value;
           const norm = step.normalize ? step.normalize(raw) : raw;
           if (norm !== raw) input.value = norm;
-
           this.state[key] = input.value;
 
-          // per-field hint
-          if (mini) {
-            if (key === "nom") mini.textContent = "Auto: MAJUSCULES ✅";
-            if (key === "prenom") mini.textContent = "Auto: Première lettre en maj ✅";
-          }
-
-          // update visuals
           const ok = this.isFilled(input.value);
           input.classList.toggle("is-ok", ok);
           input.classList.toggle("is-empty", !ok);
           check.classList.toggle("show", ok);
 
           this.refresh();
-        });
+        };
 
-        // initial state class
-        const ok0 = this.isFilled(input.value);
-        input.classList.toggle("is-ok", ok0);
-        input.classList.toggle("is-empty", !ok0);
-        check.classList.toggle("show", ok0);
+        input.addEventListener("input", onInput);
+
+        // init state
+        onInput();
 
         setTimeout(() => {
           try { input.focus({ preventScroll:true }); } catch(e) { input.focus(); }
-        }, 60);
+        }, 70);
       }
 
       renderSelect(key, firstLabel, options) {
         const opts = [
-          `<option value="">${this.escapeHtml(firstLabel)}</option>`,
-          ...options.map(o => `<option value="${this.escapeHtml(o)}">${this.escapeHtml(o)}</option>`)
+          `<option value="">${this.esc(firstLabel)}</option>`,
+          ...options.map(o => `<option value="${this.esc(o)}">${this.esc(o)}</option>`)
         ].join("");
 
-        this.panelInner.innerHTML = `
+        this.stage.innerHTML = `
           <div class="field">
             <select id="field">${opts}</select>
             <div class="check" id="check">✓</div>
           </div>
-          <div class="mini">iOS: la sélection déclenche la suite automatiquement.</div>
+          <div class="mini">Sélection → on passe automatiquement à l’étape suivante.</div>
         `;
 
         const select = document.getElementById("field");
@@ -553,69 +627,51 @@
 
           this.refresh();
 
-          // auto next if ok
-          if (ok) setTimeout(() => this.next(), 120);
+          if (ok) setTimeout(() => this.next(), 140);
         };
 
         select.addEventListener("change", onChange);
         select.addEventListener("input", onChange);
 
-        const ok0 = this.isFilled(select.value);
-        select.classList.toggle("is-ok", ok0);
-        select.classList.toggle("is-empty", !ok0);
-        check.classList.toggle("show", ok0);
+        onChange();
 
         setTimeout(() => {
           try { select.focus({ preventScroll:true }); } catch(e) { select.focus(); }
-        }, 60);
-      }
-
-      // ===== flow =====
-      renderStep(i) {
-        const step = this.steps[i];
-        this.stepTitle.textContent = step.title;
-        this.stepSub.textContent = step.sub;
-
-        // (re)render current control
-        step.render();
-
-        this.refresh();
+        }, 70);
       }
 
       next() {
-        // if current not ok -> do nothing
         if (!this.isStepOk(this.current)) return;
 
-        // animate panel out (the "zone disappears")
-        this.panel.classList.add("hide");
+        // hide current field area (the zone disappears)
+        this.fieldArea.classList.add("hiding");
 
         setTimeout(() => {
-          // move to next
           if (this.current < this.steps.length - 1) {
             this.current++;
-            this.panel.classList.remove("hide");
+            this.fieldArea.classList.remove("hiding");
             this.renderStep(this.current);
           } else {
-            // finished -> show QR
-            this.panel.classList.remove("hide");
+            // final -> show QR
+            this.fieldArea.classList.remove("hiding");
             this.showQR();
           }
-        }, 180);
+        }, 220);
       }
 
       go(i, animate) {
         i = Math.max(0, Math.min(this.steps.length - 1, i));
-        // you can only go back freely; forward only up to last completed+1
+        // allow going back freely; forward only up to first missing step
         const max = this.maxReachableStep();
         if (i > max) return;
 
         if (animate) {
-          this.panel.classList.add("hide");
+          this.fieldArea.classList.add("hiding");
           setTimeout(() => {
             this.current = i;
-            this.panel.classList.remove("hide");
+            this.fieldArea.classList.remove("hiding");
             this.renderStep(this.current);
-          }, 180);
+          }, 220);
         } else {
           this.current = i;
           this.renderStep(this.current);
@@ -623,12 +679,14 @@
       }
 
       maxReachableStep() {
-        // You can reach current step or previous completed ones
-        // forward limited to first missing step
         for (let i = 0; i < this.steps.length; i++) {
-          if (!this.isStepOk(i)) return i; // first missing is reachable
+          if (!this.isStepOk(i)) return i;
         }
         return this.steps.length - 1;
+      }
+
+      isFilled(v) {
+        return String(v || "").trim().length > 0;
       }
 
       isStepOk(i) {
@@ -636,26 +694,28 @@
         return this.isFilled(this.state[key]);
       }
 
-      isFilled(v) {
-        return String(v || "").trim().length > 0;
+      isAllComplete() {
+        return this.steps.every((_, i) => this.isStepOk(i));
       }
 
       refresh() {
-        // pill state
         const ok = this.isStepOk(this.current);
-        this.pill.classList.toggle("ok", ok);
-        this.pillTxt.textContent = ok ? "✓ OK" : "Requis";
 
-        // progress
-        const filled = this.steps.reduce((acc, st, i) => acc + (this.isStepOk(i) ? 1 : 0), 0);
-        const pct = Math.round((filled / this.steps.length) * 100);
-        this.progressBar.style.width = `${pct}%`;
+        // status capsule
+        this.status.classList.toggle("ok", ok);
+        this.status.classList.toggle("bad", !ok && this.isFilled(this.state[this.steps[this.current].key]) === false);
+        this.statusTxt.textContent = ok ? "✓ OK" : "Requis";
 
         // buttons
         this.backBtn.disabled = (this.current === 0);
         this.nextBtn.disabled = !ok;
+        this.nextBtn.textContent = (this.current === this.steps.length - 1) ? "Terminer" : "Suivant";
 
-        // global hint
+        // progress
+        const filled = this.steps.reduce((acc, _, i) => acc + (this.isStepOk(i) ? 1 : 0), 0);
+        this.progressBar.style.width = `${Math.round((filled / this.steps.length) * 100)}%`;
+
+        // hint + QR visibility
         if (this.isAllComplete()) {
           this.formHint.textContent = "✅ Tout est OK — QR généré";
         } else {
@@ -664,15 +724,9 @@
           if (!this.isFilled(this.state.prenom)) missing.push("Prénom");
           if (!this.isFilled(this.state.club)) missing.push("Club");
           if (!this.isFilled(this.state.sexe)) missing.push("Sexe");
-          this.formHint.textContent = `➡️ Étape ${this.current+1}/${this.steps.length} — manque : ${missing.join(", ")}`;
+          this.formHint.textContent = `Étape ${this.current+1}/4 · Manque : ${missing.join(", ")}`;
+          this.hideQR();
         }
-
-        // hide QR if user edits / not complete
-        if (!this.isAllComplete()) this.hideQR();
-      }
-
-      isAllComplete() {
-        return this.steps.every((_, i) => this.isStepOk(i));
       }
 
       buildPayload() {
@@ -680,20 +734,18 @@
         const p = (this.state.prenom || "").trim();
         const c = (this.state.club || "").trim();
         const s = (this.state.sexe || "").trim();
-        const payload = `${n};${p};${c};${s};`;
-        return { payload };
+        return `${n};${p};${c};${s};`;
       }
 
       showQR() {
         if (!this.isAllComplete()) return;
 
-        const { payload } = this.buildPayload();
-
+        const payload = this.buildPayload();
         this.qr.src = QrService.url(payload, 520);
 
-        this.qr.classList.remove("pop");
+        this.qr.classList.remove("reveal");
         void this.qr.offsetWidth;
-        this.qr.classList.add("pop");
+        this.qr.classList.add("reveal");
 
         this.spark.classList.remove("on");
         void this.spark.offsetWidth;
@@ -714,7 +766,7 @@
 
       hideQR() {
         this.qr.style.display = "none";
-        this.qr.classList.remove("pop");
+        this.qr.classList.remove("reveal");
         this.empty.style.display = "block";
         this.hint.textContent = "";
         this.payloadBox.style.display = "none";
@@ -726,9 +778,10 @@
         this.current = 0;
         this.hideQR();
         this.renderStep(this.current);
+        this.refresh();
       }
 
-      escapeHtml(s){
+      esc(s){
         return String(s)
           .replaceAll("&","&amp;")
           .replaceAll("<","&lt;")
