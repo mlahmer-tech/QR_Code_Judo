@@ -7,89 +7,94 @@
 
   <style>
     html{ color-scheme: light dark; }
+
     :root{
-      /* Daylight / iOS widget glass */
+      /* ===== Light (iOS daylight glass) ===== */
       --bg1:#eef2ff;
       --bg2:#f7f8ff;
-
-      --stroke:rgba(15,20,35,.10);
-      --stroke2:rgba(255,255,255,.55);
 
       --text:rgba(10,12,22,.92);
       --muted:rgba(10,12,22,.62);
       --ink:rgba(10,12,22,.82);
 
+      --stroke:rgba(15,20,35,.10);
+      --strokeSoft:rgba(15,20,35,.08);
+
+      --glass1: rgba(255,255,255,.72);
+      --glass2: rgba(255,255,255,.50);
+      --glass3: rgba(255,255,255,.30);
+
+      --sep: rgba(15,20,35,.10);
+
       --shadow:0 22px 70px rgba(12,18,40,.14);
       --shadow2:0 10px 28px rgba(12,18,40,.10);
 
+      --focusRing: rgba(10,132,255,.18);
+      --okRing: rgba(52,199,89,.16);
+      --dangerRing: rgba(255,69,69,.18);
+
       --r:24px;
 
-      --ok: rgba(52,199,89,1);
       --blue: rgba(10,132,255,1);
       --violet: rgba(94,92,230,1);
       --pink: rgba(255,55,95,1);
-
-      --glass1: rgba(255,255,255,.70);
-      --glass2: rgba(255,255,255,.46);
-      --glass3: rgba(255,255,255,.26);
-      --sep: rgba(15,20,35,.10);
-
-      --danger: rgba(255,69,69,.95);
-      --dangerRing: rgba(255,69,69,.18);
-      --focusRing: rgba(10,132,255,.18);
-      --okRing: rgba(52,199,89,.16);
     }
 
     /* ===== Auto Dark (no manual override) ===== */
     @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) {
+      html:not([data-theme]) {
         --bg1:#07080d;
         --bg2:#0f1222;
 
-        --stroke:rgba(255,255,255,.14);
-        --stroke2:rgba(255,255,255,.08);
-
         --text:rgba(255,255,255,.92);
         --muted:rgba(255,255,255,.62);
-        --ink: rgba(255,255,255,.82);
+        --ink:rgba(255,255,255,.82);
 
-        --shadow:0 22px 70px rgba(0,0,0,.60);
-        --shadow2:0 10px 28px rgba(0,0,0,.38);
+        --stroke:rgba(255,255,255,.14);
+        --strokeSoft:rgba(255,255,255,.08);
 
         --glass1: rgba(24,28,46,.72);
         --glass2: rgba(16,18,30,.52);
         --glass3: rgba(12,14,22,.30);
+
         --sep: rgba(255,255,255,.10);
 
-        --dangerRing: rgba(255,69,69,.22);
+        --shadow:0 22px 70px rgba(0,0,0,.60);
+        --shadow2:0 10px 28px rgba(0,0,0,.38);
+
         --focusRing: rgba(10,132,255,.26);
         --okRing: rgba(52,199,89,.20);
+        --dangerRing: rgba(255,69,69,.22);
       }
     }
 
-    /* ===== Manual Dark ===== */
+    /* ===== Manual themes ===== */
     html[data-theme="dark"]{
       --bg1:#07080d;
       --bg2:#0f1222;
 
-      --stroke:rgba(255,255,255,.14);
-      --stroke2:rgba(255,255,255,.08);
-
       --text:rgba(255,255,255,.92);
       --muted:rgba(255,255,255,.62);
-      --ink: rgba(255,255,255,.82);
+      --ink:rgba(255,255,255,.82);
 
-      --shadow:0 22px 70px rgba(0,0,0,.60);
-      --shadow2:0 10px 28px rgba(0,0,0,.38);
+      --stroke:rgba(255,255,255,.14);
+      --strokeSoft:rgba(255,255,255,.08);
 
       --glass1: rgba(24,28,46,.72);
       --glass2: rgba(16,18,30,.52);
       --glass3: rgba(12,14,22,.30);
+
       --sep: rgba(255,255,255,.10);
 
-      --dangerRing: rgba(255,69,69,.22);
+      --shadow:0 22px 70px rgba(0,0,0,.60);
+      --shadow2:0 10px 28px rgba(0,0,0,.38);
+
       --focusRing: rgba(10,132,255,.26);
       --okRing: rgba(52,199,89,.20);
+      --dangerRing: rgba(255,69,69,.22);
+    }
+    html[data-theme="light"]{
+      /* Explicit light (same as default, but forces it) */
     }
 
     *{box-sizing:border-box}
@@ -104,20 +109,17 @@
         14px;
       font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Arial,sans-serif;
       color:var(--text);
+      overflow-x:hidden;
 
-      /* Soft background (light by default, dark via tokens) */
       background:
         radial-gradient(1200px 700px at 10% 10%, rgba(120,130,255,.32), transparent 62%),
         radial-gradient(900px 700px at 90% 18%, rgba(50,200,255,.26), transparent 62%),
         radial-gradient(1000px 780px at 45% 95%, rgba(255,125,200,.18), transparent 68%),
         radial-gradient(1100px 700px at 50% 50%, rgba(255,255,255,.75), rgba(255,255,255,0) 60%),
         linear-gradient(180deg, var(--bg1), var(--bg2));
-      overflow-x:hidden;
     }
-
-    /* Dark background remix (only when dark tokens are active) */
     @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) body{
+      html:not([data-theme]) body{
         background:
           radial-gradient(1200px 700px at 12% 10%, rgba(94,92,230,.22), transparent 62%),
           radial-gradient(900px 700px at 92% 18%, rgba(10,132,255,.18), transparent 62%),
@@ -135,6 +137,25 @@
         linear-gradient(180deg, var(--bg1), var(--bg2));
     }
 
+    /* ===== Theme transition (fade + blur) ===== */
+    .themeFlash{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:0;
+      z-index:20000;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      transition: opacity 220ms ease;
+    }
+    .themeFlash.on{ opacity:1; }
+    .themeFlash.light{
+      background: radial-gradient(1200px 700px at 50% 20%, rgba(255,255,255,.40), rgba(255,255,255,.18) 46%, rgba(255,255,255,0) 80%);
+    }
+    .themeFlash.dark{
+      background: radial-gradient(1200px 700px at 50% 20%, rgba(10,12,22,.55), rgba(10,12,22,.26) 46%, rgba(10,12,22,0) 82%);
+    }
+
     .wrap{width:100%;max-width:720px;margin:0 auto}
     .card{
       border-radius:var(--r);
@@ -146,8 +167,6 @@
       -webkit-backdrop-filter: blur(22px);
       position:relative;
     }
-
-    /* subtle “widget sheen” */
     .card:before{
       content:"";
       position:absolute; inset:-2px;
@@ -162,20 +181,16 @@
     .cardHead{
       position:relative;
       padding:18px 16px 14px;
-      border-bottom:1px solid rgba(15,20,35,.08);
+      border-bottom:1px solid var(--strokeSoft);
       background:linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.38));
       text-align:center;
     }
-
-    /* Dark polish for head (when dark tokens) */
     @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) .cardHead{
-        border-bottom:1px solid rgba(255,255,255,.08);
+      html:not([data-theme]) .cardHead{
         background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       }
     }
     html[data-theme="dark"] .cardHead{
-      border-bottom:1px solid rgba(255,255,255,.08);
       background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
     }
 
@@ -193,70 +208,21 @@
       line-height:1.35;
     }
 
-    /* ===== Theme toggle (Apple-ish) ===== */
-    .themeBtn{
-      position:absolute;
-      right:14px;
-      top: calc(14px + env(safe-area-inset-top));
-      transform: translateY(-6px);
-      height:36px;
-      padding:0 12px;
-      border-radius:999px;
-      border:1px solid rgba(15,20,35,.10);
-      background:rgba(255,255,255,.58);
-      color:var(--text);
-      display:flex;
-      align-items:center;
-      gap:8px;
-      cursor:pointer;
-      box-shadow:var(--shadow2);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      transition:transform .08s ease, opacity .16s ease;
-      z-index:2;
-    }
-    .themeBtn:active{ transform: translateY(-6px) scale(.99); }
-    .themeIcon{ width:16px; height:16px; opacity:.92; }
-    .themeLabel{
-      font-weight:850;
-      font-size:12px;
-      letter-spacing:-.01em;
-      color:var(--muted);
-    }
-
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) .themeBtn{
-        border:1px solid rgba(255,255,255,.12);
-        background:rgba(255,255,255,.06);
-      }
-    }
-    html[data-theme="dark"] .themeBtn{
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.06);
-    }
-
-    /* ===== Premium progress + back (daylight) ===== */
+    /* ===== Progress ===== */
     .progressWrap{
       position:relative;
       padding:14px 14px 16px;
-      border-bottom:1px solid rgba(15,20,35,.08);
+      border-bottom:1px solid var(--strokeSoft);
       background:rgba(255,255,255,.35);
       overflow:hidden;
-
       touch-action: pan-y;
       user-select:none;
       -webkit-user-select:none;
     }
     @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) .progressWrap{
-        border-bottom:1px solid rgba(255,255,255,.08);
-        background:rgba(255,255,255,.04);
-      }
+      html:not([data-theme]) .progressWrap{ background:rgba(255,255,255,.04); }
     }
-    html[data-theme="dark"] .progressWrap{
-      border-bottom:1px solid rgba(255,255,255,.08);
-      background:rgba(255,255,255,.04);
-    }
+    html[data-theme="dark"] .progressWrap{ background:rgba(255,255,255,.04); }
 
     .progressTopRow{
       display:flex;
@@ -267,7 +233,7 @@
       z-index:1;
     }
 
-    .backMini{
+    .backMini, .themeMini{
       width:38px;height:38px;
       border-radius:999px;
       border:1px solid rgba(15,20,35,.10);
@@ -280,19 +246,67 @@
       box-shadow:var(--shadow2);
       transition:transform .08s ease, opacity .16s ease;
       flex:0 0 auto;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      position:relative;
+      overflow:visible;
     }
-    .backMini:active{ transform:scale(.99); }
+    .backMini:active, .themeMini:active{ transform:scale(.99); }
     .backMini[disabled]{ opacity:.35; cursor:not-allowed; }
 
     @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) .backMini{
+      html:not([data-theme]) .backMini,
+      html:not([data-theme]) .themeMini{
         border:1px solid rgba(255,255,255,.12);
         background:rgba(255,255,255,.06);
       }
     }
-    html[data-theme="dark"] .backMini{
+    html[data-theme="dark"] .backMini,
+    html[data-theme="dark"] .themeMini{
       border:1px solid rgba(255,255,255,.12);
       background:rgba(255,255,255,.06);
+    }
+
+    .themeIcon{
+      width:18px;height:18px;
+      display:flex; align-items:center; justify-content:center;
+      color:var(--text);
+      opacity:.92;
+    }
+
+    /* ===== Mini “manual override” tick (blue) ===== */
+    .miniTick{
+      position:absolute;
+      right:-3px;
+      bottom:-3px;
+      width:18px;height:18px;
+      border-radius:999px;
+      background:var(--blue);
+      border:2px solid rgba(255,255,255,.85);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 10px 24px rgba(0,0,0,.18);
+    }
+    .miniTick svg{ width:12px;height:12px; display:block; }
+    .miniTick path{ fill:#fff; }
+    html[data-theme="dark"] .miniTick,
+    html[data-theme="light"] .miniTick{ display:flex; }
+    @media (prefers-color-scheme: dark){
+      html[data-theme="dark"] .miniTick,
+      html[data-theme="light"] .miniTick{
+        border:2px solid rgba(20,22,34,.92);
+      }
+    }
+
+    .sf{
+      width:18px;height:18px;
+      display:block;
+      stroke:currentColor;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      fill:none;
     }
 
     .progressWrap::after{
@@ -318,7 +332,8 @@
       align-items:center;
       justify-content:space-between;
       gap:14px;
-      width:100%;
+      flex:1;
+      min-width:0;
     }
 
     .node{
@@ -341,7 +356,7 @@
       transform:scale(.94);
     }
     @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) .node::before{
+      html:not([data-theme]) .node::before{
         background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
         border:1px solid rgba(255,255,255,.12);
       }
@@ -363,7 +378,7 @@
       transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
     }
     @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) .dot{
+      html:not([data-theme]) .dot{
         border:2px solid rgba(255,255,255,.16);
         background:rgba(255,255,255,.06);
         box-shadow:
@@ -461,7 +476,7 @@
     .line.filled > i{ width:100%; }
 
     @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) .line{
+      html:not([data-theme]) .line{
         background:rgba(255,255,255,.06);
         border:1px solid rgba(255,255,255,.10);
         box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
@@ -484,7 +499,7 @@
       position:relative;
     }
     @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) .sheet{
+      html:not([data-theme]) .sheet{
         border:1px solid rgba(255,255,255,.12);
         background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.035));
       }
@@ -513,7 +528,7 @@
       flex:0 0 auto;
     }
     @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) .badge{
+      html:not([data-theme]) .badge{
         background:rgba(255,255,255,.06);
         border:1px solid rgba(255,255,255,.12);
       }
@@ -569,18 +584,16 @@
     input::placeholder{ color:rgba(10,12,22,.30); }
 
     @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) input,
-      html:not([data-theme="light"]):not([data-theme="dark"]) select{
+      html:not([data-theme]) input,
+      html:not([data-theme]) select{
         border:1px solid rgba(255,255,255,.14);
         background:rgba(255,255,255,.06);
       }
-      html:not([data-theme="light"]):not([data-theme="dark"]) input:focus,
-      html:not([data-theme="light"]):not([data-theme="dark"]) select:focus{
+      html:not([data-theme]) input:focus,
+      html:not([data-theme]) select:focus{
         background:rgba(255,255,255,.08);
       }
-      html:not([data-theme="light"]):not([data-theme="dark"]) input::placeholder{
-        color:rgba(255,255,255,.28);
-      }
+      html:not([data-theme]) input::placeholder{ color:rgba(255,255,255,.28); }
     }
     html[data-theme="dark"] input,
     html[data-theme="dark"] select{
@@ -591,9 +604,7 @@
     html[data-theme="dark"] select:focus{
       background:rgba(255,255,255,.08);
     }
-    html[data-theme="dark"] input::placeholder{
-      color:rgba(255,255,255,.28);
-    }
+    html[data-theme="dark"] input::placeholder{ color:rgba(255,255,255,.28); }
 
     .chev{
       position:absolute; right:14px; top:50%;
@@ -646,7 +657,7 @@
       box-shadow:0 0 0 8px var(--okRing);
     }
     @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) .check{
+      html:not([data-theme]) .check{
         border:1px solid rgba(255,255,255,.14);
         background:rgba(255,255,255,.06);
       }
@@ -659,20 +670,14 @@
     /* ===== QR ===== */
     .qrBox{
       padding:14px 16px 18px;
-      border-top:1px solid rgba(15,20,35,.08);
+      border-top:1px solid var(--strokeSoft);
       background:rgba(255,255,255,.34);
       text-align:center;
     }
     @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) .qrBox{
-        border-top:1px solid rgba(255,255,255,.08);
-        background:rgba(255,255,255,.03);
-      }
+      html:not([data-theme]) .qrBox{ background:rgba(255,255,255,.03); }
     }
-    html[data-theme="dark"] .qrBox{
-      border-top:1px solid rgba(255,255,255,.08);
-      background:rgba(255,255,255,.03);
-    }
+    html[data-theme="dark"] .qrBox{ background:rgba(255,255,255,.03); }
 
     .tip{
       margin:0 0 10px;
@@ -686,7 +691,7 @@
     }
     .tip b{ color:var(--text); }
     @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) .tip{
+      html:not([data-theme]) .tip{
         border:1px solid rgba(255,255,255,.12);
         background:rgba(255,255,255,.06);
         color:rgba(255,255,255,.74);
@@ -711,7 +716,7 @@
       isolation:isolate;
     }
     @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) .qrFrame{
+      html:not([data-theme]) .qrFrame{
         border:1px solid rgba(255,255,255,.12);
         background:rgba(255,255,255,.05);
       }
@@ -740,12 +745,7 @@
       100%{opacity:1; transform:scale(1) rotate(0)}
     }
 
-    .spark{
-      position:absolute; inset:0;
-      pointer-events:none;
-      opacity:0;
-      z-index:3;
-    }
+    .spark{ position:absolute; inset:0; pointer-events:none; opacity:0; z-index:3; }
     .spark.on{ animation:spark .72s ease forwards; }
     @keyframes spark{
       0%{opacity:0; transform:scale(.98)}
@@ -782,7 +782,7 @@
       display:none;
     }
     @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) .payload{
+      html:not([data-theme]) .payload{
         border:1px dashed rgba(255,255,255,.16);
         background:rgba(255,255,255,.05);
         color:rgba(255,255,255,.84);
@@ -826,8 +826,6 @@
       font-size:16px;
       letter-spacing:-.01em;
       cursor:pointer;
-
-      /* Apple-ish: subtle blue tint, not neon */
       background:linear-gradient(180deg, rgba(10,132,255,.18), rgba(255,255,255,.55));
       box-shadow:0 14px 40px rgba(10,132,255,.10);
       position:relative;
@@ -848,11 +846,11 @@
     @keyframes btnshine{ to{ transform:translateX(60%);} }
 
     @media (prefers-color-scheme: dark){
-      html:not([data-theme="light"]):not([data-theme="dark"]) .ctaGlass{
+      html:not([data-theme]) .ctaGlass{
         border:1px solid rgba(255,255,255,.12);
         background:rgba(20,22,34,.62);
       }
-      html:not([data-theme="light"]):not([data-theme="dark"]) .ctaBtn{
+      html:not([data-theme]) .ctaBtn{
         border:1px solid rgba(255,255,255,.12);
         background:linear-gradient(180deg, rgba(10,132,255,.22), rgba(255,255,255,.06));
         box-shadow:0 14px 40px rgba(10,132,255,.12);
@@ -868,9 +866,216 @@
       box-shadow:0 14px 40px rgba(10,132,255,.12);
     }
 
+    /* ===== Toast ===== */
+    .toast{
+      position:fixed;
+      left:50%;
+      top: calc(10px + env(safe-area-inset-top));
+      transform:translateX(-50%) translateY(-8px);
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(15,20,35,.10);
+      background:rgba(255,255,255,.72);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      color:var(--text);
+      font-weight:900;
+      font-size:12px;
+      letter-spacing:-.01em;
+      box-shadow:var(--shadow2);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .18s ease, transform .18s ease;
+      z-index:10000;
+    }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme]) .toast{
+        border:1px solid rgba(255,255,255,.12);
+        background:rgba(20,22,34,.62);
+      }
+    }
+    html[data-theme="dark"] .toast{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(20,22,34,.62);
+    }
+
+    /* ===== iOS Action Sheet ===== */
+    .overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.28);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .18s ease;
+      z-index:10001;
+    }
+    .overlay.show{ opacity:1; pointer-events:auto; }
+
+    .sheetModal{
+      position:absolute;
+      left:0; right:0; bottom:0;
+      padding: 10px 10px calc(10px + env(safe-area-inset-bottom)) 10px;
+      transform:translateY(14px);
+      transition:transform .22s cubic-bezier(.2,.9,.2,1);
+      will-change: transform;
+    }
+    .overlay.show .sheetModal{ transform:translateY(0); }
+
+    .sheetCard{
+      border-radius:20px;
+      border:1px solid rgba(15,20,35,.10);
+      background:rgba(255,255,255,.78);
+      backdrop-filter: blur(26px);
+      -webkit-backdrop-filter: blur(26px);
+      box-shadow:0 30px 90px rgba(0,0,0,.22);
+      overflow:hidden;
+      will-change: transform;
+      touch-action: pan-y;
+    }
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme]) .sheetCard{
+        border:1px solid rgba(255,255,255,.12);
+        background:rgba(20,22,34,.76);
+        box-shadow:0 30px 90px rgba(0,0,0,.55);
+      }
+    }
+    html[data-theme="dark"] .sheetCard{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(20,22,34,.76);
+      box-shadow:0 30px 90px rgba(0,0,0,.55);
+    }
+
+    .sheetHandle{
+      width:44px;
+      height:5px;
+      border-radius:99px;
+      margin:10px auto 6px;
+      background:rgba(10,12,22,.18);
+    }
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme]) .sheetHandle{ background:rgba(255,255,255,.20); }
+    }
+    html[data-theme="dark"] .sheetHandle{ background:rgba(255,255,255,.20); }
+
+    .sheetTitle{
+      padding: 8px 16px 10px;
+      text-align:center;
+      font-weight:950;
+      letter-spacing:-.02em;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .sheetRow{
+      width:100%;
+      border:0;
+      background:transparent;
+      color:var(--text);
+      padding: 14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      font-size:16px;
+      font-weight:900;
+      letter-spacing:-.01em;
+      cursor:pointer;
+      transition: background .15s ease, transform .08s ease;
+    }
+    .sheetRow:active{
+      transform: scale(.992);
+      background: rgba(10,132,255,.08);
+    }
+    .sheetRow + .sheetRow{ border-top:1px solid rgba(15,20,35,.08); }
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme]) .sheetRow + .sheetRow{ border-top:1px solid rgba(255,255,255,.08); }
+      html:not([data-theme]) .sheetRow:active{ background: rgba(10,132,255,.12); }
+    }
+    html[data-theme="dark"] .sheetRow + .sheetRow{ border-top:1px solid rgba(255,255,255,.08); }
+    html[data-theme="dark"] .sheetRow:active{ background: rgba(10,132,255,.12); }
+
+    .rowLeft{ display:flex; align-items:center; gap:10px; min-width:0; }
+    .rowIcon{
+      width:28px;height:28px;
+      border-radius:10px;
+      border:1px solid rgba(15,20,35,.10);
+      background:rgba(255,255,255,.56);
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 10px 22px rgba(0,0,0,.08);
+      flex:0 0 auto;
+      color:var(--text);
+    }
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme]) .rowIcon{
+        border:1px solid rgba(255,255,255,.12);
+        background:rgba(255,255,255,.06);
+        box-shadow:0 10px 22px rgba(0,0,0,.30);
+      }
+    }
+    html[data-theme="dark"] .rowIcon{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      box-shadow:0 10px 22px rgba(0,0,0,.30);
+    }
+
+    .rowIcon .sf{ width:16px; height:16px; }
+    .rowText{ min-width:0; }
+    .rowText small{
+      display:block;
+      margin-top:3px;
+      font-size:12px;
+      font-weight:850;
+      color:var(--muted);
+      line-height:1.2;
+    }
+
+    .checkMark{
+      width:22px;height:22px;
+      border-radius:999px;
+      display:flex;align-items:center;justify-content:center;
+      opacity:0;
+      transform:scale(.92);
+      transition:opacity .16s ease, transform .16s ease;
+      color:var(--blue);
+      flex:0 0 auto;
+    }
+    .sheetRow[aria-checked="true"] .checkMark{ opacity:1; transform:scale(1); }
+
+    .sheetCancel{
+      width:100%;
+      margin-top:10px;
+      border-radius:20px;
+      border:1px solid rgba(15,20,35,.10);
+      background:rgba(255,255,255,.78);
+      backdrop-filter: blur(26px);
+      -webkit-backdrop-filter: blur(26px);
+      box-shadow:0 30px 90px rgba(0,0,0,.18);
+      padding:14px 16px;
+      font-size:16px;
+      font-weight:950;
+      color:rgba(255,69,69,.95);
+      cursor:pointer;
+      transition: transform .08s ease;
+    }
+    .sheetCancel:active{ transform:scale(.992); }
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme]) .sheetCancel{
+        border:1px solid rgba(255,255,255,.12);
+        background:rgba(20,22,34,.76);
+        box-shadow:0 30px 90px rgba(0,0,0,.45);
+      }
+    }
+    html[data-theme="dark"] .sheetCancel{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(20,22,34,.76);
+      box-shadow:0 30px 90px rgba(0,0,0,.45);
+    }
+
     @media (prefers-reduced-motion: reduce){
       *{ animation:none !important; transition:none !important; }
       .progressWrap::after{ display:none; }
+      .themeFlash{ display:none; }
     }
   </style>
 </head>
@@ -880,11 +1085,6 @@
     <div class="card">
 
       <div class="cardHead">
-        <button class="themeBtn" id="themeBtn" aria-label="Changer le thème">
-          <span class="themeIcon" id="themeIcon" aria-hidden="true"></span>
-          <span class="themeLabel" id="themeLabel">Auto</span>
-        </button>
-
         <h1 class="title">🏆 Pré-inscription 🥋</h1>
         <p class="sub">Renseigne les infos, puis récupère ton QR.</p>
       </div>
@@ -909,6 +1109,15 @@
 
             <div class="node" data-i="3"><div class="dot"></div></div>
           </div>
+
+          <button class="themeMini" id="themeBtn" aria-label="Apparence">
+            <span class="themeIcon" id="themeIcon" aria-hidden="true"></span>
+            <span class="miniTick" id="miniTick" aria-hidden="true">
+              <svg viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M16.7 5.8a1 1 0 0 1 0 1.4l-7.2 7.2a1 1 0 0 1-1.4 0L3.3 9.6a1 1 0 1 1 1.4-1.4l3 3 6.5-6.5a1 1 0 0 1 1.5.1Z"/>
+              </svg>
+            </span>
+          </button>
         </div>
       </div>
 
@@ -953,6 +1162,60 @@
     </div>
   </div>
 
+  <!-- Theme flash (fade + blur) -->
+  <div class="themeFlash" id="themeFlash" aria-hidden="true"></div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+  <!-- iOS Action Sheet -->
+  <div class="overlay" id="themeOverlay" aria-hidden="true">
+    <div class="sheetModal" role="dialog" aria-modal="true" aria-label="Apparence">
+      <div class="sheetCard" id="themeCard">
+        <div class="sheetHandle"></div>
+        <div class="sheetTitle">APPARENCE</div>
+
+        <button class="sheetRow" type="button" data-theme="auto" role="radio" aria-checked="true">
+          <span class="rowLeft">
+            <span class="rowIcon" id="rowIconAuto" aria-hidden="true"></span>
+            <span class="rowText">Automatique<small>Suit iOS (clair/sombre)</small></span>
+          </span>
+          <span class="checkMark" aria-hidden="true">
+            <svg viewBox="0 0 20 20" width="18" height="18" fill="none">
+              <path d="M16.7 5.8a1 1 0 0 1 0 1.4l-7.2 7.2a1 1 0 0 1-1.4 0L3.3 9.6a1 1 0 1 1 1.4-1.4l3 3 6.5-6.5a1 1 0 0 1 1.5.1Z" fill="currentColor"/>
+            </svg>
+          </span>
+        </button>
+
+        <button class="sheetRow" type="button" data-theme="light" role="radio" aria-checked="false">
+          <span class="rowLeft">
+            <span class="rowIcon" id="rowIconLight" aria-hidden="true"></span>
+            <span class="rowText">Clair<small>Daylight glass</small></span>
+          </span>
+          <span class="checkMark" aria-hidden="true">
+            <svg viewBox="0 0 20 20" width="18" height="18" fill="none">
+              <path d="M16.7 5.8a1 1 0 0 1 0 1.4l-7.2 7.2a1 1 0 0 1-1.4 0L3.3 9.6a1 1 0 1 1 1.4-1.4l3 3 6.5-6.5a1 1 0 0 1 1.5.1Z" fill="currentColor"/>
+            </svg>
+          </span>
+        </button>
+
+        <button class="sheetRow" type="button" data-theme="dark" role="radio" aria-checked="false">
+          <span class="rowLeft">
+            <span class="rowIcon" id="rowIconDark" aria-hidden="true"></span>
+            <span class="rowText">Sombre<small>Midnight glass</small></span>
+          </span>
+          <span class="checkMark" aria-hidden="true">
+            <svg viewBox="0 0 20 20" width="18" height="18" fill="none">
+              <path d="M16.7 5.8a1 1 0 0 1 0 1.4l-7.2 7.2a1 1 0 0 1-1.4 0L3.3 9.6a1 1 0 1 1 1.4-1.4l3 3 6.5-6.5a1 1 0 0 1 1.5.1Z" fill="currentColor"/>
+            </svg>
+          </span>
+        </button>
+      </div>
+
+      <button class="sheetCancel" id="themeCancel" type="button">Annuler</button>
+    </div>
+  </div>
+
   <script>
     class ClubsProvider {
       static list() { return ["Paris","Nice","Lyon","Marseille","Lille","Toulouse","Chambly"]; }
@@ -970,6 +1233,14 @@
       static light(){ try{ navigator.vibrate?.(10); }catch(e){} }
       static success(){ try{ navigator.vibrate?.([12, 18, 12]); }catch(e){} }
       static error(){ try{ navigator.vibrate?.([20, 30, 20]); }catch(e){} }
+      static theme(mode){
+        try{
+          if (!navigator.vibrate) return;
+          if (mode === "light") navigator.vibrate([8, 10, 8]);
+          else if (mode === "dark") navigator.vibrate([14, 18, 14]);
+          else navigator.vibrate([6, 10, 6, 10, 6]);
+        }catch(e){}
+      }
     }
 
     class SoundService {
@@ -1016,100 +1287,170 @@
       }
     }
 
+    class Toast {
+      static init(el){ this.el = el; }
+      static show(text){
+        if (!this.el) return;
+        this.el.textContent = text;
+        this.el.classList.remove("show");
+        void this.el.offsetWidth;
+        this.el.classList.add("show");
+        clearTimeout(this._t);
+        this._t = setTimeout(() => this.el.classList.remove("show"), 900);
+      }
+    }
+
+    class ThemeIcons {
+      static sun(){
+        return `
+          <svg class="sf" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 8.3a3.7 3.7 0 1 0 0 7.4 3.7 3.7 0 0 0 0-7.4Z"></path>
+            <path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"></path>
+          </svg>`;
+      }
+      static moon(){
+        return `
+          <svg class="sf" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20.5 14.9A7.7 7.7 0 0 1 9.1 3.5a6.8 6.8 0 1 0 11.4 11.4Z"></path>
+          </svg>`;
+      }
+      static auto(){
+        return `
+          <svg class="sf" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 20.5a8.5 8.5 0 1 1 0-17 8.5 8.5 0 0 1 0 17Z"></path>
+            <path d="M12 3.5v17"></path>
+          </svg>`;
+      }
+    }
+
     class ThemeManager {
       static KEY = "qrjudoka_theme"; // "auto" | "light" | "dark"
 
-      static init({ btn, iconEl, labelEl }) {
-        this.btn = btn;
+      static init({ iconEl, overlayEl, sheetCardEl, cancelEl, flashEl }) {
         this.iconEl = iconEl;
-        this.labelEl = labelEl;
+        this.overlayEl = overlayEl;
+        this.sheetCardEl = sheetCardEl;
+        this.cancelEl = cancelEl;
+        this.flashEl = flashEl;
+        this.rows = [...overlayEl.querySelectorAll(".sheetRow[data-theme]")];
         this.mq = window.matchMedia?.("(prefers-color-scheme: dark)");
 
-        const saved = localStorage.getItem(this.KEY) || "auto";
-        this.apply(saved);
+        document.getElementById("rowIconAuto").innerHTML  = ThemeIcons.auto();
+        document.getElementById("rowIconLight").innerHTML = ThemeIcons.sun();
+        document.getElementById("rowIconDark").innerHTML  = ThemeIcons.moon();
 
-        this.btn.addEventListener("click", () => {
-          const next = this.nextMode(this.mode);
-          this.apply(next);
-          try{ localStorage.setItem(this.KEY, next); }catch(e){}
-          Haptics.light();
+        const saved = localStorage.getItem(this.KEY) || "auto";
+        this.apply(saved, false);
+
+        this.overlayEl.addEventListener("click", (e) => {
+          if (e.target === this.overlayEl) this.closeSheet();
+        });
+        this.cancelEl.addEventListener("click", () => this.closeSheet());
+
+        this.rows.forEach(r => {
+          r.addEventListener("click", () => {
+            const mode = r.dataset.theme;
+            this.apply(mode, true);
+            this.closeSheet();
+          });
         });
 
-        // If user is in AUTO, reflect system changes live
-        if (this.mq && this.mq.addEventListener) {
-          this.mq.addEventListener("change", () => {
-            if (this.mode === "auto") this.refreshUI();
-          });
-        } else if (this.mq && this.mq.addListener) {
-          this.mq.addListener(() => {
-            if (this.mode === "auto") this.refreshUI();
-          });
-        }
+        window.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && this.isOpen()) this.closeSheet();
+        });
+
+        const onSystemChange = () => { if (this.mode === "auto") this.refreshIcon(); };
+        if (this.mq && this.mq.addEventListener) this.mq.addEventListener("change", onSystemChange);
+        else if (this.mq && this.mq.addListener) this.mq.addListener(onSystemChange);
+
+        this.bindSwipeDismiss();
       }
 
-      static nextMode(mode){
-        // cycle: auto -> light -> dark -> auto
-        if (mode === "auto") return "light";
-        if (mode === "light") return "dark";
-        return "auto";
+      static isSystemDark(){ return !!(this.mq && this.mq.matches); }
+
+      static flash(targetMode){
+        if (!this.flashEl) return;
+        const isDarkTarget = (targetMode === "dark") || (targetMode === "auto" && this.isSystemDark());
+        this.flashEl.classList.remove("light","dark","on");
+        this.flashEl.classList.add(isDarkTarget ? "dark" : "light");
+        void this.flashEl.offsetWidth;
+        this.flashEl.classList.add("on");
+        clearTimeout(this._flashT);
+        this._flashT = setTimeout(() => this.flashEl.classList.remove("on"), 230);
       }
 
-      static apply(mode){
+      static openSheet(){
+        this.overlayEl.classList.add("show");
+        this.overlayEl.setAttribute("aria-hidden","false");
+        this.syncRows();
+        Haptics.light();
+      }
+      static closeSheet(){
+        this.overlayEl.classList.remove("show");
+        this.overlayEl.setAttribute("aria-hidden","true");
+        this.sheetCardEl.style.transform = "translateY(0)";
+      }
+      static isOpen(){ return this.overlayEl.classList.contains("show"); }
+
+      static apply(mode, toast){
         this.mode = mode;
+
+        // flash BEFORE switching (masks the abrupt swap)
+        this.flash(mode);
+
         const html = document.documentElement;
+        if (mode === "auto") html.removeAttribute("data-theme");
+        else html.setAttribute("data-theme", mode);
 
-        if (mode === "auto") {
-          delete html.dataset.theme; // let prefers-color-scheme do its job
-        } else {
-          html.dataset.theme = mode; // "light" or "dark"
-        }
-        this.refreshUI();
+        try{ localStorage.setItem(this.KEY, mode); }catch(e){}
+        this.refreshIcon();
+        this.syncRows();
+
+        Haptics.theme(mode);
+        if (toast) Toast.show(mode === "auto" ? "Auto" : (mode === "light" ? "Clair" : "Sombre"));
       }
 
-      static isSystemDark(){
-        return !!(this.mq && this.mq.matches);
+      static syncRows(){
+        this.rows.forEach(r => r.setAttribute("aria-checked", String(r.dataset.theme === this.mode)));
       }
 
-      static refreshUI(){
-        const effectiveDark = (this.mode === "dark") || (this.mode === "auto" && this.isSystemDark());
-
-        // label
-        this.labelEl.textContent =
-          this.mode === "auto" ? "Auto" :
-          this.mode === "light" ? "Clair" : "Sombre";
-
-        // icon
-        this.iconEl.innerHTML = this.mode === "auto"
-          ? this.svgAuto(effectiveDark)
-          : (this.mode === "light" ? this.svgSun() : this.svgMoon());
+      static refreshIcon(){
+        this.iconEl.innerHTML =
+          this.mode === "auto" ? ThemeIcons.auto() :
+          this.mode === "light" ? ThemeIcons.sun() :
+          ThemeIcons.moon();
       }
 
-      static svgSun(){
-        return `
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" stroke="currentColor" stroke-width="2"/>
-            <path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>`;
-      }
+      static bindSwipeDismiss(){
+        let startY=0, curY=0, dragging=false;
 
-      static svgMoon(){
-        return `
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M21 14.5A7.5 7.5 0 0 1 9.5 3a6.8 6.8 0 1 0 11.5 11.5Z"
-              stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-          </svg>`;
-      }
+        const onStart = (e) => {
+          if (!this.isOpen()) return;
+          const t = e.touches ? e.touches[0] : e;
+          startY = t.clientY;
+          curY = 0;
+          dragging = true;
+        };
 
-      static svgAuto(effectiveDark){
-        // little "A" spark: looks iOS-ish; also hints current effective (sun/moon tiny)
-        return `
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M7.5 19 12 5l4.5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M9.2 14h5.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="${effectiveDark ? "M18.8 8.2a3.2 3.2 0 0 1-4.7-3.9 2.9 2.9 0 1 0 4.7 3.9Z" : "M18 6.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"}"
-              stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-          </svg>`;
+        const onMove = (e) => {
+          if (!dragging) return;
+          const t = e.touches ? e.touches[0] : e;
+          const dy = Math.max(0, t.clientY - startY);
+          curY = dy;
+          this.sheetCardEl.style.transform = `translateY(${dy}px)`;
+          if (dy > 0) e.preventDefault?.();
+        };
+
+        const onEnd = () => {
+          if (!dragging) return;
+          dragging = false;
+          if (curY > 90) this.closeSheet();
+          else this.sheetCardEl.style.transform = "translateY(0)";
+        };
+
+        this.sheetCardEl.addEventListener("touchstart", onStart, { passive:true });
+        this.sheetCardEl.addEventListener("touchmove", onMove, { passive:false });
+        this.sheetCardEl.addEventListener("touchend", onEnd, { passive:true });
       }
     }
 
@@ -1134,6 +1475,8 @@
         this.payloadBox = document.getElementById("payload");
         this.spark = document.getElementById("spark");
 
+        this.themeBtn = document.getElementById("themeBtn");
+
         this.state = { nom:"", prenom:"", club:"", sexe:"" };
         this.current = 0;
         this.playedSound = false;
@@ -1157,13 +1500,18 @@
 
       init() {
         SoundService.warmupVoices();
+        Toast.init(document.getElementById("toast"));
 
-        // Theme toggle
         ThemeManager.init({
-          btn: document.getElementById("themeBtn"),
           iconEl: document.getElementById("themeIcon"),
-          labelEl: document.getElementById("themeLabel"),
+          overlayEl: document.getElementById("themeOverlay"),
+          sheetCardEl: document.getElementById("themeCard"),
+          cancelEl: document.getElementById("themeCancel"),
+          flashEl: document.getElementById("themeFlash"),
         });
+        ThemeManager.refreshIcon();
+
+        this.themeBtn.addEventListener("click", () => ThemeManager.openSheet());
 
         this.backMini.addEventListener("click", () => this.prev());
         this.ctaBtn.addEventListener("click", () => this.next());
@@ -1467,4 +1815,4 @@
     new App().init();
   </script>
 </body>
-</html> 
+</html>
