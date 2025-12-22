@@ -6,6 +6,7 @@
   <title>QR Judoka</title>
 
   <style>
+    html{ color-scheme: light dark; }
     :root{
       /* Daylight / iOS widget glass */
       --bg1:#eef2ff;
@@ -16,6 +17,7 @@
 
       --text:rgba(10,12,22,.92);
       --muted:rgba(10,12,22,.62);
+      --ink:rgba(10,12,22,.82);
 
       --shadow:0 22px 70px rgba(12,18,40,.14);
       --shadow2:0 10px 28px rgba(12,18,40,.10);
@@ -38,6 +40,58 @@
       --okRing: rgba(52,199,89,.16);
     }
 
+    /* ===== Auto Dark (no manual override) ===== */
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) {
+        --bg1:#07080d;
+        --bg2:#0f1222;
+
+        --stroke:rgba(255,255,255,.14);
+        --stroke2:rgba(255,255,255,.08);
+
+        --text:rgba(255,255,255,.92);
+        --muted:rgba(255,255,255,.62);
+        --ink: rgba(255,255,255,.82);
+
+        --shadow:0 22px 70px rgba(0,0,0,.60);
+        --shadow2:0 10px 28px rgba(0,0,0,.38);
+
+        --glass1: rgba(24,28,46,.72);
+        --glass2: rgba(16,18,30,.52);
+        --glass3: rgba(12,14,22,.30);
+        --sep: rgba(255,255,255,.10);
+
+        --dangerRing: rgba(255,69,69,.22);
+        --focusRing: rgba(10,132,255,.26);
+        --okRing: rgba(52,199,89,.20);
+      }
+    }
+
+    /* ===== Manual Dark ===== */
+    html[data-theme="dark"]{
+      --bg1:#07080d;
+      --bg2:#0f1222;
+
+      --stroke:rgba(255,255,255,.14);
+      --stroke2:rgba(255,255,255,.08);
+
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.62);
+      --ink: rgba(255,255,255,.82);
+
+      --shadow:0 22px 70px rgba(0,0,0,.60);
+      --shadow2:0 10px 28px rgba(0,0,0,.38);
+
+      --glass1: rgba(24,28,46,.72);
+      --glass2: rgba(16,18,30,.52);
+      --glass3: rgba(12,14,22,.30);
+      --sep: rgba(255,255,255,.10);
+
+      --dangerRing: rgba(255,69,69,.22);
+      --focusRing: rgba(10,132,255,.26);
+      --okRing: rgba(52,199,89,.20);
+    }
+
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
@@ -51,7 +105,7 @@
       font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Arial,sans-serif;
       color:var(--text);
 
-      /* Soft daylight background */
+      /* Soft background (light by default, dark via tokens) */
       background:
         radial-gradient(1200px 700px at 10% 10%, rgba(120,130,255,.32), transparent 62%),
         radial-gradient(900px 700px at 90% 18%, rgba(50,200,255,.26), transparent 62%),
@@ -59,6 +113,26 @@
         radial-gradient(1100px 700px at 50% 50%, rgba(255,255,255,.75), rgba(255,255,255,0) 60%),
         linear-gradient(180deg, var(--bg1), var(--bg2));
       overflow-x:hidden;
+    }
+
+    /* Dark background remix (only when dark tokens are active) */
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) body{
+        background:
+          radial-gradient(1200px 700px at 12% 10%, rgba(94,92,230,.22), transparent 62%),
+          radial-gradient(900px 700px at 92% 18%, rgba(10,132,255,.18), transparent 62%),
+          radial-gradient(1000px 780px at 45% 95%, rgba(255,55,95,.12), transparent 68%),
+          radial-gradient(1100px 700px at 50% 50%, rgba(255,255,255,.06), rgba(255,255,255,0) 60%),
+          linear-gradient(180deg, var(--bg1), var(--bg2));
+      }
+    }
+    html[data-theme="dark"] body{
+      background:
+        radial-gradient(1200px 700px at 12% 10%, rgba(94,92,230,.22), transparent 62%),
+        radial-gradient(900px 700px at 92% 18%, rgba(10,132,255,.18), transparent 62%),
+        radial-gradient(1000px 780px at 45% 95%, rgba(255,55,95,.12), transparent 68%),
+        radial-gradient(1100px 700px at 50% 50%, rgba(255,255,255,.06), rgba(255,255,255,0) 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
     }
 
     .wrap{width:100%;max-width:720px;margin:0 auto}
@@ -92,6 +166,19 @@
       background:linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.38));
       text-align:center;
     }
+
+    /* Dark polish for head (when dark tokens) */
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) .cardHead{
+        border-bottom:1px solid rgba(255,255,255,.08);
+        background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      }
+    }
+    html[data-theme="dark"] .cardHead{
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    }
+
     .title{
       margin:0 0 6px;
       font-weight:950;
@@ -106,6 +193,48 @@
       line-height:1.35;
     }
 
+    /* ===== Theme toggle (Apple-ish) ===== */
+    .themeBtn{
+      position:absolute;
+      right:14px;
+      top: calc(14px + env(safe-area-inset-top));
+      transform: translateY(-6px);
+      height:36px;
+      padding:0 12px;
+      border-radius:999px;
+      border:1px solid rgba(15,20,35,.10);
+      background:rgba(255,255,255,.58);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      gap:8px;
+      cursor:pointer;
+      box-shadow:var(--shadow2);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      transition:transform .08s ease, opacity .16s ease;
+      z-index:2;
+    }
+    .themeBtn:active{ transform: translateY(-6px) scale(.99); }
+    .themeIcon{ width:16px; height:16px; opacity:.92; }
+    .themeLabel{
+      font-weight:850;
+      font-size:12px;
+      letter-spacing:-.01em;
+      color:var(--muted);
+    }
+
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) .themeBtn{
+        border:1px solid rgba(255,255,255,.12);
+        background:rgba(255,255,255,.06);
+      }
+    }
+    html[data-theme="dark"] .themeBtn{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+    }
+
     /* ===== Premium progress + back (daylight) ===== */
     .progressWrap{
       position:relative;
@@ -117,6 +246,16 @@
       touch-action: pan-y;
       user-select:none;
       -webkit-user-select:none;
+    }
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) .progressWrap{
+        border-bottom:1px solid rgba(255,255,255,.08);
+        background:rgba(255,255,255,.04);
+      }
+    }
+    html[data-theme="dark"] .progressWrap{
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);
     }
 
     .progressTopRow{
@@ -133,7 +272,7 @@
       border-radius:999px;
       border:1px solid rgba(15,20,35,.10);
       background:rgba(255,255,255,.58);
-      color:rgba(10,12,22,.92);
+      color:var(--text);
       display:flex;
       align-items:center;
       justify-content:center;
@@ -144,6 +283,17 @@
     }
     .backMini:active{ transform:scale(.99); }
     .backMini[disabled]{ opacity:.35; cursor:not-allowed; }
+
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) .backMini{
+        border:1px solid rgba(255,255,255,.12);
+        background:rgba(255,255,255,.06);
+      }
+    }
+    html[data-theme="dark"] .backMini{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+    }
 
     .progressWrap::after{
       content:"";
@@ -190,6 +340,16 @@
       opacity:.98;
       transform:scale(.94);
     }
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) .node::before{
+        background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+        border:1px solid rgba(255,255,255,.12);
+      }
+    }
+    html[data-theme="dark"] .node::before{
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.12);
+    }
 
     .dot{
       width:24px;height:24px;
@@ -201,6 +361,22 @@
         0 12px 24px rgba(12,18,40,.10),
         inset 0 1px 0 rgba(255,255,255,.70);
       transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) .dot{
+        border:2px solid rgba(255,255,255,.16);
+        background:rgba(255,255,255,.06);
+        box-shadow:
+          0 12px 24px rgba(0,0,0,.35),
+          inset 0 1px 0 rgba(255,255,255,.10);
+      }
+    }
+    html[data-theme="dark"] .dot{
+      border:2px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.06);
+      box-shadow:
+        0 12px 24px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.10);
     }
 
     .node.active .dot{
@@ -284,6 +460,19 @@
     @keyframes shine{ to{ transform:translateX(55%);} }
     .line.filled > i{ width:100%; }
 
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) .line{
+        background:rgba(255,255,255,.06);
+        border:1px solid rgba(255,255,255,.10);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      }
+    }
+    html[data-theme="dark"] .line{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
     /* ===== Step sheet ===== */
     .sec{ padding:16px; }
     .sheet{
@@ -293,6 +482,16 @@
       overflow:hidden;
       box-shadow:0 12px 34px rgba(12,18,40,.10);
       position:relative;
+    }
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) .sheet{
+        border:1px solid rgba(255,255,255,.12);
+        background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.035));
+      }
+    }
+    html[data-theme="dark"] .sheet{
+      border:1px solid rgba(255,255,255,.12);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.035));
     }
 
     .sheetTop{
@@ -307,11 +506,21 @@
       display:flex;align-items:center;justify-content:center;
       background:rgba(255,255,255,.60);
       border:1px solid rgba(15,20,35,.10);
-      color:rgba(10,12,22,.92);
+      color:var(--text);
       font-weight:950;
       font-size:13px;
       box-shadow:0 12px 26px rgba(12,18,40,.10);
       flex:0 0 auto;
+    }
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) .badge{
+        background:rgba(255,255,255,.06);
+        border:1px solid rgba(255,255,255,.12);
+      }
+    }
+    html[data-theme="dark"] .badge{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
     }
 
     .stepTitle{ margin:0; font-size:18px; font-weight:950; letter-spacing:-.02em; line-height:1.15; }
@@ -346,7 +555,7 @@
       border-radius:16px;
       border:1px solid rgba(15,20,35,.12);
       background:rgba(255,255,255,.76);
-      color:rgba(10,12,22,.92);
+      color:var(--text);
       outline:none;
       -webkit-appearance:none;
       appearance:none;
@@ -359,12 +568,39 @@
     }
     input::placeholder{ color:rgba(10,12,22,.30); }
 
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) input,
+      html:not([data-theme="light"]):not([data-theme="dark"]) select{
+        border:1px solid rgba(255,255,255,.14);
+        background:rgba(255,255,255,.06);
+      }
+      html:not([data-theme="light"]):not([data-theme="dark"]) input:focus,
+      html:not([data-theme="light"]):not([data-theme="dark"]) select:focus{
+        background:rgba(255,255,255,.08);
+      }
+      html:not([data-theme="light"]):not([data-theme="dark"]) input::placeholder{
+        color:rgba(255,255,255,.28);
+      }
+    }
+    html[data-theme="dark"] input,
+    html[data-theme="dark"] select{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+    }
+    html[data-theme="dark"] input:focus,
+    html[data-theme="dark"] select:focus{
+      background:rgba(255,255,255,.08);
+    }
+    html[data-theme="dark"] input::placeholder{
+      color:rgba(255,255,255,.28);
+    }
+
     .chev{
       position:absolute; right:14px; top:50%;
       transform:translateY(-50%);
       width:16px;height:16px;
       opacity:.65; pointer-events:none;
-      background:conic-gradient(from 180deg, rgba(10,12,22,0), rgba(10,12,22,.82), rgba(10,12,22,0));
+      background:conic-gradient(from 180deg, transparent, var(--ink), transparent);
       -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="black" d="M5.6 7.4a1 1 0 0 1 1.4 0L10 10.4l3-3a1 1 0 1 1 1.4 1.4l-3.7 3.7a1 1 0 0 1-1.4 0L5.6 8.8a1 1 0 0 1 0-1.4Z"/></svg>') center/contain no-repeat;
               mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="black" d="M5.6 7.4a1 1 0 0 1 1.4 0L10 10.4l3-3a1 1 0 1 1 1.4 1.4l-3.7 3.7a1 1 0 0 1-1.4 0L5.6 8.8a1 1 0 0 1 0-1.4Z"/></svg>') center/contain no-repeat;
     }
@@ -397,7 +633,7 @@
       display:flex;align-items:center;justify-content:center;
       border:1px solid rgba(15,20,35,.12);
       background:rgba(255,255,255,.72);
-      color:rgba(10,12,22,.92);
+      color:var(--text);
       font-size:14px;
       opacity:0;
       transition:opacity .18s ease, transform .18s ease;
@@ -409,6 +645,16 @@
       border-color:rgba(52,199,89,.40);
       box-shadow:0 0 0 8px var(--okRing);
     }
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) .check{
+        border:1px solid rgba(255,255,255,.14);
+        background:rgba(255,255,255,.06);
+      }
+    }
+    html[data-theme="dark"] .check{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+    }
 
     /* ===== QR ===== */
     .qrBox{
@@ -416,6 +662,16 @@
       border-top:1px solid rgba(15,20,35,.08);
       background:rgba(255,255,255,.34);
       text-align:center;
+    }
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) .qrBox{
+        border-top:1px solid rgba(255,255,255,.08);
+        background:rgba(255,255,255,.03);
+      }
+    }
+    html[data-theme="dark"] .qrBox{
+      border-top:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
     }
 
     .tip{
@@ -428,7 +684,19 @@
       font-size:13px;
       line-height:1.35;
     }
-    .tip b{ color:rgba(10,12,22,.92); }
+    .tip b{ color:var(--text); }
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) .tip{
+        border:1px solid rgba(255,255,255,.12);
+        background:rgba(255,255,255,.06);
+        color:rgba(255,255,255,.74);
+      }
+    }
+    html[data-theme="dark"] .tip{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:rgba(255,255,255,.74);
+    }
 
     .qrFrame{
       margin:6px auto 0;
@@ -441,6 +709,16 @@
       overflow:hidden;
       position:relative;
       isolation:isolate;
+    }
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) .qrFrame{
+        border:1px solid rgba(255,255,255,.12);
+        background:rgba(255,255,255,.05);
+      }
+    }
+    html[data-theme="dark"] .qrFrame{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
     }
 
     #qr{
@@ -500,8 +778,20 @@
       background:rgba(255,255,255,.52);
       word-break:break-word;
       font-size:13px;
-      color:rgba(10,12,22,.82);
+      color:var(--ink);
       display:none;
+    }
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) .payload{
+        border:1px dashed rgba(255,255,255,.16);
+        background:rgba(255,255,255,.05);
+        color:rgba(255,255,255,.84);
+      }
+    }
+    html[data-theme="dark"] .payload{
+      border:1px dashed rgba(255,255,255,.16);
+      background:rgba(255,255,255,.05);
+      color:rgba(255,255,255,.84);
     }
 
     /* ===== Sticky CTA ===== */
@@ -531,7 +821,7 @@
       padding:14px 14px;
       border-radius:18px;
       border:1px solid rgba(15,20,35,.10);
-      color:rgba(10,12,22,.92);
+      color:var(--text);
       font-weight:950;
       font-size:16px;
       letter-spacing:-.01em;
@@ -557,6 +847,27 @@
     }
     @keyframes btnshine{ to{ transform:translateX(60%);} }
 
+    @media (prefers-color-scheme: dark){
+      html:not([data-theme="light"]):not([data-theme="dark"]) .ctaGlass{
+        border:1px solid rgba(255,255,255,.12);
+        background:rgba(20,22,34,.62);
+      }
+      html:not([data-theme="light"]):not([data-theme="dark"]) .ctaBtn{
+        border:1px solid rgba(255,255,255,.12);
+        background:linear-gradient(180deg, rgba(10,132,255,.22), rgba(255,255,255,.06));
+        box-shadow:0 14px 40px rgba(10,132,255,.12);
+      }
+    }
+    html[data-theme="dark"] .ctaGlass{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(20,22,34,.62);
+    }
+    html[data-theme="dark"] .ctaBtn{
+      border:1px solid rgba(255,255,255,.12);
+      background:linear-gradient(180deg, rgba(10,132,255,.22), rgba(255,255,255,.06));
+      box-shadow:0 14px 40px rgba(10,132,255,.12);
+    }
+
     @media (prefers-reduced-motion: reduce){
       *{ animation:none !important; transition:none !important; }
       .progressWrap::after{ display:none; }
@@ -569,6 +880,11 @@
     <div class="card">
 
       <div class="cardHead">
+        <button class="themeBtn" id="themeBtn" aria-label="Changer le thème">
+          <span class="themeIcon" id="themeIcon" aria-hidden="true"></span>
+          <span class="themeLabel" id="themeLabel">Auto</span>
+        </button>
+
         <h1 class="title">🏆 Pré-inscription 🥋</h1>
         <p class="sub">Renseigne les infos, puis récupère ton QR.</p>
       </div>
@@ -577,7 +893,7 @@
         <div class="progressTopRow">
           <button class="backMini" id="backMini" disabled aria-label="Retour">
             <svg viewBox="0 0 20 20" fill="none" width="18" height="18" aria-hidden="true">
-              <path d="M12.8 4.5a1 1 0 0 1 0 1.4L8.7 10l4.1 4.1a1 1 0 1 1-1.4 1.4L6.6 10.7a1 1 0 0 1 0-1.4l4.8-4.8a1 1 0 0 1 1.4 0Z" fill="rgba(10,12,22,.92)"/>
+              <path d="M12.8 4.5a1 1 0 0 1 0 1.4L8.7 10l4.1 4.1a1 1 0 1 1-1.4 1.4L6.6 10.7a1 1 0 0 1 0-1.4l4.8-4.8a1 1 0 0 1 1.4 0Z" fill="currentColor"/>
             </svg>
           </button>
 
@@ -700,6 +1016,103 @@
       }
     }
 
+    class ThemeManager {
+      static KEY = "qrjudoka_theme"; // "auto" | "light" | "dark"
+
+      static init({ btn, iconEl, labelEl }) {
+        this.btn = btn;
+        this.iconEl = iconEl;
+        this.labelEl = labelEl;
+        this.mq = window.matchMedia?.("(prefers-color-scheme: dark)");
+
+        const saved = localStorage.getItem(this.KEY) || "auto";
+        this.apply(saved);
+
+        this.btn.addEventListener("click", () => {
+          const next = this.nextMode(this.mode);
+          this.apply(next);
+          try{ localStorage.setItem(this.KEY, next); }catch(e){}
+          Haptics.light();
+        });
+
+        // If user is in AUTO, reflect system changes live
+        if (this.mq && this.mq.addEventListener) {
+          this.mq.addEventListener("change", () => {
+            if (this.mode === "auto") this.refreshUI();
+          });
+        } else if (this.mq && this.mq.addListener) {
+          this.mq.addListener(() => {
+            if (this.mode === "auto") this.refreshUI();
+          });
+        }
+      }
+
+      static nextMode(mode){
+        // cycle: auto -> light -> dark -> auto
+        if (mode === "auto") return "light";
+        if (mode === "light") return "dark";
+        return "auto";
+      }
+
+      static apply(mode){
+        this.mode = mode;
+        const html = document.documentElement;
+
+        if (mode === "auto") {
+          delete html.dataset.theme; // let prefers-color-scheme do its job
+        } else {
+          html.dataset.theme = mode; // "light" or "dark"
+        }
+        this.refreshUI();
+      }
+
+      static isSystemDark(){
+        return !!(this.mq && this.mq.matches);
+      }
+
+      static refreshUI(){
+        const effectiveDark = (this.mode === "dark") || (this.mode === "auto" && this.isSystemDark());
+
+        // label
+        this.labelEl.textContent =
+          this.mode === "auto" ? "Auto" :
+          this.mode === "light" ? "Clair" : "Sombre";
+
+        // icon
+        this.iconEl.innerHTML = this.mode === "auto"
+          ? this.svgAuto(effectiveDark)
+          : (this.mode === "light" ? this.svgSun() : this.svgMoon());
+      }
+
+      static svgSun(){
+        return `
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>`;
+      }
+
+      static svgMoon(){
+        return `
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 14.5A7.5 7.5 0 0 1 9.5 3a6.8 6.8 0 1 0 11.5 11.5Z"
+              stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>`;
+      }
+
+      static svgAuto(effectiveDark){
+        // little "A" spark: looks iOS-ish; also hints current effective (sun/moon tiny)
+        return `
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.5 19 12 5l4.5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9.2 14h5.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="${effectiveDark ? "M18.8 8.2a3.2 3.2 0 0 1-4.7-3.9 2.9 2.9 0 1 0 4.7 3.9Z" : "M18 6.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"}"
+              stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>`;
+      }
+    }
+
     class App {
       constructor() {
         this.progressWrap = document.getElementById("progressWrap");
@@ -744,6 +1157,13 @@
 
       init() {
         SoundService.warmupVoices();
+
+        // Theme toggle
+        ThemeManager.init({
+          btn: document.getElementById("themeBtn"),
+          iconEl: document.getElementById("themeIcon"),
+          labelEl: document.getElementById("themeLabel"),
+        });
 
         this.backMini.addEventListener("click", () => this.prev());
         this.ctaBtn.addEventListener("click", () => this.next());
