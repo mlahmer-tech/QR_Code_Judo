@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Pong 2P / IA (1 fichier)</title>
+  <style>
+    :root { color-scheme: dark; }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; margin:0; background:#0b0b0f; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+    .wrap{
+      min-height:100%;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      padding: max(14px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom));
+      gap: 10px;
+    }
+    .top{
+      width:min(980px, 96vw);
+      display:flex; flex-wrap:wrap; gap:10px;
+      align-items:center; justify-content:space-between;
+      color:rgba(255,255,255,.86);
+    }
+    .pill{
+      display:flex; gap:10px; align-items:center;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      padding:10px 12px;
+      border-radius:999px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .pill b{ font-weight:800; letter-spacing:.2px; }
+    .controls{
+      display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:flex-end;
+    }
+    button, select, input[type="range"]{
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.07);
+      color:rgba(255,255,255,.9);
+      border-radius:12px;
+      padding:10px 12px;
+      font:inherit;
+      outline:none;
+    }
+    button{ cursor:pointer; }
+    button:active{ transform: translateY(1px); }
+    select{ padding-right:34px; }
+    .rangeWrap{
+      display:flex; gap:8px; align-items:center;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      padding:8px 10px;
+      border-radius:999px;
+    }
+    .rangeWrap span{ font-size:12px; color:rgba(255,255,255,.75); white-space:nowrap; }
+    input[type="range"]{ padding:0; height:32px; width:160px; }
+
+    canvas{
+      width:min(980px, 96vw);
+      aspect-ratio: 16 / 9;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.14);
+      background:radial-gradient(1000px 500px at 50% 0%, rgba(255,255,255,.08), rgba(255,255,255,.02) 60%, rgba(0,0,0,.0));
+      box-shadow: 0 26px 90px rgba(0,0,0,.55);
+      touch-action: none;
+    }
+
+    .hint{
+      width:min(980px, 96vw);
+      color:rgba(255,255,255,.65);
+      font-size:12px; line-height:1.35;
+      text-align:center;
+    }
+    kbd{
+      font: inherit;
+      padding:2px 8px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.06);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="pill">
+        <b id="scoreL">J1: 0</b>
+        <span style="opacity:.65">•</span>
+        <b id="scoreR">J2: 0</b>
+        <span style="opacity:.65">•</span>
+        <span id="status">Pause</span>
+      </div>
+
+      <div class="controls">
+        <select id="mode">
+          <option value="PVP">2 joueurs (même tel)</option>
+          <option value="AI">Solo vs IA</option>
+        </select>
+
+        <div class="rangeWrap" id="aiWrap" style="display:none">
+          <span>IA</span>
+          <input id="aiDiff" type="range" min="1" max="10" step="1" value="6" />
+          <span id="aiLabel">6/10</span>
+        </div>
+
+        <button id="btnStart">Start</button>
+        <button id="btnReset">Reset</button>
+      </div>
+    </div>
+
+    <canvas id="c" width="1600" height="900"></canvas>
+
+    <div class="hint">
+      Clavier: J1 <kbd>W</kbd>/<kbd>S</kbd> • J2 <kbd>↑</kbd>/<kbd>↓</kbd> • <kbd>Espace</kbd> pause/start • <kbd>R</kbd> reset<br/>
+      Mobile: glisse sur ta moitié d’écran. En 2 joueurs, <b>multi-touch</b> ok (2 doigts).
+    </div>
+  </div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+
+  const scoreL = document.getElementById('scoreL');
+  const scoreR = document.getElementById('scoreR');
+  const statusEl = document.getElementById('status');
+
+  const modeSel = document.getElementById('mode');
+  const aiWrap = document.getElementById('aiWrap');
+  const aiDiff = document.getElementById('aiDiff');
+  const aiLabel = document.getElementById('aiLabel');
+
+  const btnStart = document.getElementById('btnStart');
+  const btnReset = document.getElementById('btnReset');
+
+  // ---------- Helpers ----------
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const randSign = () => (Math.random() < 0.5 ? -1 : 1);
+
+  // ---------- Game config ----------
+  const W = canvas.width;
+  const H = canvas.height;
+
+  const paddle = { w: 18, h: 160, speed: 980, inset: 46 };
+  const ballCfg = { r: 12, baseSpeed: 720, maxSpeed: 1500, accel: 1.045 };
+  const netCfg  = { w: 6, h: 22, gap: 18 };
+
+  // ---------- State ----------
+  let running = false;
+  let lastT = performance.now();
+  const keys = new Set();
+
+  const L = { x: paddle.inset, y: (H - paddle.h)/2, vy: 0, score: 0 };
+  const R = { x: W - paddle.inset - paddle.w, y: (H - paddle.h)/2, vy: 0, score: 0 };
+
+  const ball = { x: W/2, y: H/2, vx: 0, vy: 0, speed: ballCfg.baseSpeed };
+
+  // Modes: 'PVP' or 'AI'
+  let mode = modeSel.value;
+
+  // IA parameters (derived from difficulty)
+  let ai = {
+    diff: Number(aiDiff.value),         // 1..10
+    maxSpeed: 720,                      // computed
+    reaction: 0.18,                     // seconds
+    aimNoise: 0,                        // pixels
+    hold: 0,                            // reaction timer
+    targetY: H/2
+  };
+
+  function setAiFromDiff(d) {
+    ai.diff = d;
+    // Plus la diff est haute: plus rapide, moins de réaction, moins d'erreur
+    const t = (d - 1) / 9; // 0..1
+    ai.maxSpeed = 540 + t * 620;        // 540..1160
+    ai.reaction = 0.28 - t * 0.18;      // 0.28..0.10
+    ai.aimNoise = 48 - t * 40;          // 48..8 px
+    aiLabel.textContent = `${d}/10`;
+  }
+
+  function updateHud() {
+    scoreL.textContent = `J1: ${L.score}`;
+    scoreR.textContent = (mode === 'AI') ? `IA: ${R.score}` : `J2: ${R.score}`;
+    statusEl.textContent = running ? 'En jeu' : 'Pause';
+    btnStart.textContent = running ? 'Pause' : 'Start';
+    aiWrap.style.display = (mode === 'AI') ? '' : 'none';
+  }
+
+  function resetRound(servingToRight = true) {
+    ball.x = W/2;
+    ball.y = H/2;
+    ball.speed = ballCfg.baseSpeed;
+
+    const angle = (Math.random() * 0.9 - 0.45); // -0.45..0.45 rad
+    const dir = servingToRight ? 1 : -1;
+    ball.vx = Math.cos(angle) * ball.speed * dir;
+    ball.vy = Math.sin(angle) * ball.speed * randSign();
+
+    // reset AI "thinking"
+    ai.hold = 0;
+    ai.targetY = H/2;
+  }
+
+  function resetGame() {
+    L.score = 0; R.score = 0;
+    L.y = (H - paddle.h)/2;
+    R.y = (H - paddle.h)/2;
+    resetRound(Math.random() < 0.5);
+    updateHud();
+  }
+
+  // ---------- Input ----------
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      running = !running;
+      updateHud();
+      return;
+    }
+    if (e.key.toLowerCase() === 'r') { resetGame(); return; }
+    keys.add(e.code);
+  }, { passive:false });
+
+  window.addEventListener('keyup', (e) => keys.delete(e.code));
+
+  btnStart.addEventListener('click', () => { running = !running; updateHud(); });
+  btnReset.addEventListener('click', () => { resetGame(); });
+
+  modeSel.addEventListener('change', () => {
+    mode = modeSel.value;
+    updateHud();
+    // petit reset de manche pour éviter transitions chelou
+    resetRound(Math.random() < 0.5);
+  });
+
+  aiDiff.addEventListener('input', () => setAiFromDiff(Number(aiDiff.value)));
+
+  // Multi-touch: chaque doigt contrôle une raquette (gauche/droite)
+  const pointers = new Map(); // pointerId -> 'L'|'R'
+  function canvasToGameX(clientX) {
+    const r = canvas.getBoundingClientRect();
+    return (clientX - r.left) / r.width * W;
+  }
+  function canvasToGameY(clientY) {
+    const r = canvas.getBoundingClientRect();
+    const y = (clientY - r.top) / r.height * H;
+    return clamp(y - paddle.h/2, 0, H - paddle.h);
+  }
+
+  canvas.addEventListener('pointerdown', (e) => {
+    canvas.setPointerCapture(e.pointerId);
+    const x = canvasToGameX(e.clientX);
+    let side;
+    if (mode === 'AI') {
+      side = 'L'; // en solo, seul J1 bouge au touch
+    } else {
+      side = x < W/2 ? 'L' : 'R';
+    }
+    pointers.set(e.pointerId, side);
+
+    const y = canvasToGameY(e.clientY);
+    if (side === 'L') L.y = y; else R.y = y;
+  });
+
+  canvas.addEventListener('pointermove', (e) => {
+    const side = pointers.get(e.pointerId);
+    if (!side) return;
+    const y = canvasToGameY(e.clientY);
+    if (side === 'L') L.y = y; else R.y = y;
+  });
+
+  function endPointer(e){
+    pointers.delete(e.pointerId);
+  }
+  canvas.addEventListener('pointerup', endPointer);
+  canvas.addEventListener('pointercancel', endPointer);
+
+  // ---------- Collision ----------
+  function collidePaddle(p) {
+    const px1 = p.x, px2 = p.x + paddle.w;
+    const py1 = p.y, py2 = p.y + paddle.h;
+    const cx = clamp(ball.x, px1, px2);
+    const cy = clamp(ball.y, py1, py2);
+    const dx = ball.x - cx;
+    const dy = ball.y - cy;
+    return (dx*dx + dy*dy) <= (ballCfg.r * ballCfg.r);
+  }
+
+  function reflectFromPaddle(p, isLeft) {
+    const center = p.y + paddle.h/2;
+    const rel = clamp((ball.y - center) / (paddle.h/2), -1, 1);
+    const spin = clamp(p.vy / 1400, -0.35, 0.35);
+
+    const maxBounce = 0.95;
+    const angle = (rel + spin) * maxBounce;
+
+    ball.speed = clamp(ball.speed * ballCfg.accel, ballCfg.baseSpeed, ballCfg.maxSpeed);
+
+    const dir = isLeft ? 1 : -1;
+    ball.vx = Math.cos(angle) * ball.speed * dir;
+    ball.vy = Math.sin(angle) * ball.speed;
+
+    ball.x = isLeft ? (p.x + paddle.w + ballCfg.r + 1) : (p.x - ballCfg.r - 1);
+  }
+
+  // ---------- IA (paddle droite) ----------
+  function predictInterceptY() {
+    // On prédit où la balle sera quand elle arrive à la raquette droite.
+    // Si la balle s'éloigne (vx <= 0) -> revient au centre.
+    if (ball.vx <= 0) return H/2;
+
+    const targetX = R.x - ballCfg.r - 1;
+    const dx = targetX - ball.x;
+    if (dx <= 0) return ball.y;
+
+    const t = dx / ball.vx; // temps estimé (ball.vx > 0)
+    let y = ball.y + ball.vy * t;
+
+    // Rebond sur murs: "miroir" (triangle wave) entre [r, H-r]
+    const top = ballCfg.r;
+    const bot = H - ballCfg.r;
+    const span = bot - top; // > 0
+    // ramener y dans un intervalle périodique de 2*span
+    let yy = y - top;
+    const period = 2 * span;
+    yy = ((yy % period) + period) % period;
+    if (yy > span) yy = period - yy;
+    y = top + yy;
+
+    return y;
+  }
+
+  function stepAI(dt) {
+    // Si on n'est pas en mode IA, ou si un joueur manipule déjà la raquette droite au touch (en PVP), on ne fait rien.
+    if (mode !== 'AI') return;
+
+    // IA "réagit" à intervalle (réaction humaine)
+    ai.hold -= dt;
+    if (ai.hold <= 0) {
+      ai.hold = ai.reaction;
+
+      const aim = predictInterceptY();
+      const noise = (Math.random() * 2 - 1) * ai.aimNoise;
+      ai.targetY = clamp(aim + noise - paddle.h/2, 0, H - paddle.h);
+    }
+
+    // Déplace la raquette droite vers la cible
+    const dy = ai.targetY - R.y;
+    const dir = Math.sign(dy);
+    const maxMove = ai.maxSpeed * dt;
+    const move = clamp(Math.abs(dy), 0, maxMove) * dir;
+
+    // vy pour le "spin"
+    R.vy = (dt > 0) ? (move / dt) : 0;
+    R.y = clamp(R.y + move, 0, H - paddle.h);
+  }
+
+  // ---------- Physics ----------
+  function step(dt) {
+    // Paddles via clavier (utile PC)
+    const upL = keys.has('KeyW');
+    const dnL = keys.has('KeyS');
+    const upR = keys.has('ArrowUp');
+    const dnR = keys.has('ArrowDown');
+
+    L.vy = (upL ? -paddle.speed : 0) + (dnL ? paddle.speed : 0);
+
+    if (mode === 'PVP') {
+      R.vy = (upR ? -paddle.speed : 0) + (dnR ? paddle.speed : 0);
+    } else {
+      // en IA, le clavier peut encore bouger la droite si tu veux: désactive en commentant ces 2 lignes
+      R.vy = (upR ? -paddle.speed : 0) + (dnR ? paddle.speed : 0);
+    }
+
+    // Appliquer mouvements clavier (le touch écrase simplement y directement, c'est ok)
+    L.y = clamp(L.y + L.vy * dt, 0, H - paddle.h);
+    if (mode === 'PVP') {
+      R.y = clamp(R.y + R.vy * dt, 0, H - paddle.h);
+    }
+
+    // IA bouge la droite (mode AI)
+    stepAI(dt);
+
+    if (!running) return;
+
+    // Ball
+    ball.x += ball.vx * dt;
+    ball.y += ball.vy * dt;
+
+    // Walls
+    if (ball.y - ballCfg.r <= 0) { ball.y = ballCfg.r; ball.vy *= -1; }
+    else if (ball.y + ballCfg.r >= H) { ball.y = H - ballCfg.r; ball.vy *= -1; }
+
+    // Paddle collisions
+    if (ball.vx < 0 && collidePaddle(L)) reflectFromPaddle(L, true);
+    if (ball.vx > 0 && collidePaddle(R)) reflectFromPaddle(R, false);
+
+    // Score
+    if (ball.x + ballCfg.r < 0) {
+      R.score++; updateHud();
+      resetRound(false);
+    } else if (ball.x - ballCfg.r > W) {
+      L.score++; updateHud();
+      resetRound(true);
+    }
+  }
+
+  // ---------- Render ----------
+  function drawNet() {
+    ctx.save();
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle = '#fff';
+    const x = (W - netCfg.w)/2;
+    for (let y = 40; y < H - 40; y += netCfg.h + netCfg.gap) {
+      ctx.fillRect(x, y, netCfg.w, netCfg.h);
+    }
+    ctx.restore();
+  }
+
+  function drawPaddle(p) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,.88)';
+    ctx.fillRect(p.x, p.y, paddle.w, paddle.h);
+    ctx.restore();
+  }
+
+  function drawBall() {
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,.92)';
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ballCfg.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawOverlay() {
+    if (running) return;
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    ctx.font = '800 54px system-ui,-apple-system,Segoe UI,Roboto,Arial';
+    ctx.fillText('PONG', W/2, H/2 - 54);
+
+    ctx.font = '500 22px system-ui,-apple-system,Segoe UI,Roboto,Arial';
+    ctx.fillStyle = 'rgba(255,255,255,0.80)';
+    const line1 = (mode === 'AI') ? 'Solo vs IA • glisse pour bouger J1' : '2 joueurs • chacun sa moitié d’écran';
+    ctx.fillText(line1, W/2, H/2 + 2);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.70)';
+    ctx.fillText('Appuie sur Start (ou Espace) pour jouer', W/2, H/2 + 34);
+
+    // Petite séparation visuelle des moitiés en PVP
+    if (mode === 'PVP') {
+      ctx.globalAlpha = 0.18;
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(W/2 - 1, 0, 2, H);
+    }
+
+    ctx.restore();
+  }
+
+  function drawFrame() {
+    ctx.clearRect(0, 0, W, H);
+
+    // vignette
+    ctx.save();
+    const g = ctx.createRadialGradient(W/2, H/2, 10, W/2, H/2, Math.max(W,H)/1.2);
+    g.addColorStop(0, 'rgba(255,255,255,0.02)');
+    g.addColorStop(1, 'rgba(0,0,0,0.35)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+
+    drawNet();
+    drawPaddle(L);
+    drawPaddle(R);
+    drawBall();
+    drawOverlay();
+  }
+
+  // ---------- Loop ----------
+  function loop(t) {
+    const dt = clamp((t - lastT) / 1000, 0, 1/20);
+    lastT = t;
+
+    step(dt);
+    drawFrame();
+
+    requestAnimationFrame(loop);
+  }
+
+  // Init
+  setAiFromDiff(Number(aiDiff.value));
+  resetGame();
+  updateHud();
+  drawFrame();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
