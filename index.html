@@ -1,3 +1,8 @@
+<!-- ✅ MODIFS DEMANDÉES :
+1) Ajout d'une 5e étape "Date de naissance" au format JJ/MM/AAAA, incluse dans le QR payload
+2) ClubsProvider.list() retourne toujours les clubs triés par ordre croissant (localeCompare, FR)
+-->
+
 <!doctype html>
 <html lang="fr">
 <head>
@@ -93,9 +98,7 @@
       --okRing: rgba(52,199,89,.20);
       --dangerRing: rgba(255,69,69,.22);
     }
-    html[data-theme="light"]{
-      /* Explicit light (same as default, but forces it) */
-    }
+    html[data-theme="light"]{ /* Explicit light (same as default) */ }
 
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -391,7 +394,8 @@
       background:rgba(255,255,255,.06);
       box-shadow:
         0 12px 24px rgba(0,0,0,.35),
-        inset 0 1px 0 rgba(255,255,255,.10);
+          inset 0 1px 0 rgba(255,255,255,.10);
+      }
     }
 
     .node.active .dot{
@@ -666,6 +670,10 @@
       border:1px solid rgba(255,255,255,.14);
       background:rgba(255,255,255,.06);
     }
+
+    /* ✅ Affichage-only transforms (no iOS input rewrite) */
+    .tf-upper{ text-transform: uppercase; }
+    .tf-cap{ text-transform: capitalize; }
 
     /* ===== QR ===== */
     .qrBox{
@@ -1108,6 +1116,9 @@
             <div class="line" data-line="2"><i></i></div>
 
             <div class="node" data-i="3"><div class="dot"></div></div>
+            <div class="line" data-line="3"><i></i></div>
+
+            <div class="node" data-i="4"><div class="dot"></div></div>
           </div>
 
           <button class="themeMini" id="themeBtn" aria-label="Apparence">
@@ -1162,13 +1173,9 @@
     </div>
   </div>
 
-  <!-- Theme flash (fade + blur) -->
   <div class="themeFlash" id="themeFlash" aria-hidden="true"></div>
-
-  <!-- Toast -->
   <div class="toast" id="toast" aria-live="polite"></div>
 
-  <!-- iOS Action Sheet -->
   <div class="overlay" id="themeOverlay" aria-hidden="true">
     <div class="sheetModal" role="dialog" aria-modal="true" aria-label="Apparence">
       <div class="sheetCard" id="themeCard">
@@ -1218,41 +1225,49 @@
 
   <script>
     class ClubsProvider {
-      static list() { return ["Beaumont-sur-oise", 
-                              "CSM Eaubonne",
-                              "Noailles", 
-                              "Domont", 
-                              "Andeville",
-                              "Mouy", 
-                              "Nogent-sur-oise",
-                              "Clermont",
-                              "VOI",
-                              "JC Magnitoy",
-                              "Presles", 
-                              "Allonne",
-                              "Auteuil",
-                              "Mours",
-                              "Noyon", 
-                              "Saint-Just", 
-                              "Pont-Saint-Maxence",
-                              "Persan",
-                              "Sarcelles", 
-                              "Dojo neuillysien",
-                              "Foyer culturel et de loisir Neuilly-en-thelle",
-                              "Boran-sur-Oise",
-                              "Orly la ville",
-                              "CMO Louvres",
-                              "Ressons-sur-matz",
-                              "Inter vallée",
-                              "Osny",
-                              "Parmain",
-                              "L’isle-Adam",
-                              "Villiers-sous-Saint-Leu",
-                              "Hénonville",
-                              "Beauchamp",
-                              "Bornel",
-                              "RSC Montreuil Judo",
-                              "Clec Chambly" ]; }
+      static list() {
+        // ✅ Tri croissant (FR), sans doublons, stable
+        const arr = ["Beaumont-sur-oise",
+          "CSM Eaubonne",
+          "Noailles",
+          "Domont",
+          "Andeville",
+          "Mouy",
+          "Nogent-sur-oise",
+          "Clermont",
+          "VOI",
+          "JC Magnitoy",
+          "Presles",
+          "Allonne",
+          "Auteuil",
+          "Mours",
+          "Noyon",
+          "Saint-Just",
+          "Pont-Saint-Maxence",
+          "Persan",
+          "Sarcelles",
+          "Dojo neuillysien",
+          "Foyer culturel et de loisir Neuilly-en-thelle",
+          "Boran-sur-Oise",
+          "Orly la ville",
+          "CMO Louvres",
+          "Ressons-sur-matz",
+          "Inter vallée",
+          "Osny",
+          "Parmain",
+          "L’isle-Adam",
+          "Villiers-sous-Saint-Leu",
+          "Hénonville",
+          "Beauchamp",
+          "Bornel",
+          "RSC Montreuil Judo",
+          "Clec Chambly"
+        ];
+
+        const collator = new Intl.Collator("fr", { sensitivity:"base", numeric:true });
+        return [...new Set(arr.map(s => String(s||"").trim()).filter(Boolean))]
+          .sort((a,b) => collator.compare(a,b));
+      }
     }
 
     class QrService {
@@ -1428,8 +1443,6 @@
 
       static apply(mode, toast){
         this.mode = mode;
-
-        // flash BEFORE switching (masks the abrupt swap)
         this.flash(mode);
 
         const html = document.documentElement;
@@ -1511,24 +1524,33 @@
 
         this.themeBtn = document.getElementById("themeBtn");
 
-        this.state = { nom:"", prenom:"", club:"", sexe:"" };
+        // ✅ ajout de naissance
+        this.state = { nom:"", prenom:"", club:"", sexe:"", naissance:"" };
         this.current = 0;
         this.playedSound = false;
         this.currentFieldEl = null;
 
         this.steps = [
-          { key:"nom", title:"Nom", sub:"Le nom passe automatiquement en MAJ.",
-            render: () => this.renderInput("nom","JORDAN","family-name"),
-            normalize: v => String(v||"").toUpperCase() },
-          { key:"prenom", title:"Prénom", sub:"Première lettre automatiquement en majuscule.",
-            render: () => this.renderInput("prenom","Mickael","given-name"),
+          { key:"nom", title:"Nom", sub:"Le nom s'affiche en MAJ (et sera encodé en MAJ).",
+            render: () => this.renderInput("nom","JORDAN","family-name","tf-upper"),
+            normalize: v => String(v||"").toUpperCase().trim() },
+
+          { key:"prenom", title:"Prénom", sub:"Première lettre en majuscule (encodé pareil).",
+            render: () => this.renderInput("prenom","Mickael","given-name","tf-cap"),
             normalize: v => { v=String(v||"").trim(); return v? v.charAt(0).toUpperCase()+v.slice(1):""; } },
-          { key:"club", title:"Club", sub:"Choisis ton club.",
+
+          { key:"club", title:"Club", sub:"Choisis ton club (trié A→Z).",
             render: () => this.renderSelect("club","— Sélectionne un club —", ClubsProvider.list()),
             normalize: v => String(v||"").trim() },
+
           { key:"sexe", title:"Sexe", sub:"Choisis Masculin ou Féminin.",
             render: () => this.renderSelect("sexe","— Sélectionne —", ["Masculin","Féminin"]),
             normalize: v => String(v||"").trim() },
+
+          // ✅ NOUVELLE ETAPE : date JJ/MM/AAAA
+          { key:"naissance", title:"Date de naissance", sub:"Format : JJ/MM/AAAA",
+            render: () => this.renderBirthDate("naissance","07/09/2014","bday"),
+            normalize: v => this.normalizeBirth(v) },
         ];
       }
 
@@ -1614,10 +1636,16 @@
         }
       }
 
-      renderInput(key, placeholder, autocomplete) {
+      renderInput(key, placeholder, autocomplete, className="") {
         this.stage.innerHTML = `
           <div class="field">
-            <input id="field" placeholder="${this.esc(placeholder)}" autocomplete="${this.esc(autocomplete)}" />
+            <input id="field"
+                   class="${this.esc(className)}"
+                   placeholder="${this.esc(placeholder)}"
+                   autocomplete="${this.esc(autocomplete)}"
+                   autocapitalize="none"
+                   spellcheck="false"
+            />
             <div class="check" id="check">✓</div>
           </div>
         `;
@@ -1628,10 +1656,7 @@
         input.value = this.state[key] || "";
 
         const onInput = () => {
-          const step = this.steps[this.current];
-          const raw = input.value;
-          const norm = step.normalize ? step.normalize(raw) : raw;
-          if (norm !== raw) input.value = norm;
+          // IMPORTANT: ne pas modifier input.value ici (iOS)
           this.state[key] = input.value;
 
           const ok = this.isFilled(input.value);
@@ -1641,6 +1666,54 @@
           input.classList.remove("invalid");
           this.refresh();
         };
+
+        input.addEventListener("input", onInput);
+        onInput();
+
+        setTimeout(() => { try{ input.focus({preventScroll:true}); }catch(e){ input.focus(); } }, 80);
+      }
+
+      // ✅ Champ date : masque live JJ/MM/AAAA sans casser iOS (on n'écrit pas pendant input)
+      renderBirthDate(key, placeholder, autocomplete) {
+        this.stage.innerHTML = `
+          <div class="field">
+            <input id="field"
+                   placeholder="${this.esc(placeholder)}"
+                   autocomplete="${this.esc(autocomplete)}"
+                   inputmode="numeric"
+                   autocapitalize="none"
+                   spellcheck="false"
+            />
+            <div class="check" id="check">✓</div>
+          </div>
+        `;
+        const input = document.getElementById("field");
+        const check = document.getElementById("check");
+        this.currentFieldEl = input;
+
+        input.value = this.state[key] || "";
+
+        const onInput = () => {
+          // ⚠️ iOS-safe: on ne force pas input.value ici
+          this.state[key] = input.value;
+
+          const ok = this.isBirthOk(input.value);
+          input.classList.toggle("is-ok", ok);
+          check.classList.toggle("show", ok);
+
+          input.classList.remove("invalid");
+          this.refresh();
+        };
+
+        // Petit confort: sur "blur", on formate (là c'est safe)
+        input.addEventListener("blur", () => {
+          const norm = this.normalizeBirth(input.value);
+          if (norm) {
+            input.value = norm;
+            this.state[key] = norm;
+          }
+          onInput();
+        });
 
         input.addEventListener("input", onInput);
         onInput();
@@ -1684,6 +1757,36 @@
         onChange();
 
         setTimeout(() => { try{ select.focus({preventScroll:true}); }catch(e){ select.focus(); } }, 80);
+      }
+
+      // ✅ Validation date JJ/MM/AAAA (simple + réaliste)
+      isBirthOk(v){
+        const s = String(v||"").trim();
+        if (!s) return false;
+        const rx = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+        const m = s.match(rx);
+        if (!m) return false;
+        const dd = Number(m[1]), mm = Number(m[2]), yy = Number(m[3]);
+        if (yy < 1900 || yy > 2100) return false;
+        if (mm < 1 || mm > 12) return false;
+        const max = new Date(yy, mm, 0).getDate();
+        if (dd < 1 || dd > max) return false;
+        return true;
+      }
+
+      // ✅ Normalisation: garde uniquement JJ/MM/AAAA si valide, sinon "" (bloque le step)
+      normalizeBirth(v){
+        const s = String(v||"").trim();
+        // Autorise saisie "07092014" => "07/09/2014"
+        const digits = s.replace(/\D/g, "");
+        let cand = s;
+
+        if (digits.length === 8) {
+          cand = `${digits.slice(0,2)}/${digits.slice(2,4)}/${digits.slice(4,8)}`;
+        }
+        // Si déjà "J/M/AAAA" on ne corrige pas ici (tu peux étendre si tu veux)
+        if (this.isBirthOk(cand)) return cand;
+        return "";
       }
 
       next() {
@@ -1770,7 +1873,15 @@
       }
 
       isFilled(v) { return String(v || "").trim().length > 0; }
-      isStepOk(i) { return this.isFilled(this.state[this.steps[i].key]); }
+
+      isStepOk(i) {
+        const key = this.steps[i].key;
+        const v = this.state[key];
+
+        if (key === "naissance") return this.isBirthOk(v);
+        return this.isFilled(v);
+      }
+
       isAllComplete() { return this.steps.every((_, i) => this.isStepOk(i)); }
 
       refresh() {
@@ -1792,11 +1903,19 @@
       }
 
       buildPayload() {
-        const n = (this.state.nom || "").trim();
-        const p = (this.state.prenom || "").trim();
-        const c = (this.state.club || "").trim();
-        const s = (this.state.sexe || "").trim();
-        return `${n};${p};${c};${s};`;
+        const norm = (key) => {
+          const step = this.steps.find(s => s.key === key);
+          const raw = this.state[key] || "";
+          return step && step.normalize ? step.normalize(raw) : String(raw||"").trim();
+        };
+
+        const n = norm("nom");
+        const p = norm("prenom");
+        const c = norm("club");
+        const s = norm("sexe");
+        const d = norm("naissance"); // ✅ AJOUT
+
+        return `${n};${p};${c};${s};${d};`;
       }
 
       showQR() {
