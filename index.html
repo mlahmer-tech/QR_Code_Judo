@@ -833,7 +833,7 @@
             normalize: v => String(v||"").trim() },
 
           // ✅ Date en mode "Apple" : input type="date" natif iOS
-          { key:"naissance", title:"Date de naissance", sub:"Sélectionne la date (style iOS).",
+          { key:"naissance", title:"Date de naissance", sub:"Sélectionne la date.",
             render: () => this.renderBirthDateApple("naissance","bday"),
             normalize: v => this.normalizeBirth(v) },
         ];
