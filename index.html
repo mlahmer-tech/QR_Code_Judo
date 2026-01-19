@@ -1,80 +1,16 @@
-<!-- ✅ MODIFS DEMANDÉES :
-1) Ajout d'une 5e étape "Date de naissance" au format JJ/MM/AAAA, incluse dans le QR payload
-2) ClubsProvider.list() retourne toujours les clubs triés par ordre croissant (localeCompare, FR)
--->
-
 <!doctype html>
-<html lang="fr">
+<html lang="fr" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>QR Judoka</title>
 
   <style>
-    html{ color-scheme: light dark; }
+    /* ✅ Dark par défaut, plus de sélection de thème */
+    html{ color-scheme: dark; }
 
     :root{
-      /* ===== Light (iOS daylight glass) ===== */
-      --bg1:#eef2ff;
-      --bg2:#f7f8ff;
-
-      --text:rgba(10,12,22,.92);
-      --muted:rgba(10,12,22,.62);
-      --ink:rgba(10,12,22,.82);
-
-      --stroke:rgba(15,20,35,.10);
-      --strokeSoft:rgba(15,20,35,.08);
-
-      --glass1: rgba(255,255,255,.72);
-      --glass2: rgba(255,255,255,.50);
-      --glass3: rgba(255,255,255,.30);
-
-      --sep: rgba(15,20,35,.10);
-
-      --shadow:0 22px 70px rgba(12,18,40,.14);
-      --shadow2:0 10px 28px rgba(12,18,40,.10);
-
-      --focusRing: rgba(10,132,255,.18);
-      --okRing: rgba(52,199,89,.16);
-      --dangerRing: rgba(255,69,69,.18);
-
-      --r:24px;
-
-      --blue: rgba(10,132,255,1);
-      --violet: rgba(94,92,230,1);
-      --pink: rgba(255,55,95,1);
-    }
-
-    /* ===== Auto Dark (no manual override) ===== */
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) {
-        --bg1:#07080d;
-        --bg2:#0f1222;
-
-        --text:rgba(255,255,255,.92);
-        --muted:rgba(255,255,255,.62);
-        --ink:rgba(255,255,255,.82);
-
-        --stroke:rgba(255,255,255,.14);
-        --strokeSoft:rgba(255,255,255,.08);
-
-        --glass1: rgba(24,28,46,.72);
-        --glass2: rgba(16,18,30,.52);
-        --glass3: rgba(12,14,22,.30);
-
-        --sep: rgba(255,255,255,.10);
-
-        --shadow:0 22px 70px rgba(0,0,0,.60);
-        --shadow2:0 10px 28px rgba(0,0,0,.38);
-
-        --focusRing: rgba(10,132,255,.26);
-        --okRing: rgba(52,199,89,.20);
-        --dangerRing: rgba(255,69,69,.22);
-      }
-    }
-
-    /* ===== Manual themes ===== */
-    html[data-theme="dark"]{
+      /* ===== Dark (Midnight glass) ===== */
       --bg1:#07080d;
       --bg2:#0f1222;
 
@@ -97,8 +33,13 @@
       --focusRing: rgba(10,132,255,.26);
       --okRing: rgba(52,199,89,.20);
       --dangerRing: rgba(255,69,69,.22);
+
+      --r:24px;
+
+      --blue: rgba(10,132,255,1);
+      --violet: rgba(94,92,230,1);
+      --pink: rgba(255,55,95,1);
     }
-    html[data-theme="light"]{ /* Explicit light (same as default) */ }
 
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -115,48 +56,11 @@
       overflow-x:hidden;
 
       background:
-        radial-gradient(1200px 700px at 10% 10%, rgba(120,130,255,.32), transparent 62%),
-        radial-gradient(900px 700px at 90% 18%, rgba(50,200,255,.26), transparent 62%),
-        radial-gradient(1000px 780px at 45% 95%, rgba(255,125,200,.18), transparent 68%),
-        radial-gradient(1100px 700px at 50% 50%, rgba(255,255,255,.75), rgba(255,255,255,0) 60%),
-        linear-gradient(180deg, var(--bg1), var(--bg2));
-    }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) body{
-        background:
-          radial-gradient(1200px 700px at 12% 10%, rgba(94,92,230,.22), transparent 62%),
-          radial-gradient(900px 700px at 92% 18%, rgba(10,132,255,.18), transparent 62%),
-          radial-gradient(1000px 780px at 45% 95%, rgba(255,55,95,.12), transparent 68%),
-          radial-gradient(1100px 700px at 50% 50%, rgba(255,255,255,.06), rgba(255,255,255,0) 60%),
-          linear-gradient(180deg, var(--bg1), var(--bg2));
-      }
-    }
-    html[data-theme="dark"] body{
-      background:
         radial-gradient(1200px 700px at 12% 10%, rgba(94,92,230,.22), transparent 62%),
         radial-gradient(900px 700px at 92% 18%, rgba(10,132,255,.18), transparent 62%),
         radial-gradient(1000px 780px at 45% 95%, rgba(255,55,95,.12), transparent 68%),
         radial-gradient(1100px 700px at 50% 50%, rgba(255,255,255,.06), rgba(255,255,255,0) 60%),
         linear-gradient(180deg, var(--bg1), var(--bg2));
-    }
-
-    /* ===== Theme transition (fade + blur) ===== */
-    .themeFlash{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      opacity:0;
-      z-index:20000;
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      transition: opacity 220ms ease;
-    }
-    .themeFlash.on{ opacity:1; }
-    .themeFlash.light{
-      background: radial-gradient(1200px 700px at 50% 20%, rgba(255,255,255,.40), rgba(255,255,255,.18) 46%, rgba(255,255,255,0) 80%);
-    }
-    .themeFlash.dark{
-      background: radial-gradient(1200px 700px at 50% 20%, rgba(10,12,22,.55), rgba(10,12,22,.26) 46%, rgba(10,12,22,0) 82%);
     }
 
     .wrap{width:100%;max-width:720px;margin:0 auto}
@@ -175,8 +79,8 @@
       position:absolute; inset:-2px;
       pointer-events:none;
       background:
-        radial-gradient(800px 180px at 30% 0%, rgba(255,255,255,.55), rgba(255,255,255,0) 70%),
-        radial-gradient(900px 220px at 70% 10%, rgba(255,255,255,.32), rgba(255,255,255,0) 74%);
+        radial-gradient(800px 180px at 30% 0%, rgba(255,255,255,.14), rgba(255,255,255,0) 70%),
+        radial-gradient(900px 220px at 70% 10%, rgba(255,255,255,.10), rgba(255,255,255,0) 74%);
       opacity:.75;
       mix-blend-mode: screen;
     }
@@ -185,16 +89,8 @@
       position:relative;
       padding:18px 16px 14px;
       border-bottom:1px solid var(--strokeSoft);
-      background:linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.38));
-      text-align:center;
-    }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .cardHead{
-        background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      }
-    }
-    html[data-theme="dark"] .cardHead{
       background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      text-align:center;
     }
 
     .title{
@@ -216,16 +112,12 @@
       position:relative;
       padding:14px 14px 16px;
       border-bottom:1px solid var(--strokeSoft);
-      background:rgba(255,255,255,.35);
+      background:rgba(255,255,255,.04);
       overflow:hidden;
       touch-action: pan-y;
       user-select:none;
       -webkit-user-select:none;
     }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .progressWrap{ background:rgba(255,255,255,.04); }
-    }
-    html[data-theme="dark"] .progressWrap{ background:rgba(255,255,255,.04); }
 
     .progressTopRow{
       display:flex;
@@ -236,11 +128,11 @@
       z-index:1;
     }
 
-    .backMini, .themeMini{
+    .backMini{
       width:38px;height:38px;
       border-radius:999px;
-      border:1px solid rgba(15,20,35,.10);
-      background:rgba(255,255,255,.58);
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
       color:var(--text);
       display:flex;
       align-items:center;
@@ -251,66 +143,9 @@
       flex:0 0 auto;
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      position:relative;
-      overflow:visible;
     }
-    .backMini:active, .themeMini:active{ transform:scale(.99); }
+    .backMini:active{ transform:scale(.99); }
     .backMini[disabled]{ opacity:.35; cursor:not-allowed; }
-
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .backMini,
-      html:not([data-theme]) .themeMini{
-        border:1px solid rgba(255,255,255,.12);
-        background:rgba(255,255,255,.06);
-      }
-    }
-    html[data-theme="dark"] .backMini,
-    html[data-theme="dark"] .themeMini{
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.06);
-    }
-
-    .themeIcon{
-      width:18px;height:18px;
-      display:flex; align-items:center; justify-content:center;
-      color:var(--text);
-      opacity:.92;
-    }
-
-    /* ===== Mini “manual override” tick (blue) ===== */
-    .miniTick{
-      position:absolute;
-      right:-3px;
-      bottom:-3px;
-      width:18px;height:18px;
-      border-radius:999px;
-      background:var(--blue);
-      border:2px solid rgba(255,255,255,.85);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      box-shadow:0 10px 24px rgba(0,0,0,.18);
-    }
-    .miniTick svg{ width:12px;height:12px; display:block; }
-    .miniTick path{ fill:#fff; }
-    html[data-theme="dark"] .miniTick,
-    html[data-theme="light"] .miniTick{ display:flex; }
-    @media (prefers-color-scheme: dark){
-      html[data-theme="dark"] .miniTick,
-      html[data-theme="light"] .miniTick{
-        border:2px solid rgba(20,22,34,.92);
-      }
-    }
-
-    .sf{
-      width:18px;height:18px;
-      display:block;
-      stroke:currentColor;
-      stroke-width:2;
-      stroke-linecap:round;
-      stroke-linejoin:round;
-      fill:none;
-    }
 
     .progressWrap::after{
       content:"";
@@ -319,7 +154,7 @@
       pointer-events:none;
       background:linear-gradient(90deg,
         rgba(255,255,255,0) 0%,
-        rgba(255,255,255,.65) 46%,
+        rgba(255,255,255,.22) 46%,
         rgba(255,255,255,0) 100%);
       transform:translateX(-120%);
       opacity:0;
@@ -352,59 +187,32 @@
       position:absolute;
       inset:0;
       border-radius:999px;
-      background:linear-gradient(180deg, rgba(255,255,255,.70), rgba(255,255,255,.38));
-      border:1px solid rgba(15,20,35,.10);
-      box-shadow:0 14px 34px rgba(12,18,40,.10);
-      opacity:.98;
-      transform:scale(.94);
-    }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .node::before{
-        background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-        border:1px solid rgba(255,255,255,.12);
-      }
-    }
-    html[data-theme="dark"] .node::before{
       background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
       border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 14px 34px rgba(0,0,0,.28);
+      opacity:.98;
+      transform:scale(.94);
     }
 
     .dot{
       width:24px;height:24px;
       border-radius:999px;
-      border:2px solid rgba(15,20,35,.16);
-      background:rgba(255,255,255,.52);
-      position:relative;
-      box-shadow:
-        0 12px 24px rgba(12,18,40,.10),
-        inset 0 1px 0 rgba(255,255,255,.70);
-      transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
-    }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .dot{
-        border:2px solid rgba(255,255,255,.16);
-        background:rgba(255,255,255,.06);
-        box-shadow:
-          0 12px 24px rgba(0,0,0,.35),
-          inset 0 1px 0 rgba(255,255,255,.10);
-      }
-    }
-    html[data-theme="dark"] .dot{
       border:2px solid rgba(255,255,255,.16);
       background:rgba(255,255,255,.06);
+      position:relative;
       box-shadow:
         0 12px 24px rgba(0,0,0,.35),
-          inset 0 1px 0 rgba(255,255,255,.10);
-      }
+        inset 0 1px 0 rgba(255,255,255,.10);
+      transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
     }
 
     .node.active .dot{
       border-color:rgba(10,132,255,.55);
-      background:rgba(255,255,255,.70);
+      background:rgba(255,255,255,.10);
       box-shadow:
         0 0 0 8px rgba(10,132,255,.12),
-        0 16px 30px rgba(12,18,40,.12),
-        inset 0 1px 0 rgba(255,255,255,.80);
+        0 16px 30px rgba(0,0,0,.32),
+        inset 0 1px 0 rgba(255,255,255,.14);
       transform:scale(1.05);
     }
     .node.active .dot::after{
@@ -426,8 +234,8 @@
       border-color:rgba(52,199,89,.70);
       box-shadow:
         0 0 0 8px rgba(52,199,89,.12),
-        0 16px 30px rgba(12,18,40,.12),
-        inset 0 1px 0 rgba(255,255,255,.30);
+        0 16px 30px rgba(0,0,0,.30),
+        inset 0 1px 0 rgba(255,255,255,.20);
       transform:scale(1.02);
     }
     .node.done .dot::before{
@@ -453,11 +261,11 @@
       flex:1;
       height:7px;
       border-radius:999px;
-      background:rgba(15,20,35,.08);
+      background:rgba(255,255,255,.06);
       position:relative;
       overflow:hidden;
-      border:1px solid rgba(15,20,35,.08);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
     }
     .line > i{
       display:block;
@@ -471,7 +279,7 @@
     .line > i::after{
       content:"";
       position:absolute; inset:0;
-      background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.32), rgba(255,255,255,0));
+      background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.20), rgba(255,255,255,0));
       transform:translateX(-55%);
       animation: shine 1.65s linear infinite;
       opacity:.90;
@@ -479,38 +287,15 @@
     @keyframes shine{ to{ transform:translateX(55%);} }
     .line.filled > i{ width:100%; }
 
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .line{
-        background:rgba(255,255,255,.06);
-        border:1px solid rgba(255,255,255,.10);
-        box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
-      }
-    }
-    html[data-theme="dark"] .line{
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
-    }
-
     /* ===== Step sheet ===== */
     .sec{ padding:16px; }
     .sheet{
-      border:1px solid rgba(15,20,35,.10);
-      background:linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.42));
-      border-radius:22px;
-      overflow:hidden;
-      box-shadow:0 12px 34px rgba(12,18,40,.10);
-      position:relative;
-    }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .sheet{
-        border:1px solid rgba(255,255,255,.12);
-        background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.035));
-      }
-    }
-    html[data-theme="dark"] .sheet{
       border:1px solid rgba(255,255,255,.12);
       background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.035));
+      border-radius:22px;
+      overflow:hidden;
+      box-shadow:0 12px 34px rgba(0,0,0,.28);
+      position:relative;
     }
 
     .sheetTop{
@@ -523,23 +308,13 @@
     .badge{
       width:34px;height:34px;border-radius:999px;
       display:flex;align-items:center;justify-content:center;
-      background:rgba(255,255,255,.60);
-      border:1px solid rgba(15,20,35,.10);
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
       color:var(--text);
       font-weight:950;
       font-size:13px;
-      box-shadow:0 12px 26px rgba(12,18,40,.10);
+      box-shadow:0 12px 26px rgba(0,0,0,.26);
       flex:0 0 auto;
-    }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .badge{
-        background:rgba(255,255,255,.06);
-        border:1px solid rgba(255,255,255,.12);
-      }
-    }
-    html[data-theme="dark"] .badge{
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.12);
     }
 
     .stepTitle{ margin:0; font-size:18px; font-weight:950; letter-spacing:-.02em; line-height:1.15; }
@@ -572,8 +347,8 @@
       padding:14px 44px 14px 14px;
       font-size:16px;
       border-radius:16px;
-      border:1px solid rgba(15,20,35,.12);
-      background:rgba(255,255,255,.76);
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
       color:var(--text);
       outline:none;
       -webkit-appearance:none;
@@ -583,32 +358,14 @@
     input:focus, select:focus{
       border-color:rgba(10,132,255,.45);
       box-shadow:0 0 0 8px var(--focusRing);
-      background:rgba(255,255,255,.86);
-    }
-    input::placeholder{ color:rgba(10,12,22,.30); }
-
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) input,
-      html:not([data-theme]) select{
-        border:1px solid rgba(255,255,255,.14);
-        background:rgba(255,255,255,.06);
-      }
-      html:not([data-theme]) input:focus,
-      html:not([data-theme]) select:focus{
-        background:rgba(255,255,255,.08);
-      }
-      html:not([data-theme]) input::placeholder{ color:rgba(255,255,255,.28); }
-    }
-    html[data-theme="dark"] input,
-    html[data-theme="dark"] select{
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);
-    }
-    html[data-theme="dark"] input:focus,
-    html[data-theme="dark"] select:focus{
       background:rgba(255,255,255,.08);
     }
-    html[data-theme="dark"] input::placeholder{ color:rgba(255,255,255,.28); }
+    input::placeholder{ color:rgba(255,255,255,.28); }
+
+    /* ✅ Date "Apple" : input type="date" natif iOS (roulette) */
+    input[type="date"]{
+      padding-right:14px; /* pas d'icône custom */
+    }
 
     .chev{
       position:absolute; right:14px; top:50%;
@@ -646,8 +403,8 @@
       width:24px;height:24px;
       border-radius:999px;
       display:flex;align-items:center;justify-content:center;
-      border:1px solid rgba(15,20,35,.12);
-      background:rgba(255,255,255,.72);
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
       color:var(--text);
       font-size:14px;
       opacity:0;
@@ -660,18 +417,7 @@
       border-color:rgba(52,199,89,.40);
       box-shadow:0 0 0 8px var(--okRing);
     }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .check{
-        border:1px solid rgba(255,255,255,.14);
-        background:rgba(255,255,255,.06);
-      }
-    }
-    html[data-theme="dark"] .check{
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);
-    }
 
-    /* ✅ Affichage-only transforms (no iOS input rewrite) */
     .tf-upper{ text-transform: uppercase; }
     .tf-cap{ text-transform: capitalize; }
 
@@ -679,59 +425,33 @@
     .qrBox{
       padding:14px 16px 18px;
       border-top:1px solid var(--strokeSoft);
-      background:rgba(255,255,255,.34);
+      background:rgba(255,255,255,.03);
       text-align:center;
     }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .qrBox{ background:rgba(255,255,255,.03); }
-    }
-    html[data-theme="dark"] .qrBox{ background:rgba(255,255,255,.03); }
 
     .tip{
       margin:0 0 10px;
       padding:10px 12px;
       border-radius:16px;
-      border:1px solid rgba(15,20,35,.10);
-      background:rgba(255,255,255,.55);
-      color:rgba(10,12,22,.78);
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:rgba(255,255,255,.74);
       font-size:13px;
       line-height:1.35;
     }
     .tip b{ color:var(--text); }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .tip{
-        border:1px solid rgba(255,255,255,.12);
-        background:rgba(255,255,255,.06);
-        color:rgba(255,255,255,.74);
-      }
-    }
-    html[data-theme="dark"] .tip{
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.06);
-      color:rgba(255,255,255,.74);
-    }
 
     .qrFrame{
       margin:6px auto 0;
       width:min(240px,74%);
       aspect-ratio:1/1;
       border-radius:22px;
-      border:1px solid rgba(15,20,35,.10);
-      background:rgba(255,255,255,.52);
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
       display:flex;align-items:center;justify-content:center;
       overflow:hidden;
       position:relative;
       isolation:isolate;
-    }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .qrFrame{
-        border:1px solid rgba(255,255,255,.12);
-        background:rgba(255,255,255,.05);
-      }
-    }
-    html[data-theme="dark"] .qrFrame{
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.05);
     }
 
     #qr{
@@ -740,7 +460,7 @@
       display:none;
       opacity:0;
       transform:scale(.84);
-      filter:drop-shadow(0 14px 30px rgba(12,18,40,.18));
+      filter:drop-shadow(0 14px 30px rgba(0,0,0,.55));
       z-index:2;
     }
     #qr.reveal{
@@ -765,7 +485,7 @@
       position:absolute;
       font-size:20px;
       opacity:.92;
-      filter:drop-shadow(0 10px 18px rgba(12,18,40,.16));
+      filter:drop-shadow(0 10px 18px rgba(0,0,0,.50));
       animation: floaty .72s ease forwards;
     }
     .spark:before{ left:14px; top:14px; }
@@ -782,24 +502,12 @@
       padding:10px 12px;
       border-radius:14px;
       text-align:left;
-      border:1px dashed rgba(15,20,35,.16);
-      background:rgba(255,255,255,.52);
-      word-break:break-word;
-      font-size:13px;
-      color:var(--ink);
-      display:none;
-    }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .payload{
-        border:1px dashed rgba(255,255,255,.16);
-        background:rgba(255,255,255,.05);
-        color:rgba(255,255,255,.84);
-      }
-    }
-    html[data-theme="dark"] .payload{
       border:1px dashed rgba(255,255,255,.16);
       background:rgba(255,255,255,.05);
+      word-break:break-word;
+      font-size:13px;
       color:rgba(255,255,255,.84);
+      display:none;
     }
 
     /* ===== Sticky CTA ===== */
@@ -816,9 +524,9 @@
     .ctaGlass{
       width:min(720px, calc(100% - 28px));
       border-radius:22px;
-      border:1px solid rgba(15,20,35,.10);
-      background:rgba(255,255,255,.64);
-      box-shadow:0 18px 70px rgba(12,18,40,.16);
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(20,22,34,.62);
+      box-shadow:0 18px 70px rgba(0,0,0,.45);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
       padding:10px;
@@ -828,14 +536,14 @@
       width:100%;
       padding:14px 14px;
       border-radius:18px;
-      border:1px solid rgba(15,20,35,.10);
+      border:1px solid rgba(255,255,255,.12);
       color:var(--text);
       font-weight:950;
       font-size:16px;
       letter-spacing:-.01em;
       cursor:pointer;
-      background:linear-gradient(180deg, rgba(10,132,255,.18), rgba(255,255,255,.55));
-      box-shadow:0 14px 40px rgba(10,132,255,.10);
+      background:linear-gradient(180deg, rgba(10,132,255,.22), rgba(255,255,255,.06));
+      box-shadow:0 14px 40px rgba(10,132,255,.12);
       position:relative;
       overflow:hidden;
       transition:transform .08s ease, opacity .16s ease;
@@ -845,34 +553,13 @@
     .ctaBtn::after{
       content:"";
       position:absolute; inset:0;
-      background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.32), rgba(255,255,255,0));
+      background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.18), rgba(255,255,255,0));
       transform:translateX(-60%);
       animation: btnshine 2.1s linear infinite;
       pointer-events:none;
       opacity:.95;
     }
     @keyframes btnshine{ to{ transform:translateX(60%);} }
-
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .ctaGlass{
-        border:1px solid rgba(255,255,255,.12);
-        background:rgba(20,22,34,.62);
-      }
-      html:not([data-theme]) .ctaBtn{
-        border:1px solid rgba(255,255,255,.12);
-        background:linear-gradient(180deg, rgba(10,132,255,.22), rgba(255,255,255,.06));
-        box-shadow:0 14px 40px rgba(10,132,255,.12);
-      }
-    }
-    html[data-theme="dark"] .ctaGlass{
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(20,22,34,.62);
-    }
-    html[data-theme="dark"] .ctaBtn{
-      border:1px solid rgba(255,255,255,.12);
-      background:linear-gradient(180deg, rgba(10,132,255,.22), rgba(255,255,255,.06));
-      box-shadow:0 14px 40px rgba(10,132,255,.12);
-    }
 
     /* ===== Toast ===== */
     .toast{
@@ -882,8 +569,8 @@
       transform:translateX(-50%) translateY(-8px);
       padding:10px 12px;
       border-radius:999px;
-      border:1px solid rgba(15,20,35,.10);
-      background:rgba(255,255,255,.72);
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(20,22,34,.62);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       color:var(--text);
@@ -897,193 +584,10 @@
       z-index:10000;
     }
     .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .toast{
-        border:1px solid rgba(255,255,255,.12);
-        background:rgba(20,22,34,.62);
-      }
-    }
-    html[data-theme="dark"] .toast{
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(20,22,34,.62);
-    }
-
-    /* ===== iOS Action Sheet ===== */
-    .overlay{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.28);
-      opacity:0;
-      pointer-events:none;
-      transition:opacity .18s ease;
-      z-index:10001;
-    }
-    .overlay.show{ opacity:1; pointer-events:auto; }
-
-    .sheetModal{
-      position:absolute;
-      left:0; right:0; bottom:0;
-      padding: 10px 10px calc(10px + env(safe-area-inset-bottom)) 10px;
-      transform:translateY(14px);
-      transition:transform .22s cubic-bezier(.2,.9,.2,1);
-      will-change: transform;
-    }
-    .overlay.show .sheetModal{ transform:translateY(0); }
-
-    .sheetCard{
-      border-radius:20px;
-      border:1px solid rgba(15,20,35,.10);
-      background:rgba(255,255,255,.78);
-      backdrop-filter: blur(26px);
-      -webkit-backdrop-filter: blur(26px);
-      box-shadow:0 30px 90px rgba(0,0,0,.22);
-      overflow:hidden;
-      will-change: transform;
-      touch-action: pan-y;
-    }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .sheetCard{
-        border:1px solid rgba(255,255,255,.12);
-        background:rgba(20,22,34,.76);
-        box-shadow:0 30px 90px rgba(0,0,0,.55);
-      }
-    }
-    html[data-theme="dark"] .sheetCard{
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(20,22,34,.76);
-      box-shadow:0 30px 90px rgba(0,0,0,.55);
-    }
-
-    .sheetHandle{
-      width:44px;
-      height:5px;
-      border-radius:99px;
-      margin:10px auto 6px;
-      background:rgba(10,12,22,.18);
-    }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .sheetHandle{ background:rgba(255,255,255,.20); }
-    }
-    html[data-theme="dark"] .sheetHandle{ background:rgba(255,255,255,.20); }
-
-    .sheetTitle{
-      padding: 8px 16px 10px;
-      text-align:center;
-      font-weight:950;
-      letter-spacing:-.02em;
-      font-size:13px;
-      color:var(--muted);
-    }
-
-    .sheetRow{
-      width:100%;
-      border:0;
-      background:transparent;
-      color:var(--text);
-      padding: 14px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      font-size:16px;
-      font-weight:900;
-      letter-spacing:-.01em;
-      cursor:pointer;
-      transition: background .15s ease, transform .08s ease;
-    }
-    .sheetRow:active{
-      transform: scale(.992);
-      background: rgba(10,132,255,.08);
-    }
-    .sheetRow + .sheetRow{ border-top:1px solid rgba(15,20,35,.08); }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .sheetRow + .sheetRow{ border-top:1px solid rgba(255,255,255,.08); }
-      html:not([data-theme]) .sheetRow:active{ background: rgba(10,132,255,.12); }
-    }
-    html[data-theme="dark"] .sheetRow + .sheetRow{ border-top:1px solid rgba(255,255,255,.08); }
-    html[data-theme="dark"] .sheetRow:active{ background: rgba(10,132,255,.12); }
-
-    .rowLeft{ display:flex; align-items:center; gap:10px; min-width:0; }
-    .rowIcon{
-      width:28px;height:28px;
-      border-radius:10px;
-      border:1px solid rgba(15,20,35,.10);
-      background:rgba(255,255,255,.56);
-      display:flex;align-items:center;justify-content:center;
-      box-shadow:0 10px 22px rgba(0,0,0,.08);
-      flex:0 0 auto;
-      color:var(--text);
-    }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .rowIcon{
-        border:1px solid rgba(255,255,255,.12);
-        background:rgba(255,255,255,.06);
-        box-shadow:0 10px 22px rgba(0,0,0,.30);
-      }
-    }
-    html[data-theme="dark"] .rowIcon{
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.06);
-      box-shadow:0 10px 22px rgba(0,0,0,.30);
-    }
-
-    .rowIcon .sf{ width:16px; height:16px; }
-    .rowText{ min-width:0; }
-    .rowText small{
-      display:block;
-      margin-top:3px;
-      font-size:12px;
-      font-weight:850;
-      color:var(--muted);
-      line-height:1.2;
-    }
-
-    .checkMark{
-      width:22px;height:22px;
-      border-radius:999px;
-      display:flex;align-items:center;justify-content:center;
-      opacity:0;
-      transform:scale(.92);
-      transition:opacity .16s ease, transform .16s ease;
-      color:var(--blue);
-      flex:0 0 auto;
-    }
-    .sheetRow[aria-checked="true"] .checkMark{ opacity:1; transform:scale(1); }
-
-    .sheetCancel{
-      width:100%;
-      margin-top:10px;
-      border-radius:20px;
-      border:1px solid rgba(15,20,35,.10);
-      background:rgba(255,255,255,.78);
-      backdrop-filter: blur(26px);
-      -webkit-backdrop-filter: blur(26px);
-      box-shadow:0 30px 90px rgba(0,0,0,.18);
-      padding:14px 16px;
-      font-size:16px;
-      font-weight:950;
-      color:rgba(255,69,69,.95);
-      cursor:pointer;
-      transition: transform .08s ease;
-    }
-    .sheetCancel:active{ transform:scale(.992); }
-    @media (prefers-color-scheme: dark){
-      html:not([data-theme]) .sheetCancel{
-        border:1px solid rgba(255,255,255,.12);
-        background:rgba(20,22,34,.76);
-        box-shadow:0 30px 90px rgba(0,0,0,.45);
-      }
-    }
-    html[data-theme="dark"] .sheetCancel{
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(20,22,34,.76);
-      box-shadow:0 30px 90px rgba(0,0,0,.45);
-    }
 
     @media (prefers-reduced-motion: reduce){
       *{ animation:none !important; transition:none !important; }
       .progressWrap::after{ display:none; }
-      .themeFlash{ display:none; }
     }
   </style>
 </head>
@@ -1120,15 +624,6 @@
 
             <div class="node" data-i="4"><div class="dot"></div></div>
           </div>
-
-          <button class="themeMini" id="themeBtn" aria-label="Apparence">
-            <span class="themeIcon" id="themeIcon" aria-hidden="true"></span>
-            <span class="miniTick" id="miniTick" aria-hidden="true">
-              <svg viewBox="0 0 20 20" aria-hidden="true">
-                <path d="M16.7 5.8a1 1 0 0 1 0 1.4l-7.2 7.2a1 1 0 0 1-1.4 0L3.3 9.6a1 1 0 1 1 1.4-1.4l3 3 6.5-6.5a1 1 0 0 1 1.5.1Z"/>
-              </svg>
-            </span>
-          </button>
         </div>
       </div>
 
@@ -1173,60 +668,11 @@
     </div>
   </div>
 
-  <div class="themeFlash" id="themeFlash" aria-hidden="true"></div>
   <div class="toast" id="toast" aria-live="polite"></div>
-
-  <div class="overlay" id="themeOverlay" aria-hidden="true">
-    <div class="sheetModal" role="dialog" aria-modal="true" aria-label="Apparence">
-      <div class="sheetCard" id="themeCard">
-        <div class="sheetHandle"></div>
-        <div class="sheetTitle">APPARENCE</div>
-
-        <button class="sheetRow" type="button" data-theme="auto" role="radio" aria-checked="true">
-          <span class="rowLeft">
-            <span class="rowIcon" id="rowIconAuto" aria-hidden="true"></span>
-            <span class="rowText">Automatique<small>Suit iOS (clair/sombre)</small></span>
-          </span>
-          <span class="checkMark" aria-hidden="true">
-            <svg viewBox="0 0 20 20" width="18" height="18" fill="none">
-              <path d="M16.7 5.8a1 1 0 0 1 0 1.4l-7.2 7.2a1 1 0 0 1-1.4 0L3.3 9.6a1 1 0 1 1 1.4-1.4l3 3 6.5-6.5a1 1 0 0 1 1.5.1Z" fill="currentColor"/>
-            </svg>
-          </span>
-        </button>
-
-        <button class="sheetRow" type="button" data-theme="light" role="radio" aria-checked="false">
-          <span class="rowLeft">
-            <span class="rowIcon" id="rowIconLight" aria-hidden="true"></span>
-            <span class="rowText">Clair<small>Daylight glass</small></span>
-          </span>
-          <span class="checkMark" aria-hidden="true">
-            <svg viewBox="0 0 20 20" width="18" height="18" fill="none">
-              <path d="M16.7 5.8a1 1 0 0 1 0 1.4l-7.2 7.2a1 1 0 0 1-1.4 0L3.3 9.6a1 1 0 1 1 1.4-1.4l3 3 6.5-6.5a1 1 0 0 1 1.5.1Z" fill="currentColor"/>
-            </svg>
-          </span>
-        </button>
-
-        <button class="sheetRow" type="button" data-theme="dark" role="radio" aria-checked="false">
-          <span class="rowLeft">
-            <span class="rowIcon" id="rowIconDark" aria-hidden="true"></span>
-            <span class="rowText">Sombre<small>Midnight glass</small></span>
-          </span>
-          <span class="checkMark" aria-hidden="true">
-            <svg viewBox="0 0 20 20" width="18" height="18" fill="none">
-              <path d="M16.7 5.8a1 1 0 0 1 0 1.4l-7.2 7.2a1 1 0 0 1-1.4 0L3.3 9.6a1 1 0 1 1 1.4-1.4l3 3 6.5-6.5a1 1 0 0 1 1.5.1Z" fill="currentColor"/>
-            </svg>
-          </span>
-        </button>
-      </div>
-
-      <button class="sheetCancel" id="themeCancel" type="button">Annuler</button>
-    </div>
-  </div>
 
   <script>
     class ClubsProvider {
       static list() {
-        // ✅ Tri croissant (FR), sans doublons, stable
         const arr = ["Beaumont-sur-oise",
           "CSM Eaubonne",
           "Noailles",
@@ -1282,14 +728,6 @@
       static light(){ try{ navigator.vibrate?.(10); }catch(e){} }
       static success(){ try{ navigator.vibrate?.([12, 18, 12]); }catch(e){} }
       static error(){ try{ navigator.vibrate?.([20, 30, 20]); }catch(e){} }
-      static theme(mode){
-        try{
-          if (!navigator.vibrate) return;
-          if (mode === "light") navigator.vibrate([8, 10, 8]);
-          else if (mode === "dark") navigator.vibrate([14, 18, 14]);
-          else navigator.vibrate([6, 10, 6, 10, 6]);
-        }catch(e){}
-      }
     }
 
     class SoundService {
@@ -1349,158 +787,6 @@
       }
     }
 
-    class ThemeIcons {
-      static sun(){
-        return `
-          <svg class="sf" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 8.3a3.7 3.7 0 1 0 0 7.4 3.7 3.7 0 0 0 0-7.4Z"></path>
-            <path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"></path>
-          </svg>`;
-      }
-      static moon(){
-        return `
-          <svg class="sf" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M20.5 14.9A7.7 7.7 0 0 1 9.1 3.5a6.8 6.8 0 1 0 11.4 11.4Z"></path>
-          </svg>`;
-      }
-      static auto(){
-        return `
-          <svg class="sf" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 20.5a8.5 8.5 0 1 1 0-17 8.5 8.5 0 0 1 0 17Z"></path>
-            <path d="M12 3.5v17"></path>
-          </svg>`;
-      }
-    }
-
-    class ThemeManager {
-      static KEY = "qrjudoka_theme"; // "auto" | "light" | "dark"
-
-      static init({ iconEl, overlayEl, sheetCardEl, cancelEl, flashEl }) {
-        this.iconEl = iconEl;
-        this.overlayEl = overlayEl;
-        this.sheetCardEl = sheetCardEl;
-        this.cancelEl = cancelEl;
-        this.flashEl = flashEl;
-        this.rows = [...overlayEl.querySelectorAll(".sheetRow[data-theme]")];
-        this.mq = window.matchMedia?.("(prefers-color-scheme: dark)");
-
-        document.getElementById("rowIconAuto").innerHTML  = ThemeIcons.auto();
-        document.getElementById("rowIconLight").innerHTML = ThemeIcons.sun();
-        document.getElementById("rowIconDark").innerHTML  = ThemeIcons.moon();
-
-        const saved = localStorage.getItem(this.KEY) || "auto";
-        this.apply(saved, false);
-
-        this.overlayEl.addEventListener("click", (e) => {
-          if (e.target === this.overlayEl) this.closeSheet();
-        });
-        this.cancelEl.addEventListener("click", () => this.closeSheet());
-
-        this.rows.forEach(r => {
-          r.addEventListener("click", () => {
-            const mode = r.dataset.theme;
-            this.apply(mode, true);
-            this.closeSheet();
-          });
-        });
-
-        window.addEventListener("keydown", (e) => {
-          if (e.key === "Escape" && this.isOpen()) this.closeSheet();
-        });
-
-        const onSystemChange = () => { if (this.mode === "auto") this.refreshIcon(); };
-        if (this.mq && this.mq.addEventListener) this.mq.addEventListener("change", onSystemChange);
-        else if (this.mq && this.mq.addListener) this.mq.addListener(onSystemChange);
-
-        this.bindSwipeDismiss();
-      }
-
-      static isSystemDark(){ return !!(this.mq && this.mq.matches); }
-
-      static flash(targetMode){
-        if (!this.flashEl) return;
-        const isDarkTarget = (targetMode === "dark") || (targetMode === "auto" && this.isSystemDark());
-        this.flashEl.classList.remove("light","dark","on");
-        this.flashEl.classList.add(isDarkTarget ? "dark" : "light");
-        void this.flashEl.offsetWidth;
-        this.flashEl.classList.add("on");
-        clearTimeout(this._flashT);
-        this._flashT = setTimeout(() => this.flashEl.classList.remove("on"), 230);
-      }
-
-      static openSheet(){
-        this.overlayEl.classList.add("show");
-        this.overlayEl.setAttribute("aria-hidden","false");
-        this.syncRows();
-        Haptics.light();
-      }
-      static closeSheet(){
-        this.overlayEl.classList.remove("show");
-        this.overlayEl.setAttribute("aria-hidden","true");
-        this.sheetCardEl.style.transform = "translateY(0)";
-      }
-      static isOpen(){ return this.overlayEl.classList.contains("show"); }
-
-      static apply(mode, toast){
-        this.mode = mode;
-        this.flash(mode);
-
-        const html = document.documentElement;
-        if (mode === "auto") html.removeAttribute("data-theme");
-        else html.setAttribute("data-theme", mode);
-
-        try{ localStorage.setItem(this.KEY, mode); }catch(e){}
-        this.refreshIcon();
-        this.syncRows();
-
-        Haptics.theme(mode);
-        if (toast) Toast.show(mode === "auto" ? "Auto" : (mode === "light" ? "Clair" : "Sombre"));
-      }
-
-      static syncRows(){
-        this.rows.forEach(r => r.setAttribute("aria-checked", String(r.dataset.theme === this.mode)));
-      }
-
-      static refreshIcon(){
-        this.iconEl.innerHTML =
-          this.mode === "auto" ? ThemeIcons.auto() :
-          this.mode === "light" ? ThemeIcons.sun() :
-          ThemeIcons.moon();
-      }
-
-      static bindSwipeDismiss(){
-        let startY=0, curY=0, dragging=false;
-
-        const onStart = (e) => {
-          if (!this.isOpen()) return;
-          const t = e.touches ? e.touches[0] : e;
-          startY = t.clientY;
-          curY = 0;
-          dragging = true;
-        };
-
-        const onMove = (e) => {
-          if (!dragging) return;
-          const t = e.touches ? e.touches[0] : e;
-          const dy = Math.max(0, t.clientY - startY);
-          curY = dy;
-          this.sheetCardEl.style.transform = `translateY(${dy}px)`;
-          if (dy > 0) e.preventDefault?.();
-        };
-
-        const onEnd = () => {
-          if (!dragging) return;
-          dragging = false;
-          if (curY > 90) this.closeSheet();
-          else this.sheetCardEl.style.transform = "translateY(0)";
-        };
-
-        this.sheetCardEl.addEventListener("touchstart", onStart, { passive:true });
-        this.sheetCardEl.addEventListener("touchmove", onMove, { passive:false });
-        this.sheetCardEl.addEventListener("touchend", onEnd, { passive:true });
-      }
-    }
-
     class App {
       constructor() {
         this.progressWrap = document.getElementById("progressWrap");
@@ -1522,9 +808,7 @@
         this.payloadBox = document.getElementById("payload");
         this.spark = document.getElementById("spark");
 
-        this.themeBtn = document.getElementById("themeBtn");
-
-        // ✅ ajout de naissance
+        // ✅ naissance ajoutée (stockée en FR: JJ/MM/AAAA)
         this.state = { nom:"", prenom:"", club:"", sexe:"", naissance:"" };
         this.current = 0;
         this.playedSound = false;
@@ -1547,9 +831,9 @@
             render: () => this.renderSelect("sexe","— Sélectionne —", ["Masculin","Féminin"]),
             normalize: v => String(v||"").trim() },
 
-          // ✅ NOUVELLE ETAPE : date JJ/MM/AAAA
-          { key:"naissance", title:"Date de naissance", sub:"Format : JJ/MM/AAAA",
-            render: () => this.renderBirthDate("naissance","07/09/2014","bday"),
+          // ✅ Date en mode "Apple" : input type="date" natif iOS
+          { key:"naissance", title:"Date de naissance", sub:"Sélectionne la date (style iOS).",
+            render: () => this.renderBirthDateApple("naissance","bday"),
             normalize: v => this.normalizeBirth(v) },
         ];
       }
@@ -1557,17 +841,6 @@
       init() {
         SoundService.warmupVoices();
         Toast.init(document.getElementById("toast"));
-
-        ThemeManager.init({
-          iconEl: document.getElementById("themeIcon"),
-          overlayEl: document.getElementById("themeOverlay"),
-          sheetCardEl: document.getElementById("themeCard"),
-          cancelEl: document.getElementById("themeCancel"),
-          flashEl: document.getElementById("themeFlash"),
-        });
-        ThemeManager.refreshIcon();
-
-        this.themeBtn.addEventListener("click", () => ThemeManager.openSheet());
 
         this.backMini.addEventListener("click", () => this.prev());
         this.ctaBtn.addEventListener("click", () => this.next());
@@ -1656,48 +929,48 @@
         input.value = this.state[key] || "";
 
         const onInput = () => {
-          // IMPORTANT: ne pas modifier input.value ici (iOS)
           this.state[key] = input.value;
-
           const ok = this.isFilled(input.value);
           input.classList.toggle("is-ok", ok);
           check.classList.toggle("show", ok);
-
           input.classList.remove("invalid");
           this.refresh();
         };
 
         input.addEventListener("input", onInput);
         onInput();
-
         setTimeout(() => { try{ input.focus({preventScroll:true}); }catch(e){ input.focus(); } }, 80);
       }
 
-      // ✅ Champ date : masque live JJ/MM/AAAA sans casser iOS (on n'écrit pas pendant input)
-      renderBirthDate(key, placeholder, autocomplete) {
+      // ✅ Date "Apple" : on stocke en FR (JJ/MM/AAAA), mais le champ utilise ISO (YYYY-MM-DD)
+      renderBirthDateApple(key, autocomplete) {
         this.stage.innerHTML = `
           <div class="field">
             <input id="field"
-                   placeholder="${this.esc(placeholder)}"
+                   type="date"
                    autocomplete="${this.esc(autocomplete)}"
-                   inputmode="numeric"
-                   autocapitalize="none"
+                   inputmode="none"
                    spellcheck="false"
             />
             <div class="check" id="check">✓</div>
           </div>
         `;
+
         const input = document.getElementById("field");
         const check = document.getElementById("check");
         this.currentFieldEl = input;
 
-        input.value = this.state[key] || "";
+        // restore si déjà saisi (state = JJ/MM/AAAA)
+        const fr = this.state[key] || "";
+        input.value = this.frToIso(fr) || "";
 
-        const onInput = () => {
-          // ⚠️ iOS-safe: on ne force pas input.value ici
-          this.state[key] = input.value;
+        const onChange = () => {
+          // input.value = ISO (YYYY-MM-DD) ou ""
+          const iso = String(input.value || "").trim();
+          const frVal = this.isoToFr(iso); // => JJ/MM/AAAA ou ""
+          this.state[key] = frVal;
 
-          const ok = this.isBirthOk(input.value);
+          const ok = this.isBirthOk(frVal);
           input.classList.toggle("is-ok", ok);
           check.classList.toggle("show", ok);
 
@@ -1705,18 +978,9 @@
           this.refresh();
         };
 
-        // Petit confort: sur "blur", on formate (là c'est safe)
-        input.addEventListener("blur", () => {
-          const norm = this.normalizeBirth(input.value);
-          if (norm) {
-            input.value = norm;
-            this.state[key] = norm;
-          }
-          onInput();
-        });
-
-        input.addEventListener("input", onInput);
-        onInput();
+        input.addEventListener("change", onChange);
+        input.addEventListener("input", onChange); // certains navigateurs déclenchent input
+        onChange();
 
         setTimeout(() => { try{ input.focus({preventScroll:true}); }catch(e){ input.focus(); } }, 80);
       }
@@ -1759,7 +1023,6 @@
         setTimeout(() => { try{ select.focus({preventScroll:true}); }catch(e){ select.focus(); } }, 80);
       }
 
-      // ✅ Validation date JJ/MM/AAAA (simple + réaliste)
       isBirthOk(v){
         const s = String(v||"").trim();
         if (!s) return false;
@@ -1774,19 +1037,30 @@
         return true;
       }
 
-      // ✅ Normalisation: garde uniquement JJ/MM/AAAA si valide, sinon "" (bloque le step)
       normalizeBirth(v){
+        // ici v est déjà en JJ/MM/AAAA (converti depuis l'ISO), sinon ""
         const s = String(v||"").trim();
-        // Autorise saisie "07092014" => "07/09/2014"
-        const digits = s.replace(/\D/g, "");
-        let cand = s;
+        return this.isBirthOk(s) ? s : "";
+      }
 
-        if (digits.length === 8) {
-          cand = `${digits.slice(0,2)}/${digits.slice(2,4)}/${digits.slice(4,8)}`;
-        }
-        // Si déjà "J/M/AAAA" on ne corrige pas ici (tu peux étendre si tu veux)
-        if (this.isBirthOk(cand)) return cand;
-        return "";
+      // ISO YYYY-MM-DD -> FR JJ/MM/AAAA
+      isoToFr(iso){
+        const s = String(iso||"").trim();
+        const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (!m) return "";
+        const yy = m[1], mm = m[2], dd = m[3];
+        const fr = `${dd}/${mm}/${yy}`;
+        return this.isBirthOk(fr) ? fr : "";
+      }
+
+      // FR JJ/MM/AAAA -> ISO YYYY-MM-DD
+      frToIso(fr){
+        const s = String(fr||"").trim();
+        const m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        if (!m) return "";
+        const dd = m[1], mm = m[2], yy = m[3];
+        const iso = `${yy}-${mm}-${dd}`;
+        return this.isBirthOk(s) ? iso : "";
       }
 
       next() {
@@ -1877,7 +1151,6 @@
       isStepOk(i) {
         const key = this.steps[i].key;
         const v = this.state[key];
-
         if (key === "naissance") return this.isBirthOk(v);
         return this.isFilled(v);
       }
@@ -1913,7 +1186,7 @@
         const p = norm("prenom");
         const c = norm("club");
         const s = norm("sexe");
-        const d = norm("naissance"); // ✅ AJOUT
+        const d = norm("naissance"); // JJ/MM/AAAA ✅
 
         return `${n};${p};${c};${s};${d};`;
       }
