@@ -1165,7 +1165,7 @@
 
         this.backMini.disabled = (this.current === 0);
         this.ctaBtn.disabled = !ok;
-        this.ctaBtn.textContent = (this.current === this.steps.length - 1) ? "Terminer" : "Continuer";
+        this.ctaBtn.textContent = (this.current === this.steps.length - 1) ? "Créer QR code" : "Continuer";
 
         this.nodes.forEach((node, i) => {
           node.classList.toggle("active", i === this.current);
